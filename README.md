@@ -61,4 +61,13 @@
       </picture>
     </a></td>
   </tr>
+  <tr>
+    <td colspan="6" align="center">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ryanlau1220/ryanlau1220/output/github-contribution-grid-snake-dark.svg" />
+        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ryanlau1220/ryanlau1220/output/github-contribution-grid-snake.svg" />
+        <img alt="snake animation" src="https://raw.githubusercontent.com/ryanlau1220/ryanlau1220/output/github-contribution-grid-snake.svg" width="100%" />
+      </picture>
+    </td>
+  </tr>
 </table>
