@@ -1,6 +1,7 @@
 import * as d3Force from 'd3-force';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Network, RefreshCw, ZoomIn, ZoomOut, Maximize, List } from 'lucide-react';
+import { PROJECTS } from '../data/registry';
 
 interface D3Node extends d3Force.SimulationNodeDatum {
   id: string;
@@ -17,9 +18,10 @@ interface D3Link extends d3Force.SimulationLinkDatum<D3Node> {
 interface SkillsGraphProps {
   selectedSkill: string | null;
   onSelectSkill: (skill: string | null) => void;
+  onRouteToProject?: (projectId: string) => void;
 }
 
-export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) {
+export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: SkillsGraphProps) {
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph');
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -259,12 +261,30 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
   // Helper to find the currently hovered node object
   const hoveredNode = useMemo(() => {
     if (!hoveredNodeId) return null;
-    return nodes.find(n => n.id === hoveredNodeId);
+    return nodes.find(n => n.id === hoveredNodeId) || { id: hoveredNodeId, name: hoveredNodeId, type: 'technology' as const, linkCount: 0 };
   }, [hoveredNodeId, nodes]);
+
+  // Helper to find the currently selected node object
+  const selectedNode = useMemo(() => {
+    if (!selectedSkill) return null;
+    return nodes.find(n => n.id === selectedSkill) || { id: selectedSkill, name: selectedSkill, type: 'technology' as const, linkCount: 0 };
+  }, [selectedSkill, nodes]);
+
+  const activeDetailNode = hoveredNode || selectedNode;
+
+  // Find linked projects
+  const activeProjects = useMemo(() => {
+    if (!activeDetailNode) return [];
+    if (activeDetailNode.type === 'domain') {
+      return PROJECTS.filter(p => p.domains.includes(activeDetailNode.id));
+    } else {
+      return PROJECTS.filter(p => p.technologies.includes(activeDetailNode.id));
+    }
+  }, [activeDetailNode]);
 
   // Helper to retrieve technologies under the hovered domain
   const hoveredDomainTechs = useMemo(() => {
-    if (!hoveredNode || hoveredNode.type !== 'domain') return [];
+    if (!activeDetailNode || activeDetailNode.type !== 'domain') return [];
     const categories = {
       'Programming Languages': ['TypeScript', 'Golang', 'Dart', 'Python', 'Java', 'R', 'Solidity'],
       'Backend': ['NodeJS', 'HonoJS', 'Keycloak', 'Drizzle ORM'],
@@ -275,15 +295,26 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
       'AI & Intelligence': ['Ollama', 'Gemini', 'OpenCV', 'LangChain'],
       'Quality & Testing': ['Vitest', 'Testing Library', 'Postman']
     };
-    return categories[hoveredNode.name as keyof typeof categories] || [];
-  }, [hoveredNode]);
+    return categories[activeDetailNode.name as keyof typeof categories] || [];
+  }, [activeDetailNode]);
 
   // Compute position coordinates for tooltip, preventing right/bottom clipping
   const tooltipStyle = useMemo(() => {
-    if (!hoveredNode || hoveredNode.type !== 'domain' || !containerRef.current) return {};
+    if (!activeDetailNode || !containerRef.current) return {};
 
-    const tooltipWidth = 280;
-    const tooltipHeight = 160; // Estimated height based on content
+    const tooltipWidth = 290;
+    // Estimate tooltip height dynamically based on contents to prevent clipping
+    const projectsCount = activeProjects.length;
+    let tooltipHeight = 110; // header height
+    if (activeDetailNode.type === 'domain') {
+      tooltipHeight += 50; // technologies listing height
+    }
+    if (projectsCount > 0) {
+      tooltipHeight += 25 + Math.min(4, projectsCount) * 24; // projects list height
+    } else {
+      tooltipHeight += 30; // "No projects" text height
+    }
+
     const rect = containerRef.current.getBoundingClientRect();
     
     let left = mousePos.x + 15;
@@ -308,7 +339,7 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
       top: `${top}px`,
       width: `${tooltipWidth}px`,
     };
-  }, [hoveredNode, mousePos]);
+  }, [activeDetailNode, activeProjects, mousePos]);
 
   const handleNodeDragStart = (e: React.MouseEvent, node: D3Node) => {
     e.stopPropagation();
@@ -396,9 +427,13 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
   }, []);
 
   return (
-    <div className="w-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden shadow-sm flex flex-col min-h-[500px]">
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="w-full relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl shadow-sm flex flex-col min-h-[500px]"
+    >
       {/* Control bar */}
-      <header className="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-3 justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
+      <header className="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-3 justify-between items-center bg-neutral-50 dark:bg-neutral-900/50 rounded-t-xl">
         <div className="flex items-center gap-2.5">
           <Network className="text-neutral-700 dark:text-neutral-300 animate-pulse" size={20} />
           <div>
@@ -452,12 +487,10 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
       </header>
 
       {/* Main graph viewport / list */}
-      <div className="flex-1 min-h-0 relative bg-neutral-50/50 dark:bg-neutral-950/20">
+      <div className="flex-1 min-h-0 relative bg-neutral-50/50 dark:bg-neutral-950/20 rounded-b-xl">
         {viewMode === 'graph' ? (
           <div
-            ref={containerRef}
             className="w-full h-[450px] sm:h-[500px] relative overflow-hidden select-none"
-            onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUpOrLeave}
             onMouseLeave={handleMouseUpOrLeave}
           >
@@ -518,33 +551,37 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
                             r={radius + 6}
                             fill="none"
                             stroke="#3b82f6"
-                            strokeWidth={2}
-                            strokeDasharray="4,2"
-                            className="animate-spin"
-                            style={{ transformOrigin: '0px 0px', animationDuration: '20s' }}
+                            strokeWidth={1.5}
+                            strokeDasharray="3 2"
+                            className="animate-[spin_20s_linear_infinite]"
                           />
                         )}
 
-                        {/* Node circle */}
+                        {/* Outer interactive circle */}
+                        <circle
+                          r={radius + 3}
+                          fill="transparent"
+                          className="group-hover:stroke-neutral-200 dark:group-hover:stroke-neutral-800 transition-colors duration-200"
+                          strokeWidth={1}
+                        />
+
+                        {/* Core circle */}
                         <circle
                           r={radius}
                           fill={node.type === 'domain' ? '#3b82f6' : '#22c55e'}
-                          stroke={isSelected ? '#ffffff' : 'transparent'}
-                          strokeWidth={2}
-                          opacity={isDimmed ? 0.15 : 1}
-                          className="transition-all duration-200 group-hover:scale-105 shadow-sm"
+                          fillOpacity={isDimmed ? 0.15 : isSelected ? 0.95 : 0.75}
+                          className="transition-all duration-300"
                         />
 
-                        {/* Label text */}
+                        {/* Core text label */}
                         <text
-                          dy=".35em"
-                          x={node.type === 'domain' ? 0 : radius + 6}
-                          textAnchor={node.type === 'domain' ? 'middle' : 'start'}
-                          fill={isSelected ? '#3b82f6' : '#171717'}
-                          fontSize={node.type === 'domain' ? '12px' : '9.5px'}
-                          fontWeight={node.type === 'domain' || isSelected ? 'bold' : 'normal'}
-                          className="pointer-events-none select-none dark:fill-neutral-300 font-mono"
-                          opacity={isDimmed ? 0.08 : isSelected || hoveredNodeId === node.id ? 1 : 0.8}
+                          dy=".31em"
+                          textAnchor="middle"
+                          fontSize={node.type === 'domain' ? '10px' : '8px'}
+                          fontWeight={node.type === 'domain' ? 'bold' : 'normal'}
+                          fill={isDimmed ? '#a3a3a3' : '#171717'}
+                          fillOpacity={isDimmed ? 0.25 : 0.9}
+                          className="select-none pointer-events-none dark:fill-white font-sans transition-all duration-300"
                         >
                           {node.name}
                         </text>
@@ -595,28 +632,6 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
                 <span>Technology</span>
               </div>
             </div>
-
-            {/* Hover Tooltip for Domain Nodes */}
-            {hoveredNode && hoveredNode.type === 'domain' && (
-              <div
-                style={tooltipStyle}
-                className="absolute z-30 pointer-events-none p-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md shadow-lg text-center font-sans space-y-2"
-              >
-                <div>
-                  <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                    {hoveredNode.name}
-                  </h4>
-                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono mt-0.5">
-                    Skill Domain
-                  </p>
-                </div>
-                <div className="border-t border-neutral-100 dark:border-neutral-900 my-2" />
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
-                  <span className="font-semibold text-neutral-700 dark:text-neutral-300">Technologies:</span>{' '}
-                  {hoveredDomainTechs.join(', ')}
-                </p>
-              </div>
-            )}
           </div>
         ) : (
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 select-text">
@@ -632,10 +647,12 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
                       <button
                         key={item}
                         type="button"
+                        onMouseEnter={() => setHoveredNodeId(item)}
+                        onMouseLeave={() => setHoveredNodeId(null)}
                         onClick={() => onSelectSkill(isSelected ? null : item)}
                         className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold'
+                            ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold animate-pulse'
                             : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
                         }`}
                       >
@@ -648,8 +665,75 @@ export function SkillsGraph({ selectedSkill, onSelectSkill }: SkillsGraphProps) 
             ))}
           </div>
         )}
+
+        {/* Interactive Details Tooltip for Domains & Technologies */}
+        {activeDetailNode && (
+          <div
+            style={tooltipStyle}
+            className="absolute z-30 pointer-events-auto p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md shadow-lg font-sans space-y-2.5 text-left select-text"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight">
+                  {activeDetailNode.name}
+                </h4>
+                {selectedSkill === activeDetailNode.id && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectSkill(null)}
+                    className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 hover:underline cursor-pointer"
+                  >
+                    [Clear]
+                  </button>
+                )}
+              </div>
+              <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block mt-0.5">
+                {activeDetailNode.type === 'domain' ? 'Skill Domain' : 'Technology / Skill'}
+              </span>
+            </div>
+
+            {activeDetailNode.type === 'domain' && hoveredDomainTechs.length > 0 && (
+              <div className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-900/60 pt-2">
+                <span className="font-bold text-neutral-800 dark:text-neutral-200">Technologies:</span>{' '}
+                {hoveredDomainTechs.join(', ')}
+              </div>
+            )}
+
+            <div className="border-t border-neutral-100 dark:border-neutral-900/60 my-2" />
+
+            <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+              <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block">
+                Linked Projects ({activeProjects.length})
+              </span>
+              {activeProjects.length === 0 ? (
+                <p className="text-[11px] text-neutral-400 dark:text-neutral-500 italic">
+                  No projects listed for this skill.
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {activeProjects.map(proj => (
+                    <button
+                      key={proj.id}
+                      type="button"
+                      onClick={() => {
+                        if (onRouteToProject) {
+                          onRouteToProject(proj.id);
+                        }
+                      }}
+                      className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-0.5 group"
+                    >
+                      <span className="truncate">{proj.title}</span>
+                      <span className="text-[9px] text-neutral-400 dark:text-neutral-600 shrink-0 font-mono font-normal">
+                        →
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
