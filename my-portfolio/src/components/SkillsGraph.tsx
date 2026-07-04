@@ -734,49 +734,66 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
             </div>
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row gap-6 p-6">
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 select-text">
-              {categorizedSkills.map(category => (
-                <div key={category.name} className="space-y-3">
-                  <h4 className="text-xs font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
-                    {category.name}
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {category.items.map(item => {
-                      const isSelected = item === selectedSkill;
-                      return (
-                        <button
-                          key={item}
-                          type="button"
-                          onMouseEnter={() => setHoveredNodeId(item)}
-                          onMouseLeave={() => setHoveredNodeId(null)}
-                          onClick={() => onSelectSkill(isSelected ? null : item)}
-                          className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold animate-pulse'
-                              : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      );
-                    })}
-                  </div>
+          // List view: full scroll within a bounded container
+          <div className="max-h-[540px] overflow-y-auto">
+            <div className="flex flex-col md:flex-row gap-6 p-6">
+              {/* On mobile, show the card ABOVE the grid so user never has to scroll past all categories */}
+              {selectedNode && (
+                <div className="md:hidden w-full bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm space-y-4 border-t-2 border-t-blue-500">
+                  {renderDetailsCard()}
                 </div>
-              ))}
-            </div>
-            {selectedNode && (
-              <div className="w-full md:w-72 shrink-0 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm h-fit space-y-4 border-t-2 border-t-blue-500">
-                {renderDetailsCard()}
+              )}
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 select-text">
+                {categorizedSkills.map(category => (
+                  <div key={category.name} className="space-y-3">
+                    <h4 className="text-xs font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
+                      {category.name}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {category.items.map(item => {
+                        const isSelected = item === selectedSkill;
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            onMouseEnter={() => setHoveredNodeId(item)}
+                            onMouseLeave={() => setHoveredNodeId(null)}
+                            onClick={() => onSelectSkill(isSelected ? null : item)}
+                            className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold animate-pulse'
+                                : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
+              {/* On desktop: sticky card that pins to the top of the scroll container */}
+              {selectedNode && (
+                <div className="hidden md:block w-72 shrink-0 sticky top-4 self-start bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm space-y-4 border-t-2 border-t-blue-500">
+                  {renderDetailsCard()}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Stationary Details Card in Graph View */}
+        {/* Stationary Details Card in Graph View — fixed to centre of viewport so it's always readable */}
         {viewMode === 'graph' && selectedNode && (
-          <div className="absolute top-4 right-4 w-72 z-20 bg-white/95 dark:bg-neutral-950/95 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg p-4 backdrop-blur-md border-t-2 border-t-blue-500">
-            {renderDetailsCard()}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            aria-modal="false"
+          >
+            {/* Translucent backdrop to help the card stand out against any node */}
+            <div className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto" onClick={() => onSelectSkill(null)} />
+            <div className="relative w-80 max-w-[92vw] pointer-events-auto bg-white/98 dark:bg-neutral-950/98 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-5 backdrop-blur-md border-t-2 border-t-blue-500">
+              {renderDetailsCard()}
+            </div>
           </div>
         )}
       </div>
