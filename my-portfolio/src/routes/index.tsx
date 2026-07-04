@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Github, ExternalLink, Mail, Phone, MapPin, Award, CheckCircle, ArrowRight, Download, Linkedin, Cloud, Code2, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { SkillsGraph } from '../components/SkillsGraph';
 import { Timeline } from '../components/Timeline';
@@ -14,6 +14,9 @@ function PortfolioHome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [projectFilter, setProjectFilter] = useState<'all' | 'open-source' | 'hackathon' | 'internship'>('all');
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
+  // Guard: when routing to a specific project we set filters + index simultaneously;
+  // this ref prevents the filter-change effect from immediately resetting index to 0.
+  const skipResetRef = useRef(false);
 
   // Dynamic numeric pagination pages list
   const paginationPages = useMemo(() => {
@@ -41,19 +44,21 @@ function PortfolioHome() {
   }, [projectFilter, selectedSkill, currentProjectIdx]);
 
   const handleRouteToProject = (projectId: string) => {
+    // Mark that we are intentionally setting the index; skip the auto-reset effect.
+    skipResetRef.current = true;
     setProjectFilter('all');
     setSelectedSkill(null);
     const idx = PROJECTS.findIndex(p => p.id === projectId);
     if (idx !== -1) {
       setCurrentProjectIdx(idx);
     }
-    // Defer scroll slightly so React can commit the index state before scrolling
+    // Scroll after React has committed the state batch
     setTimeout(() => {
       const element = document.getElementById('projects');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 50);
+    }, 80);
   };
 
   // Scroll to hash element on mount if present
@@ -85,8 +90,12 @@ function PortfolioHome() {
     return list;
   }, [projectFilter, selectedSkill]);
 
-  // Reset slideshow index when filters change
+  // Reset slideshow index when filters change — but skip if a direct project route just set the index
   useEffect(() => {
+    if (skipResetRef.current) {
+      skipResetRef.current = false;
+      return;
+    }
     setCurrentProjectIdx(0);
   }, [projectFilter, selectedSkill]);
 
