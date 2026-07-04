@@ -133,6 +133,12 @@ function RootLayout() {
           currentSectionId = '#' + id
         }
       })
+
+      // Check if user has scrolled to the absolute bottom of the page
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 20;
+      if (isAtBottom) {
+        currentSectionId = '#contact';
+      }
       
       setActiveHash((prev) => (prev !== currentSectionId ? currentSectionId : prev))
     }
