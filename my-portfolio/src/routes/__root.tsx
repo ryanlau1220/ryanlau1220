@@ -40,7 +40,23 @@ export const Route = createRootRoute({
       }
     ]
   }),
-  component: RootComponent
+  component: RootComponent,
+  notFoundComponent: () => {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+        <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Page Not Found</h2>
+        <p className="text-sm text-neutral-500 mt-2 max-w-sm">
+          The page or resource you are looking for does not exist, or the screenshot file has not been uploaded yet.
+        </p>
+        <a
+          href="/"
+          className="mt-6 text-xs font-mono px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Return Home
+        </a>
+      </div>
+    );
+  }
 })
 
 function RootComponent() {
@@ -182,7 +198,7 @@ function RootLayout() {
             className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight hover:opacity-85"
           >
             <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
-            <span>Ryan's Portfolio</span>
+            <span>Ryan Lau.</span>
           </a>
 
           {/* Desktop Nav links */}
