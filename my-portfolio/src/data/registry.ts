@@ -53,7 +53,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/llm-wiki',
     domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'React', 'TanStack Start', 'TanStack React Router', 'TanStack React Query', 'Vite', 'Tailwind CSS', 'Bun', 'Elysia', 'ORPC', 'Drizzle ORM', 'PostgreSQL', 'pgvector', 'Gemini', 'Ollama', 'd3-force', 'Obsidian', 'Vitest'],
+    technologies: ['TanStack Start', 'Tailwind CSS', 'Bun', 'Elysia', 'ORPC', 'Drizzle ORM', 'pgvector', 'Gemini', 'Ollama', 'Obsidian', 'Vitest'],
     imageUrl: '/projects/llmwiki/screenshot.png'
   },
   {
@@ -69,7 +69,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/LedgerTrace',
     domains: ['Backend', 'DevOps'],
-    technologies: ['TypeScript', 'Bun', 'React', 'Next.js', 'Express', 'PostgreSQL', 'Redis', 'BullMQ', 'Docker Compose', 'Blnk', 'Chutes AI', 'Stripe', 'TRON', 'Git'],
+    technologies: ['Next.js', 'Express', 'PostgreSQL', 'Redis', 'BullMQ', 'Docker Compose', 'Blnk', 'Stripe', 'TRON'],
     imageUrl: '/projects/aimarathon/screenshot.png',
     videoUrl: 'https://youtu.be/1o_8vI79uZQ'
   },
@@ -86,7 +86,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/UMHackathon-WarungAI',
     domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'Node.js', 'Hono.js', 'PostgreSQL', 'pgvector', 'Redis', 'BullMQ', 'Docker', 'Telegram Bot', 'ILMU-GLM-5.1', 'GLM-OCR', 'Whisper.cpp'],
+    technologies: ['TypeScript', 'Hono.js', 'pgvector', 'BullMQ', 'Docker', 'Telegram Bot', 'ILMU-GLM-5.1', 'GLM-OCR', 'Whisper.cpp'],
     imageUrl: '/projects/umhackathon/screenshot.png',
     videoUrl: 'https://youtu.be/B28F81tFSwQ'
   },
@@ -103,7 +103,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/MyAI_Future_Hackathon-AEGIS',
     domains: ['AI & Intelligence'],
-    technologies: ['Next.js 16', 'React', 'Tailwind CSS 4', 'Framer Motion', 'TanStack Query', 'React-Leaflet', 'Leaflet', 'Node.js', 'Express', 'Prisma', 'PostgreSQL', 'PostGIS', 'Firebase Genkit', 'Gemini 2.5 Flash', 'Kotlin', 'Jetpack Compose', 'Room', 'Dagger Hilt', 'SQLCipher', 'ML Kit OCR', 'WorkManager', 'GitHub Actions', 'Discord Webhooks'],
+    technologies: ['Next.js', 'Tailwind CSS', 'Framer Motion', 'TanStack Query', 'Leaflet', 'Express', 'Prisma', 'PostGIS', 'Firebase Genkit', 'Gemini', 'Kotlin', 'Jetpack Compose', 'Room', 'SQLCipher', 'ML Kit OCR', 'Discord Webhooks'],
     imageUrl: '/projects/myaifuture/screenshot.png',
     videoUrl: 'https://youtu.be/WdT77Km9cOc'
   },
@@ -120,7 +120,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/KitaHack_Shelf-OS',
     domains: ['Backend'],
-    technologies: ['Dart', 'Flutter', 'Firebase', 'Firestore', 'Python', 'Google Cloud Functions', 'Vertex AI', 'Gemini 2.5 Flash', 'Cloud Storage', 'Cloud Pub/Sub', 'Google Cloud'],
+    technologies: ['Dart', 'Flutter', 'Firebase', 'Firestore', 'Python', 'Vertex AI', 'Gemini', 'Cloud Storage', 'Cloud Pub/Sub', 'Google Cloud'],
     imageUrl: '/projects/kitahack/screenshot.png',
     videoUrl: 'https://youtu.be/ZXsvXQVFl1M'
   },
@@ -137,7 +137,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/GreatMalaysiaAIHackathon_AI-Powered-Learning-Companion',
     domains: ['AI & Intelligence'],
-    technologies: ['TypeScript', 'React', 'Vite', 'Tailwind CSS', 'Node.js', 'Express.js', 'AWS Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly', 'DynamoDB', 'Docker', 'S3', 'App Runner', 'ECR'],
+    technologies: ['React', 'Vite', 'Tailwind CSS', 'Express', 'Amazon Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly', 'DynamoDB', 'Docker', 'AWS'],
     imageUrl: '/projects/greatmalaysiaai/screenshot.png',
     videoUrl: 'https://youtu.be/DEYFJtiCJsI'
   },
@@ -154,7 +154,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/DevMatch-EcoChain',
     domains: ['Backend'],
-    technologies: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Sui SDK', 'zkLogin', 'Solidity', 'Hardhat', 'The Graph', 'Oasis ROFL', 'Google Gemini API', 'React Icons', 'React Markdown', 'Recharts', 'Chart.js'],
+    technologies: ['React', 'Vite', 'Tailwind CSS', 'Sui SDK', 'zkLogin', 'Solidity', 'Hardhat', 'The Graph', 'Oasis ROFL', 'Gemini'],
     imageUrl: '/projects/devmatch/screenshot.png',
     videoUrl: 'https://youtu.be/XhHIwUfuJPs'
   },
@@ -171,7 +171,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/FutureHack_Fake-Review-and-Fraud-Detection',
     domains: ['AI & Intelligence'],
-    technologies: ['Python', 'FastAPI', 'PyTorch', 'Hugging Face Transformers', 'BERT', 'R', 'PostgreSQL', 'HTML5', 'CSS3', 'JavaScript'],
+    technologies: ['Python', 'FastAPI', 'PyTorch', 'Hugging Face Transformers', 'BERT', 'HTML5', 'CSS3', 'JavaScript'],
     imageUrl: '/projects/futurehack/screenshot.png'
   },
   {
@@ -186,7 +186,7 @@ export const PROJECTS: Project[] = [
       'Centralized IAM and user authentication infrastructure utilizing Keycloak for standard OIDC protocols.'
     ],
     domains: ['Backend', 'DevOps'],
-    technologies: ['Go', 'React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Redux Toolkit', 'TanStack Query', 'React Router', 'Framer Motion', 'GSAP', 'Keycloak', 'AWS Amplify', 'Stripe', 'Solana Web3.js', 'Viem', 'Redis', 'PostgreSQL', 'GORM', 'Docker', 'GitHub Actions', 'Atlas']
+    technologies: ['Go', 'React', 'Vite', 'Tailwind CSS', 'Redux Toolkit', 'TanStack Query', 'Framer Motion', 'GSAP', 'Keycloak', 'AWS Amplify', 'Stripe', 'Viem', 'Redis', 'PostgreSQL', 'GORM', 'Docker', 'GitHub Actions', 'Atlas']
   }
 ];
 
@@ -246,7 +246,7 @@ export const EVENTS: EventItem[] = [
     description: 'Designed asynchronous double-entry analytical ledgers and Stripe/TRON webhook processing.',
     category: 'hackathon',
     featured: true,
-    technologies: ['Bun', 'Turborepo', 'Blnk', 'Stripe', 'TronGrid', 'Chutes AI TEE Models', 'OAuth'],
+    technologies: ['Bun', 'Turborepo', 'Blnk', 'Stripe', 'TRON', 'OAuth'],
     sortKey: 202605
   },
   {
@@ -259,7 +259,7 @@ export const EVENTS: EventItem[] = [
     category: 'hackathon',
     featured: true,
     technologies: ['Telegram Bot', 'Hono.js', 'pgvector', 'Whisper.cpp', 'Ollama', 'ILMU-GLM-5.1', 'BullMQ', 'Cloudflare Tunnel'],
-    sortKey: 2026042
+    sortKey: 202604
   },
   {
     id: 'event-aegis',
@@ -271,7 +271,7 @@ export const EVENTS: EventItem[] = [
     category: 'hackathon',
     featured: true,
     technologies: ['Kotlin', 'Jetpack Compose', 'PostGIS', 'Prisma', 'Firebase Genkit', 'ML Kit OCR', 'Biometric Auth'],
-    sortKey: 2026041
+    sortKey: 202604
   },
   {
     id: 'event-futurehack',
@@ -306,7 +306,7 @@ export const EVENTS: EventItem[] = [
     description: 'Designed LLM parsing algorithms and adaptive retrieval prompts for personalized flashcard generation.',
     category: 'hackathon',
     featured: true,
-    technologies: ['AWS App Runner', 'Amazon Bedrock', 'AWS S3', 'AWS ECR', 'AWS Translate', 'AWS Comprehend', 'React', 'Docker'],
+    technologies: ['Amazon Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'React', 'Docker', 'AWS'],
     sortKey: 202509
   },
   {

@@ -47,10 +47,13 @@ function PortfolioHome() {
     if (idx !== -1) {
       setCurrentProjectIdx(idx);
     }
-    const element = document.getElementById('projects');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    // Defer scroll slightly so React can commit the index state before scrolling
+    setTimeout(() => {
+      const element = document.getElementById('projects');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 50);
   };
 
   // Scroll to hash element on mount if present

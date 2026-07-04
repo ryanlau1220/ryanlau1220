@@ -37,70 +37,50 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
   const hasMovedRef = useRef(false);
 
   // 1. Group domains as the eight main categories, and map all 45 technologies
-  const { nodes, links, domains, technologies } = useMemo(() => {
+  const { nodes, links, domains, technologies, techMap } = useMemo(() => {
     const techToCategoryMap: Record<string, string> = {
       // 1. Programming Languages
       TypeScript: 'Programming Languages',
       Go: 'Programming Languages',
-      Golang: 'Programming Languages',
       Dart: 'Programming Languages',
       Python: 'Programming Languages',
       Java: 'Programming Languages',
       R: 'Programming Languages',
       Solidity: 'Programming Languages',
-      'R Programming': 'Programming Languages',
       Kotlin: 'Programming Languages',
       JavaScript: 'Programming Languages',
       PHP: 'Programming Languages',
 
       // 2. Backend
       'Node.js': 'Backend',
-      NodeJS: 'Backend',
       'Hono.js': 'Backend',
-      HonoJS: 'Backend',
       Keycloak: 'Backend',
       'Drizzle ORM': 'Backend',
       Bun: 'Backend',
       Elysia: 'Backend',
       ORPC: 'Backend',
       Express: 'Backend',
-      'Express.js': 'Backend',
       Firebase: 'Backend',
       'Firebase Genkit': 'Backend',
       Prisma: 'Backend',
       GORM: 'Backend',
-      'AWS App Runner': 'Backend',
-      'App Runner': 'Backend',
       FastAPI: 'Backend',
+      BullMQ: 'Backend',
 
       // 3. Frontend
       React: 'Frontend',
-      ReactJS: 'Frontend',
       'Next.js': 'Frontend',
-      NextJS: 'Frontend',
       'TanStack Start': 'Frontend',
-      'TanStack React Router': 'Frontend',
-      'TanStack React Query': 'Frontend',
       'TanStack Query': 'Frontend',
-      'React Router': 'Frontend',
-      'React Native Expo': 'Frontend',
       Flutter: 'Frontend',
       'Redux Toolkit': 'Frontend',
       'Framer Motion': 'Frontend',
       GSAP: 'Frontend',
-      'React Icons': 'Frontend',
-      'React Markdown': 'Frontend',
       Recharts: 'Frontend',
-      'Chart.js': 'Frontend',
       'Tailwind CSS': 'Frontend',
-      'Tailwind CSS 4': 'Frontend',
-      'Next.js 16': 'Frontend',
       'Jetpack Compose': 'Frontend',
-      HTML: 'Frontend',
       HTML5: 'Frontend',
-      CSS: 'Frontend',
       CSS3: 'Frontend',
-      'React-Leaflet': 'Frontend',
       Leaflet: 'Frontend',
 
       // 4. Databases
@@ -119,30 +99,23 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       // 5. Tools
       Git: 'Tools',
       Linux: 'Tools',
-      WSL: 'Tools',
       Jira: 'Tools',
       Biome: 'Tools',
       PNPM: 'Tools',
       Turborepo: 'Tools',
       Vite: 'Tools',
       Obsidian: 'Tools',
-      'AWS S3': 'Tools',
-      S3: 'Tools',
-      'AWS ECR': 'Tools',
-      ECR: 'Tools',
-      'Cloud Storage': 'Tools',
-      'Cloud Pub/Sub': 'Tools',
-      WorkManager: 'Tools',
-      'Discord Webhooks': 'Tools',
       Hardhat: 'Tools',
       'The Graph': 'Tools',
-      Postman: 'Tools',
-      'ERP Systems': 'Tools',
+      'Discord Webhooks': 'Tools',
+      'Cloud Storage': 'Tools',
+      'Cloud Pub/Sub': 'Tools',
+      'Telegram Bot': 'Tools',
+      'Cloudflare Tunnel': 'Tools',
 
       // 6. DevOps
       Docker: 'DevOps',
       'Docker Compose': 'DevOps',
-      Contabo: 'DevOps',
       'Google Cloud': 'DevOps',
       GCP: 'DevOps',
       AWS: 'DevOps',
@@ -150,31 +123,23 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       Vercel: 'DevOps',
       'Oracle Cloud': 'DevOps',
       'GitHub Actions': 'DevOps',
-      Atlas: 'DevOps',
+      TRON: 'DevOps',
+      OAuth: 'DevOps',
       'AWS Amplify': 'DevOps',
       Stripe: 'DevOps',
-      TRON: 'DevOps',
       'Sui SDK': 'DevOps',
       zkLogin: 'DevOps',
       'Oasis ROFL': 'DevOps',
-      'Oasis Protocol': 'DevOps',
-      'Cloudflare Tunnel': 'DevOps',
+      Atlas: 'DevOps',
       Blnk: 'DevOps',
-      'Solana Web3.js': 'DevOps',
       Viem: 'DevOps',
-      OAuth: 'DevOps',
-      'Google Cloud Functions': 'DevOps',
-      TronGrid: 'DevOps',
 
       // 7. AI & Intelligence
       Ollama: 'AI & Intelligence',
       Gemini: 'AI & Intelligence',
       OpenCV: 'AI & Intelligence',
       LangChain: 'AI & Intelligence',
-      'Gemini 2.5 Flash': 'AI & Intelligence',
-      'Google Gemini API': 'AI & Intelligence',
       'Vertex AI': 'AI & Intelligence',
-      'AWS Bedrock': 'AI & Intelligence',
       'Amazon Bedrock': 'AI & Intelligence',
       'Amazon Comprehend': 'AI & Intelligence',
       'Amazon Translate': 'AI & Intelligence',
@@ -187,14 +152,11 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       'Whisper.cpp': 'AI & Intelligence',
       'GLM-OCR': 'AI & Intelligence',
       'ML Kit OCR': 'AI & Intelligence',
-      'Chutes AI': 'AI & Intelligence',
-      'Chutes AI TEE Models': 'AI & Intelligence',
-      'd3-force': 'AI & Intelligence',
 
       // 8. Quality & Testing
       Vitest: 'Quality & Testing',
-      'Testing Library': 'Quality & Testing',
-      'Biometric Auth': 'Quality & Testing'
+      'Biometric Auth': 'Quality & Testing',
+      Postman: 'Quality & Testing',
     };
 
     const uniqueDomains = new Set<string>([
@@ -251,7 +213,8 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       nodes: nodeList,
       links: linkList,
       domains: Array.from(uniqueDomains).sort(),
-      technologies: Array.from(uniqueTech).sort()
+      technologies: Array.from(uniqueTech).sort(),
+      techMap: techToCategoryMap
     };
   }, []);
 
@@ -383,31 +346,34 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
     return nodes.find(n => n.id === selectedSkill) || { id: selectedSkill, name: selectedSkill, type: 'technology' as const, linkCount: 0 };
   }, [selectedSkill, nodes]);
 
-  // Find linked projects
+  // Find linked projects — for domain nodes, find projects that contain any tech in that domain
   const activeProjects = useMemo(() => {
     if (!selectedNode) return [];
     if (selectedNode.type === 'domain') {
-      return PROJECTS.filter(p => p.domains.includes(selectedNode.id));
+      // Collect all canonical tech names that belong to this domain
+      const domainTechs = new Set(
+        Object.entries(techMap)
+          .filter(([, cat]) => cat === selectedNode.id)
+          .map(([tech]) => tech)
+      );
+      // Also check p.domains directly (for projects that categorise themselves under this domain)
+      return PROJECTS.filter(p =>
+        p.domains.includes(selectedNode.id) ||
+        p.technologies.some(t => domainTechs.has(t))
+      );
     } else {
       return PROJECTS.filter(p => p.technologies.includes(selectedNode.id));
     }
-  }, [selectedNode]);
+  }, [selectedNode, techMap]);
 
-  // Helper to retrieve technologies under the selected domain
+  // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
     if (!selectedNode || selectedNode.type !== 'domain') return [];
-    const categories = {
-      'Programming Languages': ['TypeScript', 'Go', 'Dart', 'Python', 'Java', 'R', 'Solidity', 'R Programming', 'Kotlin', 'JavaScript', 'PHP'],
-      'Backend': ['Node.js', 'Hono.js', 'Keycloak', 'Drizzle ORM', 'Bun', 'Elysia', 'ORPC', 'Express', 'Express.js', 'Firebase', 'Firebase Genkit', 'Prisma', 'GORM', 'AWS App Runner', 'App Runner', 'FastAPI'],
-      'Frontend': ['React', 'Next.js', 'TanStack Start', 'TanStack React Router', 'TanStack React Query', 'TanStack Query', 'React Router', 'React Native Expo', 'Flutter', 'Redux Toolkit', 'Framer Motion', 'GSAP', 'React Icons', 'React Markdown', 'Recharts', 'Chart.js', 'Tailwind CSS', 'Tailwind CSS 4', 'Next.js 16', 'Jetpack Compose', 'HTML', 'HTML5', 'CSS', 'CSS3', 'React-Leaflet', 'Leaflet'],
-      'Databases': ['PostgreSQL', 'MySQL', 'Supabase', 'pgvector', 'Redis', 'SQLite', 'DynamoDB', 'Room', 'SQLCipher', 'PostGIS', 'Firestore'],
-      'Tools': ['Git', 'Linux', 'WSL', 'Jira', 'Biome', 'PNPM', 'Turborepo', 'Vite', 'Obsidian', 'AWS S3', 'S3', 'AWS ECR', 'ECR', 'Cloud Storage', 'Cloud Pub/Sub', 'WorkManager', 'Discord Webhooks', 'Hardhat', 'The Graph', 'Postman', 'ERP Systems'],
-      'DevOps': ['Docker', 'Docker Compose', 'Contabo', 'Google Cloud', 'GCP', 'AWS', 'Cloudflare', 'Vercel', 'Oracle Cloud', 'GitHub Actions', 'Atlas', 'AWS Amplify', 'Stripe', 'TRON', 'Sui SDK', 'zkLogin', 'Oasis ROFL', 'Cloudflare Tunnel', 'Blnk', 'Solana Web3.js', 'Viem', 'OAuth', 'Google Cloud Functions', 'TronGrid'],
-      'AI & Intelligence': ['Ollama', 'Gemini', 'OpenCV', 'LangChain', 'Gemini 2.5 Flash', 'Google Gemini API', 'Vertex AI', 'AWS Bedrock', 'Amazon Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly', 'BERT', 'PyTorch', 'Hugging Face Transformers', 'ILMU-GLM-5.1', 'Whisper.cpp', 'GLM-OCR', 'ML Kit OCR', 'Chutes AI', 'Chutes AI TEE Models', 'd3-force'],
-      'Quality & Testing': ['Vitest', 'Testing Library', 'Biometric Auth']
-    };
-    return categories[selectedNode.name as keyof typeof categories] || [];
-  }, [selectedNode]);
+    return Object.entries(techMap)
+      .filter(([, cat]) => cat === selectedNode.id)
+      .map(([tech]) => tech)
+      .sort();
+  }, [selectedNode, techMap]);
 
   const handleNodeDragStart = (e: React.MouseEvent, node: D3Node) => {
     e.stopPropagation();
@@ -473,26 +439,28 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
     return false;
   };
 
-  // Categorize technologies for the traditional list view
+  // Categorize technologies for the traditional list view — derived dynamically from techMap so it's always in sync
   const categorizedSkills = useMemo(() => {
-    const categories = {
-      'Programming Languages': ['TypeScript', 'Golang', 'Dart', 'Python', 'Java', 'R', 'Solidity'],
-      'Backend': ['NodeJS', 'HonoJS', 'Keycloak', 'Drizzle ORM'],
-      'Frontend': ['ReactJS', 'NextJS', 'TanStack Start', 'React Native Expo', 'Flutter'],
-      'Databases': ['PostgreSQL', 'MySQL', 'Supabase', 'pgvector', 'Redis', 'SQLite'],
-      'Tools': ['Git', 'Linux', 'WSL', 'Jira', 'Biome', 'Bun', 'PNPM', 'Turborepo'],
-      'DevOps': ['Docker', 'Contabo', 'Google Cloud', 'AWS', 'Cloudflare', 'Vercel', 'Oracle Cloud', 'GitHub Actions'],
-      'AI & Intelligence': ['Ollama', 'Gemini', 'OpenCV', 'LangChain'],
-      'Quality & Testing': ['Vitest', 'Testing Library', 'Postman']
-    };
-
-    return Object.entries(categories).map(([catName, techList]) => {
-      return {
-        name: catName,
-        items: techList
-      };
+    const order = [
+      'Programming Languages',
+      'Backend',
+      'Frontend',
+      'Databases',
+      'Tools',
+      'DevOps',
+      'AI & Intelligence',
+      'Quality & Testing'
+    ];
+    const buckets: Record<string, string[]> = {};
+    order.forEach(cat => { buckets[cat] = []; });
+    Object.entries(techMap).forEach(([tech, cat]) => {
+      if (buckets[cat]) buckets[cat].push(tech);
     });
-  }, []);
+    return order.map(catName => ({
+      name: catName,
+      items: buckets[catName].sort()
+    }));
+  }, [techMap]);
 
   const renderDetailsCard = () => {
     if (!selectedNode) return null;
