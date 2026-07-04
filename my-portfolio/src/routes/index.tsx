@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo, useEffect } from 'react';
-import { Github, ExternalLink, Mail, Phone, MapPin, Award, CheckCircle, ArrowRight, Download, Linkedin, Cloud, Code2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Github, ExternalLink, Mail, Phone, MapPin, Award, CheckCircle, ArrowRight, Download, Linkedin, Cloud, Code2, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { SkillsGraph } from '../components/SkillsGraph';
 import { Timeline } from '../components/Timeline';
 import { PROJECTS } from '../data/registry';
@@ -14,6 +14,19 @@ function PortfolioHome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [projectFilter, setProjectFilter] = useState<'all' | 'open-source' | 'hackathon' | 'internship'>('all');
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
+
+  const handleRouteToProject = (projectId: string) => {
+    setProjectFilter('all');
+    setSelectedSkill(null);
+    const idx = PROJECTS.findIndex(p => p.id === projectId);
+    if (idx !== -1) {
+      setCurrentProjectIdx(idx);
+    }
+    const element = document.getElementById('projects');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Scroll to hash element on mount if present
   useEffect(() => {
@@ -138,7 +151,7 @@ function PortfolioHome() {
       {/* 2. ABOUT SECTION */}
       <section
         id="about"
-        className="max-w-4xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
+        className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
           <div>
@@ -172,7 +185,7 @@ function PortfolioHome() {
       {/* 3. SKILLS SECTION */}
       <section
         id="skills"
-        className="max-w-5xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
+        className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="text-center space-y-3 mb-10">
           <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
@@ -180,13 +193,13 @@ function PortfolioHome() {
           </h3>
         </div>
         
-        <SkillsGraph selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
+        <SkillsGraph selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} onRouteToProject={handleRouteToProject} />
       </section>
 
       {/* 4. PROJECTS SECTION */}
       <section
         id="projects"
-        className="max-w-4xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
+        className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
           <div>
@@ -249,82 +262,112 @@ function PortfolioHome() {
 
               {/* Project Card */}
               {(() => {
-                const project = filteredProjects[currentProjectIdx];
+                const project = filteredProjects[currentProjectIdx] || filteredProjects[0];
+                if (!project) return null;
+                const hasImage = !!project.imageUrl;
                 return (
                   <div
                     key={project.id}
-                    className="flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm p-6 sm:p-8 space-y-6"
+                    className={`flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col ${
+                      hasImage ? 'md:flex-row' : 'p-6 sm:p-8 space-y-6'
+                    }`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                          {project.subtitle}
+                    {hasImage && (
+                      <div className="w-full md:w-1/2 h-48 sm:h-64 md:h-auto min-h-[220px] md:min-h-[380px] relative overflow-hidden bg-neutral-50 dark:bg-neutral-900/40 shrink-0">
+                        <img
+                          src={project.imageUrl}
+                          alt={project.title}
+                          className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none transition-transform duration-500 group-hover:scale-[1.02]"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <div className={`w-full ${hasImage ? 'md:w-1/2 p-6 sm:p-8 flex flex-col justify-between space-y-6' : 'space-y-6'}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                            {project.subtitle}
+                          </span>
+                          <h4 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
+                            {project.title}
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          {project.videoUrl && (
+                            <a
+                              href={project.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                              title="Watch Demo Video"
+                            >
+                              <Play size={16} className="opacity-80" />
+                            </a>
+                          )}
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                              title="GitHub Repo"
+                            >
+                              <Github size={16} />
+                            </a>
+                          )}
+                          {project.demoUrl && (
+                            <a
+                              href={project.demoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                              title="Live Demo"
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                        {project.description}
+                      </p>
+
+                      {/* Achievements List */}
+                      <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-900 pt-4">
+                        <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-wider block mb-2">
+                          Key Outcomes &amp; Technical Achievements
                         </span>
-                        <h4 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
-                          {project.title}
-                        </h4>
+                        <ul className="space-y-2">
+                          {project.achievements.map((ach, idx) => (
+                            <li key={idx} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
+                              <CheckCircle size={14} className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5" />
+                              <span>{ach}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
-                            title="GitHub Repo"
-                          >
-                            <Github size={16} />
-                          </a>
-                        )}
-                        {project.demoUrl && (
-                          <a
-                            href={project.demoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
-                            title="Live Demo"
-                          >
-                            <ExternalLink size={16} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
 
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                      {project.description}
-                    </p>
-
-                    {/* Achievements List */}
-                    <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-900 pt-4">
-                      <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-wider block mb-2">
-                        Key Outcomes &amp; Technical Achievements
-                      </span>
-                      <ul className="space-y-2">
-                        {project.achievements.map((ach, idx) => (
-                          <li key={idx} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
-                            <CheckCircle size={14} className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5" />
-                            <span>{ach}</span>
-                          </li>
+                      {/* Technologies Badges */}
+                      <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
+                        {project.technologies.map(tech => (
+                          <button
+                            key={tech}
+                            type="button"
+                            onClick={() => setSelectedSkill(tech)}
+                            className={`text-[10px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
+                              selectedSkill === tech
+                                ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold'
+                                : 'bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
+                            }`}
+                          >
+                            {tech}
+                          </button>
                         ))}
-                      </ul>
-                    </div>
-
-                    {/* Technologies Badges */}
-                    <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                      {project.technologies.map(tech => (
-                        <button
-                          key={tech}
-                          type="button"
-                          onClick={() => setSelectedSkill(tech)}
-                          className={`text-[10px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
-                            selectedSkill === tech
-                              ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold'
-                              : 'bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
-                          }`}
-                        >
-                          {tech}
-                        </button>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 );
@@ -368,7 +411,7 @@ function PortfolioHome() {
       {/* 5. TIMELINE SECTION */}
       <section
         id="timeline"
-        className="max-w-4xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
+        className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="text-center space-y-3 mb-12">
           <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
@@ -382,7 +425,7 @@ function PortfolioHome() {
       {/* 6. CERTIFICATIONS & CREDENTIALS SECTION */}
       <section
         id="certifications"
-        className="max-w-4xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
+        className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
         <div className="text-center space-y-3 mb-12">
           <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
@@ -471,7 +514,7 @@ function PortfolioHome() {
       {/* 7. CONTACT SECTION */}
       <section
         id="contact"
-        className="max-w-4xl mx-auto py-24 px-6 select-text"
+        className="max-w-6xl mx-auto py-24 px-6 select-text"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
@@ -589,6 +632,7 @@ function PortfolioHome() {
           </div>
         </div>
       </section>
+
     </div>
   );
 }
