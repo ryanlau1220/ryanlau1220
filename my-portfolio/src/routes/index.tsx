@@ -15,6 +15,31 @@ function PortfolioHome() {
   const [projectFilter, setProjectFilter] = useState<'all' | 'open-source' | 'hackathon' | 'internship'>('all');
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
 
+  // Dynamic numeric pagination pages list
+  const paginationPages = useMemo(() => {
+    const total = PROJECTS.filter(p => {
+      const matchCat = projectFilter === 'all' || p.category === projectFilter;
+      const matchSkill = !selectedSkill || p.technologies.includes(selectedSkill) || p.domains.includes(selectedSkill);
+      return matchCat && matchSkill;
+    }).length; // Match the dynamic filteredProjects length computation below
+    
+    const current = currentProjectIdx;
+    
+    if (total <= 6) {
+      return Array.from({ length: total }, (_, i) => i);
+    }
+    
+    if (current < 3) {
+      return [0, 1, 2, 'ellipsis', total - 2, total - 1];
+    }
+    
+    if (current >= total - 3) {
+      return [0, 1, 'ellipsis', total - 3, total - 2, total - 1];
+    }
+    
+    return [0, 'ellipsis-left', current, 'ellipsis-right', total - 1];
+  }, [projectFilter, selectedSkill, currentProjectIdx]);
+
   const handleRouteToProject = (projectId: string) => {
     setProjectFilter('all');
     setSelectedSkill(null);
@@ -387,22 +412,38 @@ function PortfolioHome() {
             </div>
           )}
 
-          {/* Dots Indicator */}
+          {/* Numeric Pagination Indicator */}
           {filteredProjects.length > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
-              {filteredProjects.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setCurrentProjectIdx(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    idx === currentProjectIdx
-                      ? 'w-6 bg-neutral-900 dark:bg-white'
-                      : 'w-1.5 bg-neutral-300 dark:bg-neutral-700'
-                  }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+            <div className="flex justify-center items-center gap-1.5 mt-8 select-none">
+              {paginationPages.map((page, idx) => {
+                if (typeof page === 'string') {
+                  return (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="text-xs text-neutral-400 dark:text-neutral-600 px-1 font-mono"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+
+                const isActive = page === currentProjectIdx;
+                return (
+                  <button
+                    key={`page-${page}`}
+                    type="button"
+                    onClick={() => setCurrentProjectIdx(page)}
+                    className={`h-7 w-7 rounded-full border text-[11px] font-mono font-semibold flex items-center justify-center transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-bold scale-105'
+                        : 'bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600'
+                    }`}
+                    aria-label={`Go to slide ${page + 1}`}
+                  >
+                    {page + 1}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
