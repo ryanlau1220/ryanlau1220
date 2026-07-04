@@ -24,7 +24,6 @@ interface SkillsGraphProps {
 export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: SkillsGraphProps) {
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph');
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
   // Pan & Zoom state
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -42,25 +41,67 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
     const techToCategoryMap: Record<string, string> = {
       // 1. Programming Languages
       TypeScript: 'Programming Languages',
+      Go: 'Programming Languages',
       Golang: 'Programming Languages',
       Dart: 'Programming Languages',
       Python: 'Programming Languages',
       Java: 'Programming Languages',
       R: 'Programming Languages',
       Solidity: 'Programming Languages',
+      'R Programming': 'Programming Languages',
+      Kotlin: 'Programming Languages',
+      JavaScript: 'Programming Languages',
+      PHP: 'Programming Languages',
 
       // 2. Backend
+      'Node.js': 'Backend',
       NodeJS: 'Backend',
+      'Hono.js': 'Backend',
       HonoJS: 'Backend',
       Keycloak: 'Backend',
       'Drizzle ORM': 'Backend',
+      Bun: 'Backend',
+      Elysia: 'Backend',
+      ORPC: 'Backend',
+      Express: 'Backend',
+      'Express.js': 'Backend',
+      Firebase: 'Backend',
+      'Firebase Genkit': 'Backend',
+      Prisma: 'Backend',
+      GORM: 'Backend',
+      'AWS App Runner': 'Backend',
+      'App Runner': 'Backend',
+      FastAPI: 'Backend',
 
       // 3. Frontend
+      React: 'Frontend',
       ReactJS: 'Frontend',
+      'Next.js': 'Frontend',
       NextJS: 'Frontend',
       'TanStack Start': 'Frontend',
+      'TanStack React Router': 'Frontend',
+      'TanStack React Query': 'Frontend',
+      'TanStack Query': 'Frontend',
+      'React Router': 'Frontend',
       'React Native Expo': 'Frontend',
       Flutter: 'Frontend',
+      'Redux Toolkit': 'Frontend',
+      'Framer Motion': 'Frontend',
+      GSAP: 'Frontend',
+      'React Icons': 'Frontend',
+      'React Markdown': 'Frontend',
+      Recharts: 'Frontend',
+      'Chart.js': 'Frontend',
+      'Tailwind CSS': 'Frontend',
+      'Tailwind CSS 4': 'Frontend',
+      'Next.js 16': 'Frontend',
+      'Jetpack Compose': 'Frontend',
+      HTML: 'Frontend',
+      HTML5: 'Frontend',
+      CSS: 'Frontend',
+      CSS3: 'Frontend',
+      'React-Leaflet': 'Frontend',
+      Leaflet: 'Frontend',
 
       // 4. Databases
       PostgreSQL: 'Databases',
@@ -69,6 +110,11 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       pgvector: 'Databases',
       Redis: 'Databases',
       SQLite: 'Databases',
+      DynamoDB: 'Databases',
+      Room: 'Databases',
+      SQLCipher: 'Databases',
+      PostGIS: 'Databases',
+      Firestore: 'Databases',
 
       // 5. Tools
       Git: 'Tools',
@@ -76,30 +122,79 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       WSL: 'Tools',
       Jira: 'Tools',
       Biome: 'Tools',
-      Bun: 'Tools',
       PNPM: 'Tools',
       Turborepo: 'Tools',
+      Vite: 'Tools',
+      Obsidian: 'Tools',
+      'AWS S3': 'Tools',
+      S3: 'Tools',
+      'AWS ECR': 'Tools',
+      ECR: 'Tools',
+      'Cloud Storage': 'Tools',
+      'Cloud Pub/Sub': 'Tools',
+      WorkManager: 'Tools',
+      'Discord Webhooks': 'Tools',
+      Hardhat: 'Tools',
+      'The Graph': 'Tools',
+      Postman: 'Tools',
+      'ERP Systems': 'Tools',
 
       // 6. DevOps
       Docker: 'DevOps',
+      'Docker Compose': 'DevOps',
       Contabo: 'DevOps',
       'Google Cloud': 'DevOps',
+      GCP: 'DevOps',
       AWS: 'DevOps',
       Cloudflare: 'DevOps',
       Vercel: 'DevOps',
       'Oracle Cloud': 'DevOps',
       'GitHub Actions': 'DevOps',
+      Atlas: 'DevOps',
+      'AWS Amplify': 'DevOps',
+      Stripe: 'DevOps',
+      TRON: 'DevOps',
+      'Sui SDK': 'DevOps',
+      zkLogin: 'DevOps',
+      'Oasis ROFL': 'DevOps',
+      'Oasis Protocol': 'DevOps',
+      'Cloudflare Tunnel': 'DevOps',
+      Blnk: 'DevOps',
+      'Solana Web3.js': 'DevOps',
+      Viem: 'DevOps',
+      OAuth: 'DevOps',
+      'Google Cloud Functions': 'DevOps',
+      TronGrid: 'DevOps',
 
       // 7. AI & Intelligence
       Ollama: 'AI & Intelligence',
       Gemini: 'AI & Intelligence',
       OpenCV: 'AI & Intelligence',
       LangChain: 'AI & Intelligence',
+      'Gemini 2.5 Flash': 'AI & Intelligence',
+      'Google Gemini API': 'AI & Intelligence',
+      'Vertex AI': 'AI & Intelligence',
+      'AWS Bedrock': 'AI & Intelligence',
+      'Amazon Bedrock': 'AI & Intelligence',
+      'Amazon Comprehend': 'AI & Intelligence',
+      'Amazon Translate': 'AI & Intelligence',
+      'Amazon Transcribe': 'AI & Intelligence',
+      'Amazon Polly': 'AI & Intelligence',
+      BERT: 'AI & Intelligence',
+      PyTorch: 'AI & Intelligence',
+      'Hugging Face Transformers': 'AI & Intelligence',
+      'ILMU-GLM-5.1': 'AI & Intelligence',
+      'Whisper.cpp': 'AI & Intelligence',
+      'GLM-OCR': 'AI & Intelligence',
+      'ML Kit OCR': 'AI & Intelligence',
+      'Chutes AI': 'AI & Intelligence',
+      'Chutes AI TEE Models': 'AI & Intelligence',
+      'd3-force': 'AI & Intelligence',
 
       // 8. Quality & Testing
       Vitest: 'Quality & Testing',
       'Testing Library': 'Quality & Testing',
-      Postman: 'Quality & Testing'
+      'Biometric Auth': 'Quality & Testing'
     };
 
     const uniqueDomains = new Set<string>([
@@ -196,6 +291,37 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
 
     // Run active updates on tick
     simulation.on('tick', () => {
+      if (svgRef.current) {
+        const rect = svgRef.current.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+
+        d3Nodes.forEach(node => {
+          const radius = node.type === 'domain' ? 30 : 18;
+          const padX = w / 2 - radius;
+          const padY = h / 2 - radius;
+
+          if (node.x !== undefined && node.y !== undefined) {
+            // Clamp X and bounce
+            if (node.x < -padX) {
+              node.x = -padX;
+              if (node.vx !== undefined) node.vx = Math.abs(node.vx) * 0.5;
+            } else if (node.x > padX) {
+              node.x = padX;
+              if (node.vx !== undefined) node.vx = -Math.abs(node.vx) * 0.5;
+            }
+
+            // Clamp Y and bounce
+            if (node.y < -padY) {
+              node.y = -padY;
+              if (node.vy !== undefined) node.vy = Math.abs(node.vy) * 0.5;
+            } else if (node.y > padY) {
+              node.y = padY;
+              if (node.vy !== undefined) node.vy = -Math.abs(node.vy) * 0.5;
+            }
+          }
+        });
+      }
       setSimulationNodes([...d3Nodes]);
       setSimulationLinks([...d3Links]);
     });
@@ -223,14 +349,6 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
   }, [viewMode]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setMousePos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-    }
-
     if (draggedNodeRef.current && svgRef.current && simulationRef.current) {
       const rect = svgRef.current.getBoundingClientRect();
       const localX = (e.clientX - rect.left - pan.x) / zoom;
@@ -258,11 +376,6 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
     }
   };
 
-  // Helper to find the currently hovered node object
-  const hoveredNode = useMemo(() => {
-    if (!hoveredNodeId) return null;
-    return nodes.find(n => n.id === hoveredNodeId) || { id: hoveredNodeId, name: hoveredNodeId, type: 'technology' as const, linkCount: 0 };
-  }, [hoveredNodeId, nodes]);
 
   // Helper to find the currently selected node object
   const selectedNode = useMemo(() => {
@@ -270,76 +383,31 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
     return nodes.find(n => n.id === selectedSkill) || { id: selectedSkill, name: selectedSkill, type: 'technology' as const, linkCount: 0 };
   }, [selectedSkill, nodes]);
 
-  const activeDetailNode = hoveredNode || selectedNode;
-
   // Find linked projects
   const activeProjects = useMemo(() => {
-    if (!activeDetailNode) return [];
-    if (activeDetailNode.type === 'domain') {
-      return PROJECTS.filter(p => p.domains.includes(activeDetailNode.id));
+    if (!selectedNode) return [];
+    if (selectedNode.type === 'domain') {
+      return PROJECTS.filter(p => p.domains.includes(selectedNode.id));
     } else {
-      return PROJECTS.filter(p => p.technologies.includes(activeDetailNode.id));
+      return PROJECTS.filter(p => p.technologies.includes(selectedNode.id));
     }
-  }, [activeDetailNode]);
+  }, [selectedNode]);
 
-  // Helper to retrieve technologies under the hovered domain
-  const hoveredDomainTechs = useMemo(() => {
-    if (!activeDetailNode || activeDetailNode.type !== 'domain') return [];
+  // Helper to retrieve technologies under the selected domain
+  const selectedDomainTechs = useMemo(() => {
+    if (!selectedNode || selectedNode.type !== 'domain') return [];
     const categories = {
-      'Programming Languages': ['TypeScript', 'Golang', 'Dart', 'Python', 'Java', 'R', 'Solidity'],
-      'Backend': ['NodeJS', 'HonoJS', 'Keycloak', 'Drizzle ORM'],
-      'Frontend': ['ReactJS', 'NextJS', 'TanStack Start', 'React Native Expo', 'Flutter'],
-      'Databases': ['PostgreSQL', 'MySQL', 'Supabase', 'pgvector', 'Redis', 'SQLite'],
-      'Tools': ['Git', 'Linux', 'WSL', 'Jira', 'Biome', 'Bun', 'PNPM', 'Turborepo'],
-      'DevOps': ['Docker', 'Contabo', 'Google Cloud', 'AWS', 'Cloudflare', 'Vercel', 'Oracle Cloud', 'GitHub Actions'],
-      'AI & Intelligence': ['Ollama', 'Gemini', 'OpenCV', 'LangChain'],
-      'Quality & Testing': ['Vitest', 'Testing Library', 'Postman']
+      'Programming Languages': ['TypeScript', 'Go', 'Dart', 'Python', 'Java', 'R', 'Solidity', 'R Programming', 'Kotlin', 'JavaScript', 'PHP'],
+      'Backend': ['Node.js', 'Hono.js', 'Keycloak', 'Drizzle ORM', 'Bun', 'Elysia', 'ORPC', 'Express', 'Express.js', 'Firebase', 'Firebase Genkit', 'Prisma', 'GORM', 'AWS App Runner', 'App Runner', 'FastAPI'],
+      'Frontend': ['React', 'Next.js', 'TanStack Start', 'TanStack React Router', 'TanStack React Query', 'TanStack Query', 'React Router', 'React Native Expo', 'Flutter', 'Redux Toolkit', 'Framer Motion', 'GSAP', 'React Icons', 'React Markdown', 'Recharts', 'Chart.js', 'Tailwind CSS', 'Tailwind CSS 4', 'Next.js 16', 'Jetpack Compose', 'HTML', 'HTML5', 'CSS', 'CSS3', 'React-Leaflet', 'Leaflet'],
+      'Databases': ['PostgreSQL', 'MySQL', 'Supabase', 'pgvector', 'Redis', 'SQLite', 'DynamoDB', 'Room', 'SQLCipher', 'PostGIS', 'Firestore'],
+      'Tools': ['Git', 'Linux', 'WSL', 'Jira', 'Biome', 'PNPM', 'Turborepo', 'Vite', 'Obsidian', 'AWS S3', 'S3', 'AWS ECR', 'ECR', 'Cloud Storage', 'Cloud Pub/Sub', 'WorkManager', 'Discord Webhooks', 'Hardhat', 'The Graph', 'Postman', 'ERP Systems'],
+      'DevOps': ['Docker', 'Docker Compose', 'Contabo', 'Google Cloud', 'GCP', 'AWS', 'Cloudflare', 'Vercel', 'Oracle Cloud', 'GitHub Actions', 'Atlas', 'AWS Amplify', 'Stripe', 'TRON', 'Sui SDK', 'zkLogin', 'Oasis ROFL', 'Cloudflare Tunnel', 'Blnk', 'Solana Web3.js', 'Viem', 'OAuth', 'Google Cloud Functions', 'TronGrid'],
+      'AI & Intelligence': ['Ollama', 'Gemini', 'OpenCV', 'LangChain', 'Gemini 2.5 Flash', 'Google Gemini API', 'Vertex AI', 'AWS Bedrock', 'Amazon Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly', 'BERT', 'PyTorch', 'Hugging Face Transformers', 'ILMU-GLM-5.1', 'Whisper.cpp', 'GLM-OCR', 'ML Kit OCR', 'Chutes AI', 'Chutes AI TEE Models', 'd3-force'],
+      'Quality & Testing': ['Vitest', 'Testing Library', 'Biometric Auth']
     };
-    return categories[activeDetailNode.name as keyof typeof categories] || [];
-  }, [activeDetailNode]);
-
-  // Compute position coordinates for tooltip, preventing right/bottom clipping
-  const tooltipStyle = useMemo(() => {
-    if (!activeDetailNode || !containerRef.current) return {};
-
-    const tooltipWidth = 290;
-    // Estimate tooltip height dynamically based on contents to prevent clipping
-    const projectsCount = activeProjects.length;
-    let tooltipHeight = 110; // header height
-    if (activeDetailNode.type === 'domain') {
-      tooltipHeight += 50; // technologies listing height
-    }
-    if (projectsCount > 0) {
-      tooltipHeight += 25 + Math.min(4, projectsCount) * 24; // projects list height
-    } else {
-      tooltipHeight += 30; // "No projects" text height
-    }
-
-    const rect = containerRef.current.getBoundingClientRect();
-    
-    let left = mousePos.x + 15;
-    let top = mousePos.y + 15;
-
-    // Check right edge
-    if (left + tooltipWidth > rect.width) {
-      left = mousePos.x - tooltipWidth - 15;
-    }
-
-    // Check bottom edge
-    if (top + tooltipHeight > rect.height) {
-      top = mousePos.y - tooltipHeight - 15;
-    }
-
-    // Lower bound safeguards
-    left = Math.max(10, left);
-    top = Math.max(10, top);
-
-    return {
-      left: `${left}px`,
-      top: `${top}px`,
-      width: `${tooltipWidth}px`,
-    };
-  }, [activeDetailNode, activeProjects, mousePos]);
+    return categories[selectedNode.name as keyof typeof categories] || [];
+  }, [selectedNode]);
 
   const handleNodeDragStart = (e: React.MouseEvent, node: D3Node) => {
     e.stopPropagation();
@@ -425,6 +493,70 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
       };
     });
   }, []);
+
+  const renderDetailsCard = () => {
+    if (!selectedNode) return null;
+    
+    return (
+      <div className="flex flex-col space-y-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight truncate">
+              {selectedNode.name}
+            </h4>
+            <button
+              type="button"
+              onClick={() => onSelectSkill(null)}
+              className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 hover:underline cursor-pointer"
+            >
+              [Clear]
+            </button>
+          </div>
+          <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block mt-0.5">
+            {selectedNode.type === 'domain' ? 'Skill Domain' : 'Technology / Skill'}
+          </span>
+        </div>
+
+        {selectedNode.type === 'domain' && selectedDomainTechs.length > 0 && (
+          <div className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-900/60 pt-2 max-h-[80px] overflow-y-auto pr-1">
+            <span className="font-bold text-neutral-800 dark:text-neutral-200">Technologies:</span>{' '}
+            {selectedDomainTechs.join(', ')}
+          </div>
+        )}
+
+        <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3 flex-1 flex flex-col min-h-0">
+          <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block mb-2">
+            Linked Projects ({activeProjects.length})
+          </span>
+          {activeProjects.length === 0 ? (
+            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 italic">
+              No projects listed for this skill.
+            </p>
+          ) : (
+            <div className="space-y-1.5 overflow-y-auto max-h-[160px] pr-1">
+              {activeProjects.map(proj => (
+                <button
+                  key={proj.id}
+                  type="button"
+                  onClick={() => {
+                    if (onRouteToProject) {
+                      onRouteToProject(proj.id);
+                    }
+                  }}
+                  className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-1 group"
+                >
+                  <span className="truncate">{proj.title}</span>
+                  <span className="text-[9px] text-neutral-400 dark:text-neutral-600 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
+                    →
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -634,103 +766,49 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
             </div>
           </div>
         ) : (
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 select-text">
-            {categorizedSkills.map(category => (
-              <div key={category.name} className="space-y-3">
-                <h4 className="text-xs font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
-                  {category.name}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {category.items.map(item => {
-                    const isSelected = item === selectedSkill;
-                    return (
-                      <button
-                        key={item}
-                        type="button"
-                        onMouseEnter={() => setHoveredNodeId(item)}
-                        onMouseLeave={() => setHoveredNodeId(null)}
-                        onClick={() => onSelectSkill(isSelected ? null : item)}
-                        className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold animate-pulse'
-                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
-                        }`}
-                      >
-                        {item}
-                      </button>
-                    );
-                  })}
+          <div className="flex flex-col md:flex-row gap-6 p-6">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 select-text">
+              {categorizedSkills.map(category => (
+                <div key={category.name} className="space-y-3">
+                  <h4 className="text-xs font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
+                    {category.name}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {category.items.map(item => {
+                      const isSelected = item === selectedSkill;
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onMouseEnter={() => setHoveredNodeId(item)}
+                          onMouseLeave={() => setHoveredNodeId(null)}
+                          onClick={() => onSelectSkill(isSelected ? null : item)}
+                          className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-400 text-blue-600 dark:text-blue-400 font-bold animate-pulse'
+                              : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-600'
+                          }`}
+                        >
+                          {item}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
+              ))}
+            </div>
+            {selectedNode && (
+              <div className="w-full md:w-72 shrink-0 bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 shadow-sm h-fit space-y-4 border-t-2 border-t-blue-500">
+                {renderDetailsCard()}
               </div>
-            ))}
+            )}
           </div>
         )}
 
-        {/* Interactive Details Tooltip for Domains & Technologies */}
-        {activeDetailNode && (
-          <div
-            style={tooltipStyle}
-            className="absolute z-30 pointer-events-auto p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md shadow-lg font-sans space-y-2.5 text-left select-text"
-          >
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight">
-                  {activeDetailNode.name}
-                </h4>
-                {selectedSkill === activeDetailNode.id && (
-                  <button
-                    type="button"
-                    onClick={() => onSelectSkill(null)}
-                    className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 hover:underline cursor-pointer"
-                  >
-                    [Clear]
-                  </button>
-                )}
-              </div>
-              <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block mt-0.5">
-                {activeDetailNode.type === 'domain' ? 'Skill Domain' : 'Technology / Skill'}
-              </span>
-            </div>
-
-            {activeDetailNode.type === 'domain' && hoveredDomainTechs.length > 0 && (
-              <div className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-900/60 pt-2">
-                <span className="font-bold text-neutral-800 dark:text-neutral-200">Technologies:</span>{' '}
-                {hoveredDomainTechs.join(', ')}
-              </div>
-            )}
-
-            <div className="border-t border-neutral-100 dark:border-neutral-900/60 my-2" />
-
-            <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
-              <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block">
-                Linked Projects ({activeProjects.length})
-              </span>
-              {activeProjects.length === 0 ? (
-                <p className="text-[11px] text-neutral-400 dark:text-neutral-500 italic">
-                  No projects listed for this skill.
-                </p>
-              ) : (
-                <div className="space-y-1">
-                  {activeProjects.map(proj => (
-                    <button
-                      key={proj.id}
-                      type="button"
-                      onClick={() => {
-                        if (onRouteToProject) {
-                          onRouteToProject(proj.id);
-                        }
-                      }}
-                      className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-0.5 group"
-                    >
-                      <span className="truncate">{proj.title}</span>
-                      <span className="text-[9px] text-neutral-400 dark:text-neutral-600 shrink-0 font-mono font-normal">
-                        →
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* Stationary Details Card in Graph View */}
+        {viewMode === 'graph' && selectedNode && (
+          <div className="absolute top-4 right-4 w-72 z-20 bg-white/95 dark:bg-neutral-950/95 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg p-4 backdrop-blur-md border-t-2 border-t-blue-500">
+            {renderDetailsCard()}
           </div>
         )}
       </div>
