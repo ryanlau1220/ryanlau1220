@@ -9,6 +9,8 @@ export interface Project {
   demoUrl?: string;
   domains: string[];
   technologies: string[];
+  imageUrl?: string;
+  videoUrl?: string;
 }
 
 export interface Experience {
@@ -51,7 +53,8 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/llm-wiki',
     domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'pgvector', 'Redis', 'Git']
+    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'pgvector', 'Redis', 'Git'],
+    imageUrl: '/projects/llmwiki/screenshot.png'
   },
   {
     id: 'krypitalx',
@@ -80,7 +83,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/LedgerTrace',
     domains: ['Backend', 'DevOps'],
-    technologies: ['TypeScript', 'NodeJS', 'Redis', 'Docker', 'Git']
+    technologies: ['TypeScript', 'NodeJS', 'Redis', 'Docker', 'Git'],
+    imageUrl: '/projects/aimarathon/screenshot.png',
+    videoUrl: 'https://youtu.be/1o_8vI79uZQ'
   },
   {
     id: 'devmatch',
@@ -95,7 +100,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/DevMatch-EcoChain',
     domains: ['Backend'],
-    technologies: ['Solidity', 'ReactJS', 'TypeScript', 'NextJS', 'Git']
+    technologies: ['Solidity', 'ReactJS', 'TypeScript', 'NextJS', 'Git'],
+    imageUrl: '/projects/devmatch/screenshot.png',
+    videoUrl: 'https://youtu.be/XhHIwUfuJPs'
   },
   {
     id: 'futurehack',
@@ -110,7 +117,8 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/FutureHack_Fake-Review-and-Fraud-Detection',
     domains: ['AI & Intelligence'],
-    technologies: ['Python', 'R', 'PostgreSQL', 'Git']
+    technologies: ['Python', 'R', 'PostgreSQL', 'Git'],
+    imageUrl: '/projects/futurehack/screenshot.png'
   },
   {
     id: 'greatmalaysiaai',
@@ -125,7 +133,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/GreatMalaysiaAIHackathon_AI-Powered-Learning-Companion',
     domains: ['AI & Intelligence'],
-    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'Git']
+    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'Git'],
+    imageUrl: '/projects/greatmalaysiaai/screenshot.png',
+    videoUrl: 'https://youtu.be/DEYFJtiCJsI'
   },
   {
     id: 'kitahack',
@@ -140,7 +150,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/KitaHack_Shelf-OS',
     domains: ['Backend'],
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'SQLite', 'Git']
+    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'SQLite', 'Git'],
+    imageUrl: '/projects/kitahack/screenshot.png',
+    videoUrl: 'https://youtu.be/ZXsvXQVFl1M'
   },
   {
     id: 'myai-future',
@@ -155,7 +167,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/MyAI_Future_Hackathon-AEGIS',
     domains: ['AI & Intelligence'],
-    technologies: ['Python', 'Docker', 'Redis', 'Git']
+    technologies: ['Python', 'Docker', 'Redis', 'Git'],
+    imageUrl: '/projects/myaifuture/screenshot.png',
+    videoUrl: 'https://youtu.be/WdT77Km9cOc'
   },
   {
     id: 'umhackathon',
@@ -170,7 +184,9 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/UMHackathon-WarungAI',
     domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'PostgreSQL', 'Git']
+    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'PostgreSQL', 'Git'],
+    imageUrl: '/projects/umhackathon/screenshot.png',
+    videoUrl: 'https://youtu.be/B28F81tFSwQ'
   }
 ];
 
@@ -225,60 +241,60 @@ export const EVENTS: EventItem[] = [
     id: 'event-ledgertrace',
     title: 'LedgerTrace Backend Architect',
     event: 'AI Marathon',
-    date: 'Nov 2025',
-    role: 'Backend Developer',
+    date: 'May 2026',
+    role: 'Participant',
     outcome: 'Fintech Innovation Spec',
     description: 'Designed asynchronous double-entry analytical ledgers and Stripe/TRON webhook processing.',
     category: 'hackathon',
     featured: true,
     technologies: ['TypeScript', 'NodeJS', 'Redis', 'Docker'],
-    sortKey: 2025112
+    sortKey: 202605
   },
   {
     id: 'event-warung',
     title: 'Lead Full-Stack Developer',
     event: 'UMHackathon (WarungAI)',
-    date: 'Nov 2025',
-    role: 'Competitor / Runner Up',
+    date: 'Apr 2026',
+    role: 'Participant',
     outcome: 'Runner Up (2nd Place)',
     description: 'Developed an AI conversational merchant voice assistant to automate order tracking and inventory forecasting.',
     category: 'hackathon',
     featured: true,
     technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'PostgreSQL', 'Ollama'],
-    sortKey: 2025111
+    sortKey: 2026042
   },
   {
     id: 'event-aegis',
     title: 'Backend & CV Developer',
     event: 'MyAI Future Hackathon (Project AEGIS)',
-    date: 'Oct 2025',
-    role: 'Competitor / Special Mention',
+    date: 'Apr 2026',
+    role: 'Participant',
     outcome: 'Special Mention (Tech Innovation)',
     description: 'Co-created a computer vision safety monitoring system integrated with local LLMs to flag compliance risks.',
     category: 'hackathon',
     featured: true,
     technologies: ['Python', 'Docker', 'Redis'],
-    sortKey: 202510
+    sortKey: 2026041
   },
   {
     id: 'event-futurehack',
     title: 'Data & Sentiment Engineer',
     event: 'FutureHack (FraudShield)',
-    date: 'Sep 2025',
-    role: 'Competitor',
+    date: 'Jul 2027',
+    role: 'Participant',
     outcome: 'Fraud Classification Winner',
     description: 'Created NLP sentiment review detection models and transactional outlier regression scoring.',
     category: 'hackathon',
     featured: true,
     technologies: ['Python', 'R', 'PostgreSQL'],
-    sortKey: 202509
+    sortKey: 202707
   },
   {
     id: 'event-devmatch',
     title: 'Smart Contract Developer',
     event: 'DevMatch (EcoChain)',
     date: 'Aug 2025',
-    role: 'Competitor',
+    role: 'Participant',
     outcome: 'Decentralized Track Finalist',
     description: 'Authored EVM carbon credit offsets tracking smart contracts in Solidity and NextJS Web3 controls.',
     category: 'hackathon',
@@ -290,25 +306,25 @@ export const EVENTS: EventItem[] = [
     id: 'event-greatmalaysia',
     title: 'Core AI Developer',
     event: 'GreatMalaysiaAI (StudyBuddy AI)',
-    date: 'Jul 2025',
-    role: 'Competitor',
+    date: 'Sep 2025',
+    role: 'Participant',
     outcome: 'Top AI Tool Spec',
     description: 'Designed LLM parsing algorithms and adaptive retrieval prompts for personalized flashcard generation.',
     category: 'hackathon',
     featured: true,
     technologies: ['TypeScript', 'NextJS', 'PostgreSQL'],
-    sortKey: 202507
+    sortKey: 202509
   },
   {
     id: 'event-kitahack',
     title: 'Local OS Lead',
     event: 'KitaHack (Shelf OS)',
-    date: 'Jun 2025',
-    role: 'Competitor',
+    date: 'Feb 2026',
+    role: 'Participant',
     description: 'Built a local inventory shelf tracker with device heartbeat statuses and SQLite warning flags.',
     category: 'hackathon',
     featured: true,
     technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'SQLite'],
-    sortKey: 202506
+    sortKey: 202602
   }
 ];
