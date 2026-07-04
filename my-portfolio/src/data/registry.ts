@@ -45,7 +45,7 @@ export const PROJECTS: Project[] = [
     category: 'open-source',
     title: 'LLM-Wiki',
     subtitle: 'Open Source AI Vault Sync',
-    description: 'A local-first AI knowledge extraction engine that watches note vaults and indexes them into structured databases for sub-200ms semantic querying.',
+    description: 'A local-first wiki that syncs Obsidian notes into a searchable knowledge graph.',
     achievements: [
       'Orchestrated a TypeScript monorepo using Turborepo and Biome for linting, type-checking, and build caching.',
       'Designed a hybrid search RAG pipeline integrating Gemini and local Ollama models, optimizing context retrieval.',
@@ -53,29 +53,15 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/llm-wiki',
     domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'pgvector', 'Redis', 'Git'],
+    technologies: ['TypeScript', 'React', 'TanStack Start', 'TanStack React Router', 'TanStack React Query', 'Vite', 'Tailwind CSS', 'Bun', 'Elysia', 'ORPC', 'Drizzle ORM', 'PostgreSQL', 'pgvector', 'Gemini', 'Ollama', 'd3-force', 'Obsidian', 'Vitest'],
     imageUrl: '/projects/llmwiki/screenshot.png'
-  },
-  {
-    id: 'krypitalx',
-    category: 'internship',
-    title: 'KrypitalX',
-    subtitle: 'Centralized Trading Platform',
-    description: 'A centralized crypto exchange backend wallet service that manages core wallet flows, transaction ledgers, and tiered compliance screening.',
-    achievements: [
-      'Owned the end-to-end design of centralized exchange backend services in Go, implementing compliant wallet flows.',
-      'Spearheaded real-time event pipeline integrations using Redis Pub/Sub to trigger instant frontend state updates.',
-      'Centralized IAM and user authentication infrastructure utilizing Keycloak for standard OIDC protocols.'
-    ],
-    domains: ['Backend', 'DevOps'],
-    technologies: ['Golang', 'Redis', 'ReactJS', 'Docker', 'Git']
   },
   {
     id: 'ledgertrace',
     category: 'hackathon',
     title: 'LedgerTrace',
     subtitle: 'AI Marathon 2026',
-    description: 'An asynchronous fintech middleware engine that ingests high-frequency payment webhooks and double-entry logs transactions in secure environments.',
+    description: 'An async reconciliation engine for Stripe and TRON payment events.',
     achievements: [
       'Developed an asynchronous middleware pipeline using Redis to ingest payment events with real-time FX enrichment.',
       'Deployed secure policy-gating using Trusted Execution Environments (TEE) to validate inbound payloads.',
@@ -83,16 +69,84 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/LedgerTrace',
     domains: ['Backend', 'DevOps'],
-    technologies: ['TypeScript', 'NodeJS', 'Redis', 'Docker', 'Git'],
+    technologies: ['TypeScript', 'Bun', 'React', 'Next.js', 'Express', 'PostgreSQL', 'Redis', 'BullMQ', 'Docker Compose', 'Blnk', 'Chutes AI', 'Stripe', 'TRON', 'Git'],
     imageUrl: '/projects/aimarathon/screenshot.png',
     videoUrl: 'https://youtu.be/1o_8vI79uZQ'
+  },
+  {
+    id: 'umhackathon',
+    category: 'hackathon',
+    title: 'WarungAI',
+    subtitle: 'UMHackathon 2026',
+    description: 'A voice assistant for micro-SMEs to manage orders and stock.',
+    achievements: [
+      'Constructed local speech transcription handlers using open LLM sound models.',
+      'Designed relational structures in PostgreSQL to log incoming customer orders.',
+      'Created dashboard for micro-stall merchants to monitor revenue in real-time.'
+    ],
+    githubUrl: 'https://github.com/ryanlau1220/UMHackathon-WarungAI',
+    domains: ['AI & Intelligence', 'Backend'],
+    technologies: ['TypeScript', 'Node.js', 'Hono.js', 'PostgreSQL', 'pgvector', 'Redis', 'BullMQ', 'Docker', 'Telegram Bot', 'ILMU-GLM-5.1', 'GLM-OCR', 'Whisper.cpp'],
+    imageUrl: '/projects/umhackathon/screenshot.png',
+    videoUrl: 'https://youtu.be/B28F81tFSwQ'
+  },
+  {
+    id: 'myai-future',
+    category: 'hackathon',
+    title: 'AEGIS',
+    subtitle: 'MyAI Future Hackathon 2026',
+    description: 'An offline-first disaster relief platform for flood response.',
+    achievements: [
+      'Integrated OpenCV pipelines to analyze frame feeds and overlay bounding boxes.',
+      'Engineered Redis queuing to process safety alerts without blocking video feeds.',
+      'Configured multi-container Docker compose environments for local edge node testing.'
+    ],
+    githubUrl: 'https://github.com/ryanlau1220/MyAI_Future_Hackathon-AEGIS',
+    domains: ['AI & Intelligence'],
+    technologies: ['Next.js 16', 'React', 'Tailwind CSS 4', 'Framer Motion', 'TanStack Query', 'React-Leaflet', 'Leaflet', 'Node.js', 'Express', 'Prisma', 'PostgreSQL', 'PostGIS', 'Firebase Genkit', 'Gemini 2.5 Flash', 'Kotlin', 'Jetpack Compose', 'Room', 'Dagger Hilt', 'SQLCipher', 'ML Kit OCR', 'WorkManager', 'GitHub Actions', 'Discord Webhooks'],
+    imageUrl: '/projects/myaifuture/screenshot.png',
+    videoUrl: 'https://youtu.be/WdT77Km9cOc'
+  },
+  {
+    id: 'kitahack',
+    category: 'hackathon',
+    title: 'Shelf OS',
+    subtitle: 'KitaHack 2026',
+    description: 'An AI retail system for shelf auditing and waste reduction.',
+    achievements: [
+      'Developed server handlers to trace device heartbeats and shelf load capacities.',
+      'Designed local database schemas using SQLite to manage instant item records.',
+      'Crafted responsive layout displaying active warning states for low-stock shelves.'
+    ],
+    githubUrl: 'https://github.com/ryanlau1220/KitaHack_Shelf-OS',
+    domains: ['Backend'],
+    technologies: ['Dart', 'Flutter', 'Firebase', 'Firestore', 'Python', 'Google Cloud Functions', 'Vertex AI', 'Gemini 2.5 Flash', 'Cloud Storage', 'Cloud Pub/Sub', 'Google Cloud'],
+    imageUrl: '/projects/kitahack/screenshot.png',
+    videoUrl: 'https://youtu.be/ZXsvXQVFl1M'
+  },
+  {
+    id: 'greatmalaysiaai',
+    category: 'hackathon',
+    title: 'AI Powered Learning Companion',
+    subtitle: 'Great Malaysia AI Hackathon 2025',
+    description: 'An AI study companion that turns text into flashcards, summaries, and schedules.',
+    achievements: [
+      'Constructed text parsing logic to decompose syllabus contents into semantic chunks.',
+      'Engineered LLM prompts to extract key educational takeaways and format flashcards.',
+      'Implemented dashboard to track student study history and recall metrics.'
+    ],
+    githubUrl: 'https://github.com/ryanlau1220/GreatMalaysiaAIHackathon_AI-Powered-Learning-Companion',
+    domains: ['AI & Intelligence'],
+    technologies: ['TypeScript', 'React', 'Vite', 'Tailwind CSS', 'Node.js', 'Express.js', 'AWS Bedrock', 'Amazon Comprehend', 'Amazon Translate', 'Amazon Transcribe', 'Amazon Polly', 'DynamoDB', 'Docker', 'S3', 'App Runner', 'ECR'],
+    imageUrl: '/projects/greatmalaysiaai/screenshot.png',
+    videoUrl: 'https://youtu.be/DEYFJtiCJsI'
   },
   {
     id: 'devmatch',
     category: 'hackathon',
     title: 'EcoChain',
     subtitle: 'DevMatch Hackathon 2025',
-    description: 'A blockchain-based carbon offset tracking platform that registers ecological contributions and transfers green credits transparently.',
+    description: 'A blockchain app for tracking environmental data and carbon credits.',
     achievements: [
       'Designed EVM smart contracts in Solidity for tracking offset credits and verifying green compliance.',
       'Built a NextJS web dashboard showing real-time carbon statistics and transaction history.',
@@ -100,7 +154,7 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/DevMatch-EcoChain',
     domains: ['Backend'],
-    technologies: ['Solidity', 'ReactJS', 'TypeScript', 'NextJS', 'Git'],
+    technologies: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Sui SDK', 'zkLogin', 'Solidity', 'Hardhat', 'The Graph', 'Oasis ROFL', 'Google Gemini API', 'React Icons', 'React Markdown', 'Recharts', 'Chart.js'],
     imageUrl: '/projects/devmatch/screenshot.png',
     videoUrl: 'https://youtu.be/XhHIwUfuJPs'
   },
@@ -109,7 +163,7 @@ export const PROJECTS: Project[] = [
     category: 'hackathon',
     title: 'Fake Review and Fraud Detection',
     subtitle: 'FutureHack 2025',
-    description: 'A statistical fraud detection engine that identifies suspicious merchant behaviors and fake reviews using data analysis pipelines.',
+    description: 'A fake review detector using NLP and behavioral fraud signals.',
     achievements: [
       'Created review classification algorithms in Python using NLP sentiment scoring.',
       'Conducted regression and cluster analysis in R to model merchant risk scores.',
@@ -117,76 +171,22 @@ export const PROJECTS: Project[] = [
     ],
     githubUrl: 'https://github.com/ryanlau1220/FutureHack_Fake-Review-and-Fraud-Detection',
     domains: ['AI & Intelligence'],
-    technologies: ['Python', 'R', 'PostgreSQL', 'Git'],
+    technologies: ['Python', 'FastAPI', 'PyTorch', 'Hugging Face Transformers', 'BERT', 'R', 'PostgreSQL', 'HTML5', 'CSS3', 'JavaScript'],
     imageUrl: '/projects/futurehack/screenshot.png'
   },
   {
-    id: 'greatmalaysiaai',
-    category: 'hackathon',
-    title: 'AI Powered Learning Companion',
-    subtitle: 'Great Malaysia AI Hackathon 2025',
-    description: 'An adaptive AI companion that parses text materials to automatically generate personalized flashcards, study schedules, and summaries.',
+    id: 'krypitalx',
+    category: 'internship',
+    title: 'KrypitalX',
+    subtitle: 'Centralized Trading Platform',
+    description: 'A crypto exchange platform for wallet flows, compliance checks, and live account updates.',
     achievements: [
-      'Constructed text parsing logic to decompose syllabus contents into semantic chunks.',
-      'Engineered LLM prompts to extract key educational takeaways and format flashcards.',
-      'Implemented dashboard to track student study history and recall metrics.'
+      'Owned the end-to-end design of centralized exchange backend services in Go, implementing compliant wallet flows.',
+      'Spearheaded real-time event pipeline integrations using Redis Pub/Sub to trigger instant frontend state updates.',
+      'Centralized IAM and user authentication infrastructure utilizing Keycloak for standard OIDC protocols.'
     ],
-    githubUrl: 'https://github.com/ryanlau1220/GreatMalaysiaAIHackathon_AI-Powered-Learning-Companion',
-    domains: ['AI & Intelligence'],
-    technologies: ['TypeScript', 'NextJS', 'PostgreSQL', 'Git'],
-    imageUrl: '/projects/greatmalaysiaai/screenshot.png',
-    videoUrl: 'https://youtu.be/DEYFJtiCJsI'
-  },
-  {
-    id: 'kitahack',
-    category: 'hackathon',
-    title: 'Shelf OS',
-    subtitle: 'KitaHack 2026',
-    description: 'An intelligent warehouse operational system featuring automated inventory tracking and localized device status monitoring.',
-    achievements: [
-      'Developed server handlers to trace device heartbeats and shelf load capacities.',
-      'Designed local database schemas using SQLite to manage instant item records.',
-      'Crafted responsive layout displaying active warning states for low-stock shelves.'
-    ],
-    githubUrl: 'https://github.com/ryanlau1220/KitaHack_Shelf-OS',
-    domains: ['Backend'],
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'SQLite', 'Git'],
-    imageUrl: '/projects/kitahack/screenshot.png',
-    videoUrl: 'https://youtu.be/ZXsvXQVFl1M'
-  },
-  {
-    id: 'myai-future',
-    category: 'hackathon',
-    title: 'AEGIS',
-    subtitle: 'MyAI Future Hackathon 2026',
-    description: 'A computer vision safety compliance system that processes warehouse footage to detect compliance violations in real-time.',
-    achievements: [
-      'Integrated OpenCV pipelines to analyze frame feeds and overlay bounding boxes.',
-      'Engineered Redis queuing to process safety alerts without blocking video feeds.',
-      'Configured multi-container Docker compose environments for local edge node testing.'
-    ],
-    githubUrl: 'https://github.com/ryanlau1220/MyAI_Future_Hackathon-AEGIS',
-    domains: ['AI & Intelligence'],
-    technologies: ['Python', 'Docker', 'Redis', 'Git'],
-    imageUrl: '/projects/myaifuture/screenshot.png',
-    videoUrl: 'https://youtu.be/WdT77Km9cOc'
-  },
-  {
-    id: 'umhackathon',
-    category: 'hackathon',
-    title: 'WarungAI',
-    subtitle: 'UMHackathon 2026',
-    description: 'A local-language conversational voice assistant designed for street vendors to automate order management and inventory updates.',
-    achievements: [
-      'Constructed local speech transcription handlers using open LLM sound models.',
-      'Designed relational structures in PostgreSQL to log incoming customer orders.',
-      'Created dashboard for micro-stall merchants to monitor revenue in real-time.'
-    ],
-    githubUrl: 'https://github.com/ryanlau1220/UMHackathon-WarungAI',
-    domains: ['AI & Intelligence', 'Backend'],
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'PostgreSQL', 'Git'],
-    imageUrl: '/projects/umhackathon/screenshot.png',
-    videoUrl: 'https://youtu.be/B28F81tFSwQ'
+    domains: ['Backend', 'DevOps'],
+    technologies: ['Go', 'React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Redux Toolkit', 'TanStack Query', 'React Router', 'Framer Motion', 'GSAP', 'Keycloak', 'AWS Amplify', 'Stripe', 'Solana Web3.js', 'Viem', 'Redis', 'PostgreSQL', 'GORM', 'Docker', 'GitHub Actions', 'Atlas']
   }
 ];
 
@@ -202,13 +202,13 @@ export const EXPERIENCES: Experience[] = [
       'Analyzing network protocols and low-latency system architectures.'
     ],
     domains: ['Education'],
-    technologies: ['TypeScript', 'Golang', 'Java', 'Git'],
+    technologies: ['R Programming', 'ERP Systems'],
     sortKey: 202602
   },
   {
     id: 'internship-fp',
     role: 'Software Engineer Intern',
-    company: 'Fintech Exchange Backend Team',
+    company: 'First Pavilion Technology Sdn Bhd',
     period: 'Sept 2025 – Jan 2026',
     description: 'Owned centralized exchange wallet development, Keycloak IAM integration, and Docker CI/CD pipelines.',
     achievements: [
@@ -217,7 +217,7 @@ export const EXPERIENCES: Experience[] = [
       'Managed database migrations and automated deployment workflows via GitHub Actions.'
     ],
     domains: ['Backend', 'DevOps'],
-    technologies: ['Golang', 'Redis', 'Docker', 'Git'],
+    technologies: ['Go', 'Redis', 'Docker', 'Git', 'Jira', 'Keycloak', 'Solidity'],
     sortKey: 202509
   },
   {
@@ -231,7 +231,7 @@ export const EXPERIENCES: Experience[] = [
       'Built relational database projects and basic security models.'
     ],
     domains: ['Education'],
-    technologies: ['Java', 'Python', 'MySQL', 'Git'],
+    technologies: ['Flutter', 'Java', 'Python', 'MySQL', 'HTML', 'PHP', 'CSS', 'JavaScript'],
     sortKey: 202308
   }
 ];
@@ -246,7 +246,7 @@ export const EVENTS: EventItem[] = [
     description: 'Designed asynchronous double-entry analytical ledgers and Stripe/TRON webhook processing.',
     category: 'hackathon',
     featured: true,
-    technologies: ['TypeScript', 'NodeJS', 'Redis', 'Docker'],
+    technologies: ['Bun', 'Turborepo', 'Blnk', 'Stripe', 'TronGrid', 'Chutes AI TEE Models', 'OAuth'],
     sortKey: 202605
   },
   {
@@ -258,7 +258,7 @@ export const EVENTS: EventItem[] = [
     description: 'Developed an AI conversational merchant voice assistant to automate order tracking and inventory forecasting.',
     category: 'hackathon',
     featured: true,
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'PostgreSQL', 'Ollama'],
+    technologies: ['Telegram Bot', 'Hono.js', 'pgvector', 'Whisper.cpp', 'Ollama', 'ILMU-GLM-5.1', 'BullMQ', 'Cloudflare Tunnel'],
     sortKey: 2026042
   },
   {
@@ -270,20 +270,20 @@ export const EVENTS: EventItem[] = [
     description: 'Co-created a computer vision safety monitoring system integrated with local LLMs to flag compliance risks.',
     category: 'hackathon',
     featured: true,
-    technologies: ['Python', 'Docker', 'Redis'],
+    technologies: ['Kotlin', 'Jetpack Compose', 'PostGIS', 'Prisma', 'Firebase Genkit', 'ML Kit OCR', 'Biometric Auth'],
     sortKey: 2026041
   },
   {
     id: 'event-futurehack',
     title: 'Fake Review and Fraud Detection',
     event: 'FutureHack 2025',
-    date: 'Jul 2027',
+    date: 'Jul 2025',
     role: 'Participant',
     description: 'Created NLP sentiment review detection models and transactional outlier regression scoring.',
     category: 'hackathon',
     featured: true,
-    technologies: ['Python', 'R', 'PostgreSQL'],
-    sortKey: 202707
+    technologies: ['Python', 'BERT', 'HTML'],
+    sortKey: 202507
   },
   {
     id: 'event-devmatch',
@@ -294,7 +294,7 @@ export const EVENTS: EventItem[] = [
     description: 'Authored EVM carbon credit offsets tracking smart contracts in Solidity and NextJS Web3 controls.',
     category: 'hackathon',
     featured: true,
-    technologies: ['Solidity', 'ReactJS', 'TypeScript', 'NextJS'],
+    technologies: ['Solidity', 'Next.js', 'Sui SDK', 'Hardhat', 'The Graph', 'Oasis ROFL'],
     sortKey: 202508
   },
   {
@@ -306,7 +306,7 @@ export const EVENTS: EventItem[] = [
     description: 'Designed LLM parsing algorithms and adaptive retrieval prompts for personalized flashcard generation.',
     category: 'hackathon',
     featured: true,
-    technologies: ['TypeScript', 'NextJS', 'PostgreSQL'],
+    technologies: ['AWS App Runner', 'Amazon Bedrock', 'AWS S3', 'AWS ECR', 'AWS Translate', 'AWS Comprehend', 'React', 'Docker'],
     sortKey: 202509
   },
   {
@@ -318,7 +318,7 @@ export const EVENTS: EventItem[] = [
     description: 'Built a local inventory shelf tracker with device heartbeat statuses and SQLite warning flags.',
     category: 'hackathon',
     featured: true,
-    technologies: ['TypeScript', 'ReactJS', 'NodeJS', 'SQLite'],
+    technologies: ['Flutter', 'Vertex AI', 'GCP', 'Firebase', 'Cloud Pub/Sub', 'Firestore'],
     sortKey: 202602
   }
 ];
