@@ -60,7 +60,7 @@ export const PROJECTS: Project[] = [
     id: 'krypitalx',
     category: 'internship',
     title: 'KrypitalX',
-    subtitle: 'Centralized Exchange Ledger',
+    subtitle: 'Centralized Trading Platform',
     description: 'A centralized crypto exchange backend wallet service that manages core wallet flows, transaction ledgers, and tiered compliance screening.',
     achievements: [
       'Owned the end-to-end design of centralized exchange backend services in Go, implementing compliant wallet flows.',
@@ -74,7 +74,7 @@ export const PROJECTS: Project[] = [
     id: 'ledgertrace',
     category: 'hackathon',
     title: 'LedgerTrace',
-    subtitle: 'Analytical Middleware Engine',
+    subtitle: 'AI Marathon 2026',
     description: 'An asynchronous fintech middleware engine that ingests high-frequency payment webhooks and double-entry logs transactions in secure environments.',
     achievements: [
       'Developed an asynchronous middleware pipeline using Redis to ingest payment events with real-time FX enrichment.',
@@ -91,7 +91,7 @@ export const PROJECTS: Project[] = [
     id: 'devmatch',
     category: 'hackathon',
     title: 'EcoChain',
-    subtitle: 'Decentralized Carbon Tracking (DevMatch)',
+    subtitle: 'DevMatch Hackathon 2025',
     description: 'A blockchain-based carbon offset tracking platform that registers ecological contributions and transfers green credits transparently.',
     achievements: [
       'Designed EVM smart contracts in Solidity for tracking offset credits and verifying green compliance.',
@@ -107,8 +107,8 @@ export const PROJECTS: Project[] = [
   {
     id: 'futurehack',
     category: 'hackathon',
-    title: 'FraudShield',
-    subtitle: 'Review & Fraud Detection (FutureHack)',
+    title: 'Fake Review and Fraud Detection',
+    subtitle: 'FutureHack 2025',
     description: 'A statistical fraud detection engine that identifies suspicious merchant behaviors and fake reviews using data analysis pipelines.',
     achievements: [
       'Created review classification algorithms in Python using NLP sentiment scoring.',
@@ -123,8 +123,8 @@ export const PROJECTS: Project[] = [
   {
     id: 'greatmalaysiaai',
     category: 'hackathon',
-    title: 'StudyBuddy AI',
-    subtitle: 'AI Learning Companion (GreatMalaysiaAI)',
+    title: 'AI Powered Learning Companion',
+    subtitle: 'Great Malaysia AI Hackathon 2025',
     description: 'An adaptive AI companion that parses text materials to automatically generate personalized flashcards, study schedules, and summaries.',
     achievements: [
       'Constructed text parsing logic to decompose syllabus contents into semantic chunks.',
@@ -141,7 +141,7 @@ export const PROJECTS: Project[] = [
     id: 'kitahack',
     category: 'hackathon',
     title: 'Shelf OS',
-    subtitle: 'Warehouse Stocking System (KitaHack)',
+    subtitle: 'KitaHack 2026',
     description: 'An intelligent warehouse operational system featuring automated inventory tracking and localized device status monitoring.',
     achievements: [
       'Developed server handlers to trace device heartbeats and shelf load capacities.',
@@ -157,8 +157,8 @@ export const PROJECTS: Project[] = [
   {
     id: 'myai-future',
     category: 'hackathon',
-    title: 'Project AEGIS',
-    subtitle: 'Warehouse Safety Monitor (MyAI Future)',
+    title: 'AEGIS',
+    subtitle: 'MyAI Future Hackathon 2026',
     description: 'A computer vision safety compliance system that processes warehouse footage to detect compliance violations in real-time.',
     achievements: [
       'Integrated OpenCV pipelines to analyze frame feeds and overlay bounding boxes.',
@@ -175,7 +175,7 @@ export const PROJECTS: Project[] = [
     id: 'umhackathon',
     category: 'hackathon',
     title: 'WarungAI',
-    subtitle: 'Conversational Stall Assistant (UMHack)',
+    subtitle: 'UMHackathon 2026',
     description: 'A local-language conversational voice assistant designed for street vendors to automate order management and inventory updates.',
     achievements: [
       'Constructed local speech transcription handlers using open LLM sound models.',
@@ -239,11 +239,10 @@ export const EXPERIENCES: Experience[] = [
 export const EVENTS: EventItem[] = [
   {
     id: 'event-ledgertrace',
-    title: 'LedgerTrace Backend Architect',
-    event: 'AI Marathon',
+    title: 'LedgerTrace',
+    event: 'AI Marathon 2026',
     date: 'May 2026',
-    role: 'Participant',
-    outcome: 'Fintech Innovation Spec',
+    role: 'Backend Developer',
     description: 'Designed asynchronous double-entry analytical ledgers and Stripe/TRON webhook processing.',
     category: 'hackathon',
     featured: true,
@@ -252,11 +251,10 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-warung',
-    title: 'Lead Full-Stack Developer',
-    event: 'UMHackathon (WarungAI)',
+    title: 'Warung AI',
+    event: 'UMHackathon 2026',
     date: 'Apr 2026',
     role: 'Participant',
-    outcome: 'Runner Up (2nd Place)',
     description: 'Developed an AI conversational merchant voice assistant to automate order tracking and inventory forecasting.',
     category: 'hackathon',
     featured: true,
@@ -265,11 +263,10 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-aegis',
-    title: 'Backend & CV Developer',
-    event: 'MyAI Future Hackathon (Project AEGIS)',
+    title: 'AEGIS',
+    event: 'MyAI Future Hackathon 2026',
     date: 'Apr 2026',
     role: 'Participant',
-    outcome: 'Special Mention (Tech Innovation)',
     description: 'Co-created a computer vision safety monitoring system integrated with local LLMs to flag compliance risks.',
     category: 'hackathon',
     featured: true,
@@ -278,11 +275,10 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-futurehack',
-    title: 'Data & Sentiment Engineer',
-    event: 'FutureHack (FraudShield)',
+    title: 'Fake Review and Fraud Detection',
+    event: 'FutureHack 2025',
     date: 'Jul 2027',
     role: 'Participant',
-    outcome: 'Fraud Classification Winner',
     description: 'Created NLP sentiment review detection models and transactional outlier regression scoring.',
     category: 'hackathon',
     featured: true,
@@ -291,11 +287,10 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-devmatch',
-    title: 'Smart Contract Developer',
-    event: 'DevMatch (EcoChain)',
+    title: 'EcoChain',
+    event: 'DevMatch Hackathon 2025',
     date: 'Aug 2025',
     role: 'Participant',
-    outcome: 'Decentralized Track Finalist',
     description: 'Authored EVM carbon credit offsets tracking smart contracts in Solidity and NextJS Web3 controls.',
     category: 'hackathon',
     featured: true,
@@ -304,11 +299,10 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-greatmalaysia',
-    title: 'Core AI Developer',
-    event: 'GreatMalaysiaAI (StudyBuddy AI)',
+    title: 'AI-Powered Learning Companion',
+    event: 'Great Malaysia AI Hackathon 2025',
     date: 'Sep 2025',
     role: 'Participant',
-    outcome: 'Top AI Tool Spec',
     description: 'Designed LLM parsing algorithms and adaptive retrieval prompts for personalized flashcard generation.',
     category: 'hackathon',
     featured: true,
@@ -317,8 +311,8 @@ export const EVENTS: EventItem[] = [
   },
   {
     id: 'event-kitahack',
-    title: 'Local OS Lead',
-    event: 'KitaHack (Shelf OS)',
+    title: 'Shelf OS',
+    event: 'KitaHack 2026',
     date: 'Feb 2026',
     role: 'Participant',
     description: 'Built a local inventory shelf tracker with device heartbeat statuses and SQLite warning flags.',
