@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Calendar, Briefcase, Award, GraduationCap, Laptop } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { Calendar, Briefcase, Award, GraduationCap, Laptop, ChevronDown } from 'lucide-react';
 import { EVENTS, EXPERIENCES } from '../data/registry';
 
 interface UnifiedTimelineItem {
@@ -17,6 +17,7 @@ interface UnifiedTimelineItem {
 
 export function Timeline() {
   const [activeFilter, setActiveFilter] = useState<'edu-work' | 'hackathon'>('edu-work');
+  const [expandedTimelineId, setExpandedTimelineId] = useState<string | null>(null);
 
   // Unified items list
   const unifiedItems = useMemo((): UnifiedTimelineItem[] => {
@@ -65,6 +66,18 @@ export function Timeline() {
     });
   }, [unifiedItems, activeFilter]);
 
+  useEffect(() => {
+    if (filteredItems.length > 0) {
+      setExpandedTimelineId(filteredItems[0].id);
+    } else {
+      setExpandedTimelineId(null);
+    }
+  }, [filteredItems]);
+
+  const toggleItem = (itemId: string) => {
+    setExpandedTimelineId(prev => prev === itemId ? null : itemId);
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'internship':
@@ -102,7 +115,7 @@ export function Timeline() {
       </div>
 
       {/* Alternating Timeline */}
-      <div className="relative max-w-4xl mx-auto px-4 select-text">
+      <div className="relative max-w-6xl mx-auto px-4 select-text">
         {/* Central Vertical Line */}
         <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-neutral-200 dark:bg-neutral-800 -translate-x-1/2" />
 
@@ -130,58 +143,83 @@ export function Timeline() {
                   {/* Left / Right Card Spacing wrapper */}
                   <div className="w-full md:w-1/2 pl-16 md:pl-0 md:px-8">
                     {/* Card Container */}
-                    <div className="group relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm">
-                      {/* Floating Date Badge */}
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase tracking-wider mb-2">
-                        <Calendar size={11} />
-                        {item.date}
-                      </span>
+                    <div
+                      onClick={() => toggleItem(item.id)}
+                      className="group relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm cursor-pointer select-none"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          {/* Floating Date Badge */}
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase tracking-wider mb-2">
+                            <Calendar size={11} />
+                            {item.date}
+                          </span>
 
-                      {/* Header details */}
-                      <h4 className="text-base font-bold text-neutral-900 dark:text-neutral-100 mt-1 leading-snug">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-500 font-mono mt-0.5">
-                        {item.subtitle}
-                      </p>
+                          {/* Header details */}
+                          <h4 className="text-base font-bold text-neutral-900 dark:text-neutral-100 mt-1 leading-snug">
+                            {item.title}
+                          </h4>
+                          <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-500 font-mono mt-0.5">
+                            {item.subtitle}
+                          </p>
 
-                      {/* Outcome Badge */}
-                      {item.outcome && (
-                        <span className="inline-flex items-center mt-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold font-mono bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/40">
-                          🏆 {item.outcome}
-                        </span>
-                      )}
-
-                      {/* Description */}
-                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-3 leading-relaxed">
-                        {item.description}
-                      </p>
-
-                      {/* Bullet Achievements (for Work / Ed) */}
-                      {item.achievements && item.achievements.length > 0 && (
-                        <ul className="mt-3.5 space-y-1.5 border-t border-neutral-100 dark:border-neutral-900 pt-3.5 select-text">
-                          {item.achievements.map((ach, idx) => (
-                            <li key={idx} className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-start gap-2 leading-relaxed">
-                              <span className="text-neutral-400 select-none">•</span>
-                              <span>{ach}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {/* Tech Tags */}
-                      {item.technologies.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-900">
-                          {item.technologies.map(tag => (
-                            <span
-                              key={tag}
-                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400"
-                            >
-                              {tag}
+                          {/* Outcome Badge */}
+                          {item.outcome && (
+                            <span className="inline-flex items-center mt-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold font-mono bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/40">
+                              🏆 {item.outcome}
                             </span>
-                          ))}
+                          )}
                         </div>
-                      )}
+
+                        <ChevronDown
+                          size={16}
+                          className={`text-neutral-400 dark:text-neutral-600 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
+                            expandedTimelineId === item.id ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </div>
+
+                      {/* Collapsible content with smooth height transition */}
+                      <div
+                        className={`grid transition-all duration-300 ease-in-out ${
+                          expandedTimelineId === item.id
+                            ? 'grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900'
+                            : 'grid-rows-[0fr] opacity-0'
+                        }`}
+                      >
+                        <div className="overflow-hidden space-y-4 select-text">
+                          {/* Description */}
+                          <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            {item.description}
+                          </p>
+
+                          {/* Bullet Achievements (for Work / Ed) */}
+                          {item.achievements && item.achievements.length > 0 && (
+                            <ul className="space-y-1.5 pt-1">
+                              {item.achievements.map((ach, idx) => (
+                                <li key={idx} className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
+                                  <span className="text-neutral-400 select-none">•</span>
+                                  <span>{ach}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          {/* Tech Tags */}
+                          {item.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-2">
+                              {item.technologies.map(tag => (
+                                <span
+                                  key={tag}
+                                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
