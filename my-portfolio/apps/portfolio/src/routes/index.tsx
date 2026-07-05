@@ -1,28 +1,50 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { Github, ExternalLink, Mail, Phone, MapPin, Award, CheckCircle, ArrowRight, Download, Linkedin, Cloud, Code2, ChevronLeft, ChevronRight, Play } from 'lucide-react';
-import { SkillsGraph } from '../components/SkillsGraph';
-import { Timeline } from '../components/Timeline';
-import { getPortfolioData } from '../server/queries';
+import { createFileRoute } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  Award,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Cloud,
+  Code2,
+  Download,
+  ExternalLink,
+  Github,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Play,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { SkillsGraph } from "../components/SkillsGraph";
+import { Timeline } from "../components/Timeline";
+import { getPortfolioData } from "../server/queries";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   loader: async () => {
     return getPortfolioData();
   },
-  component: PortfolioHome
+  component: PortfolioHome,
 });
 
 function PortfolioHome() {
-  const { projects: PROJECTS, experiences: EXPERIENCES, events: EVENTS } = Route.useLoaderData() as {
+  const {
+    projects: PROJECTS,
+    experiences: EXPERIENCES,
+    events: EVENTS,
+  } = Route.useLoaderData() as {
     projects: any[];
     experiences: any[];
     events: any[];
   };
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [projectFilter, setProjectFilter] = useState<'all' | 'open-source' | 'hackathon' | 'internship'>('all');
+  const [projectFilter, setProjectFilter] = useState<
+    "all" | "open-source" | "hackathon" | "internship"
+  >("all");
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
   // Guard: when routing to a specific project we set filters + index simultaneously;
   // this ref prevents the filter-change effect from immediately resetting index to 0.
@@ -30,43 +52,46 @@ function PortfolioHome() {
 
   // Dynamic numeric pagination pages list
   const paginationPages = useMemo(() => {
-    const total = PROJECTS.filter(p => {
-      const matchCat = projectFilter === 'all' || p.category === projectFilter;
-      const matchSkill = !selectedSkill || p.technologies.includes(selectedSkill) || p.domains.includes(selectedSkill);
+    const total = PROJECTS.filter((p) => {
+      const matchCat = projectFilter === "all" || p.category === projectFilter;
+      const matchSkill =
+        !selectedSkill ||
+        p.technologies.includes(selectedSkill) ||
+        p.domains.includes(selectedSkill);
       return matchCat && matchSkill;
     }).length; // Match the dynamic filteredProjects length computation below
-    
+
     const current = currentProjectIdx;
-    
+
     if (total <= 6) {
       return Array.from({ length: total }, (_, i) => i);
     }
-    
+
     if (current < 3) {
-      return [0, 1, 2, 'ellipsis', total - 2, total - 1];
+      return [0, 1, 2, "ellipsis", total - 2, total - 1];
     }
-    
+
     if (current >= total - 3) {
-      return [0, 1, 'ellipsis', total - 3, total - 2, total - 1];
+      return [0, 1, "ellipsis", total - 3, total - 2, total - 1];
     }
-    
-    return [0, 'ellipsis-left', current, 'ellipsis-right', total - 1];
+
+    return [0, "ellipsis-left", current, "ellipsis-right", total - 1];
   }, [projectFilter, selectedSkill, currentProjectIdx]);
 
   const handleRouteToProject = (projectId: string) => {
     // Mark that we are intentionally setting the index; skip the auto-reset effect.
     skipResetRef.current = true;
-    setProjectFilter('all');
+    setProjectFilter("all");
     setSelectedSkill(null);
-    const idx = PROJECTS.findIndex(p => p.id === projectId);
+    const idx = PROJECTS.findIndex((p) => p.id === projectId);
     if (idx !== -1) {
       setCurrentProjectIdx(idx);
     }
     // Scroll after React has committed the state batch
     setTimeout(() => {
-      const element = document.getElementById('projects');
+      const element = document.getElementById("projects");
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
     }, 80);
   };
@@ -75,11 +100,11 @@ function PortfolioHome() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      const id = hash.replace('#', '');
+      const id = hash.replace("#", "");
       const element = document.getElementById(id);
       if (element) {
         const timer = setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }, 150);
         return () => clearTimeout(timer);
       }
@@ -89,12 +114,12 @@ function PortfolioHome() {
   // Filter projects by selected category and skill (technologies or domains)
   const filteredProjects = useMemo(() => {
     let list = PROJECTS;
-    if (projectFilter !== 'all') {
-      list = list.filter(p => p.category === projectFilter);
+    if (projectFilter !== "all") {
+      list = list.filter((p) => p.category === projectFilter);
     }
     if (selectedSkill) {
       list = list.filter(
-        p => p.technologies.includes(selectedSkill) || p.domains.includes(selectedSkill)
+        (p) => p.technologies.includes(selectedSkill) || p.domains.includes(selectedSkill),
       );
     }
     return list;
@@ -114,31 +139,31 @@ function PortfolioHome() {
     if (contactForm.name && contactForm.email && contactForm.message) {
       setIsSubmitting(true);
       try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify({
-            access_key: '4cf3d562-875e-40d3-aac8-04ad869ec935', 
+            access_key: "4cf3d562-875e-40d3-aac8-04ad869ec935",
             name: contactForm.name,
             email: contactForm.email,
             message: contactForm.message,
-            subject: 'New Portfolio Contact Form Submission'
-          })
+            subject: "New Portfolio Contact Form Submission",
+          }),
         });
         const result = await response.json();
         if (result.success) {
           setFormSubmitted(true);
-          setContactForm({ name: '', email: '', message: '' });
+          setContactForm({ name: "", email: "", message: "" });
           setTimeout(() => setFormSubmitted(false), 5000);
         } else {
-          alert('Failed to send message. Please email directly to liujunhong20@gmail.com');
+          alert("Failed to send message. Please email directly to liujunhong20@gmail.com");
         }
       } catch (error) {
         console.error(error);
-        alert('Failed to send message. Please email directly to liujunhong20@gmail.com');
+        alert("Failed to send message. Please email directly to liujunhong20@gmail.com");
       } finally {
         setIsSubmitting(false);
       }
@@ -149,7 +174,7 @@ function PortfolioHome() {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -161,24 +186,25 @@ function PortfolioHome() {
         className="relative min-h-[85vh] flex items-center justify-center py-20 px-6 bg-grid overflow-hidden border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white dark:via-neutral-950/50 dark:to-neutral-950 pointer-events-none" />
-        
+
         <div className="max-w-3xl mx-auto text-center space-y-6 relative z-10 select-text">
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
             Ryan Lau Jun Hong
           </h1>
-          
+
           <p className="text-lg sm:text-xl font-medium text-neutral-600 dark:text-neutral-400 font-mono">
             Software Engineer
           </p>
 
           <p className="max-w-lg mx-auto text-sm sm:text-base text-neutral-500 dark:text-neutral-500 leading-relaxed font-sans">
-            Focusing on DevOps pipelines, AI-driven automation, and secure, high-performance Backend architectures.
+            Focusing on DevOps pipelines, AI-driven automation, and secure, high-performance Backend
+            architectures.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
             <a
               href="#projects"
-              onClick={(e) => scrollToSection(e, 'projects')}
+              onClick={(e) => scrollToSection(e, "projects")}
               className="inline-flex items-center gap-2 text-xs font-mono px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
             >
               <span>View Projects</span>
@@ -186,7 +212,7 @@ function PortfolioHome() {
             </a>
             <a
               href="#contact"
-              onClick={(e) => scrollToSection(e, 'contact')}
+              onClick={(e) => scrollToSection(e, "contact")}
               className="inline-flex items-center gap-2 text-xs font-mono px-5 py-2.5 bg-white hover:bg-neutral-50 dark:bg-neutral-950 dark:hover:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 rounded-lg transition-colors font-semibold"
             >
               <span>Get in Touch</span>
@@ -208,10 +234,14 @@ function PortfolioHome() {
           </div>
           <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
             <p>
-              I am a Software Engineering student passionate about exploring latest technologies and building reliable systems. My engineering approach centers on designing clean architectures, solving technical complexity, and optimizing performance.
+              I am a Software Engineering student passionate about exploring latest technologies and
+              building reliable systems. My engineering approach centers on designing clean
+              architectures, solving technical complexity, and optimizing performance.
             </p>
             <p>
-              I am deeply interested in DevOps automation, distributed ledgers, and intelligent AI pipelines, constantly experimenting with cutting-edge tools to build high-performance backend systems.
+              I am deeply interested in DevOps automation, distributed ledgers, and intelligent AI
+              pipelines, constantly experimenting with cutting-edge tools to build high-performance
+              backend systems.
             </p>
 
             <div className="pt-4">
@@ -220,6 +250,7 @@ function PortfolioHome() {
                 download
                 target="_blank"
                 className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
+                rel="noreferrer"
               >
                 <Download size={14} />
                 <span>Download Resume</span>
@@ -239,8 +270,13 @@ function PortfolioHome() {
             Skill Connections
           </h3>
         </div>
-        
-        <SkillsGraph selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} onRouteToProject={handleRouteToProject} projects={PROJECTS} />
+
+        <SkillsGraph
+          selectedSkill={selectedSkill}
+          onSelectSkill={setSelectedSkill}
+          onRouteToProject={handleRouteToProject}
+          projects={PROJECTS}
+        />
       </section>
 
       {/* 4. PROJECTS SECTION */}
@@ -268,19 +304,19 @@ function PortfolioHome() {
         {/* Category Filters */}
         <div className="flex flex-wrap gap-2 mb-10">
           {[
-            { id: 'all', label: 'All Projects' },
-            { id: 'internship', label: 'Internships' },
-            { id: 'hackathon', label: 'Hackathons' },
-            { id: 'open-source', label: 'Open Source' }
-          ].map(filter => (
+            { id: "all", label: "All Projects" },
+            { id: "internship", label: "Internships" },
+            { id: "hackathon", label: "Hackathons" },
+            { id: "open-source", label: "Open Source" },
+          ].map((filter) => (
             <button
               key={filter.id}
               type="button"
               onClick={() => setProjectFilter(filter.id as any)}
               className={`text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
                 projectFilter === filter.id
-                  ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                  : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600'
+                  ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"
+                  : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
               }`}
             >
               {filter.label}
@@ -298,9 +334,13 @@ function PortfolioHome() {
               {/* Left Arrow Button */}
               <button
                 type="button"
-                onClick={() => setCurrentProjectIdx(prev => (prev - 1 + filteredProjects.length) % filteredProjects.length)}
+                onClick={() =>
+                  setCurrentProjectIdx(
+                    (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
+                  )
+                }
                 className={`p-2.5 sm:p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
-                  filteredProjects.length <= 1 ? 'opacity-0 pointer-events-none' : ''
+                  filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
                 }`}
                 aria-label="Previous project"
               >
@@ -316,7 +356,7 @@ function PortfolioHome() {
                   <div
                     key={project.id}
                     className={`flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col ${
-                      hasImage ? 'md:flex-row' : 'p-6 sm:p-8 space-y-6'
+                      hasImage ? "md:flex-row" : "p-6 sm:p-8 space-y-6"
                     }`}
                   >
                     {hasImage && (
@@ -326,13 +366,15 @@ function PortfolioHome() {
                           alt={project.title}
                           className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none transition-transform duration-500 group-hover:scale-[1.02]"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.style.display = "none";
                           }}
                         />
                       </div>
                     )}
 
-                    <div className={`w-full ${hasImage ? 'md:w-1/2 p-6 sm:p-8 flex flex-col justify-between space-y-6' : 'space-y-6'}`}>
+                    <div
+                      className={`w-full ${hasImage ? "md:w-1/2 p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
+                    >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
@@ -390,8 +432,14 @@ function PortfolioHome() {
                         </span>
                         <ul className="space-y-2">
                           {project.achievements.map((ach: string, idx: number) => (
-                            <li key={idx} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
-                              <CheckCircle size={14} className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5" />
+                            <li
+                              key={idx}
+                              className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed"
+                            >
+                              <CheckCircle
+                                size={14}
+                                className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5"
+                              />
                               <span>{ach}</span>
                             </li>
                           ))}
@@ -407,8 +455,8 @@ function PortfolioHome() {
                             onClick={() => setSelectedSkill(tech)}
                             className={`text-[10px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
                               selectedSkill === tech
-                                ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold'
-                                : 'bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700'
+                                ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold"
+                                : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
                             }`}
                           >
                             {tech}
@@ -423,9 +471,9 @@ function PortfolioHome() {
               {/* Right Arrow Button */}
               <button
                 type="button"
-                onClick={() => setCurrentProjectIdx(prev => (prev + 1) % filteredProjects.length)}
+                onClick={() => setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)}
                 className={`p-2.5 sm:p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
-                  filteredProjects.length <= 1 ? 'opacity-0 pointer-events-none' : ''
+                  filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
                 }`}
                 aria-label="Next project"
               >
@@ -438,7 +486,7 @@ function PortfolioHome() {
           {filteredProjects.length > 1 && (
             <div className="flex justify-center items-center gap-1.5 mt-8 select-none">
               {paginationPages.map((page, idx) => {
-                if (typeof page === 'string') {
+                if (typeof page === "string") {
                   return (
                     <span
                       key={`ellipsis-${idx}`}
@@ -457,8 +505,8 @@ function PortfolioHome() {
                     onClick={() => setCurrentProjectIdx(page)}
                     className={`h-7 w-7 rounded-full border text-[11px] font-mono font-semibold flex items-center justify-center transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-bold scale-105'
-                        : 'bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600'
+                        ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-bold scale-105"
+                        : "bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
                     }`}
                     aria-label={`Go to slide ${page + 1}`}
                   >
@@ -508,9 +556,7 @@ function PortfolioHome() {
                 <Award size={22} />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
-                  Certificates
-                </h4>
+                <h4 className="text-sm font-bold text-neutral-900 dark:text-white">Certificates</h4>
                 <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
                   A compilation of my learning journey and development roadmap.
                 </p>
@@ -575,17 +621,15 @@ function PortfolioHome() {
       </section>
 
       {/* 7. CONTACT SECTION */}
-      <section
-        id="contact"
-        className="max-w-6xl mx-auto py-24 px-6 select-text"
-      >
+      <section id="contact" className="max-w-6xl mx-auto py-24 px-6 select-text">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
               Let's Connect
             </h3>
             <p className="text-xs text-neutral-500 mt-2">
-              Have a question or looking to recruit? Drop me an email directly or submit the contact form.
+              Have a question or looking to recruit? Drop me an email directly or submit the contact
+              form.
             </p>
 
             <div className="mt-8 space-y-4 font-mono text-xs text-neutral-600 dark:text-neutral-400">
@@ -636,7 +680,10 @@ function PortfolioHome() {
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase" htmlFor="form-name">
+                  <label
+                    className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                    htmlFor="form-name"
+                  >
                     Name
                   </label>
                   <input
@@ -649,7 +696,10 @@ function PortfolioHome() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase" htmlFor="form-email">
+                  <label
+                    className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                    htmlFor="form-email"
+                  >
                     Email
                   </label>
                   <input
@@ -662,9 +712,12 @@ function PortfolioHome() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1">
-                <label className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase" htmlFor="form-msg">
+                <label
+                  className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                  htmlFor="form-msg"
+                >
                   Message
                 </label>
                 <textarea
@@ -688,16 +741,13 @@ function PortfolioHome() {
                   disabled={isSubmitting}
                   className="text-xs font-mono px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-all font-semibold shadow-sm cursor-pointer disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               )}
             </form>
           </div>
         </div>
       </section>
-
     </div>
   );
 }
-
-

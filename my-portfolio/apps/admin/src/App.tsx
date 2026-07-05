@@ -1,27 +1,24 @@
-import { useState, useEffect } from 'react';
-import { 
-  FolderGit2, 
-  Layers, 
-  Clock3, 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  Upload, 
-  Check, 
-  X, 
-  Github, 
-  Play, 
-  Globe,
-  Settings
-} from 'lucide-react';
-import { client } from './client';
-import { skillCategoryEnum, projectCategoryEnum, timelineCategoryEnum } from '@portfolio/api';
+import { projectCategoryEnum, skillCategoryEnum, timelineCategoryEnum } from "@portfolio/api";
+import {
+  Check,
+  Clock3,
+  Edit3,
+  FolderGit2,
+  Layers,
+  Plus,
+  Settings,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { client } from "./client";
 
-type Tab = 'projects' | 'skills' | 'timeline';
+type Tab = "projects" | "skills" | "timeline";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('projects');
-  
+  const [activeTab, setActiveTab] = useState<Tab>("projects");
+
   // Data state
   const [projects, setProjects] = useState<any[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
@@ -29,8 +26,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   // Auth token state (simple protection)
-  const [authToken, setAuthToken] = useState(() => localStorage.getItem('cms_auth_token') || '');
-  const [isAuthSaved, setIsAuthSaved] = useState(() => !!localStorage.getItem('cms_auth_token'));
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem("cms_auth_token") || "");
+  const [isAuthSaved, setIsAuthSaved] = useState(() => !!localStorage.getItem("cms_auth_token"));
 
   // Active form state (editing or adding new)
   const [editingItem, setEditingItem] = useState<any | null>(null);
@@ -44,13 +41,13 @@ export default function App() {
       const [pRes, sRes, tRes] = await Promise.all([
         client.getProjects(),
         client.getSkills(),
-        client.getTimeline()
+        client.getTimeline(),
       ]);
       setProjects(pRes);
       setSkills(sRes);
       setTimeline(tRes);
     } catch (e) {
-      console.error('Failed to load portfolio database content:', e);
+      console.error("Failed to load portfolio database content:", e);
     } finally {
       setLoading(false);
     }
@@ -62,13 +59,13 @@ export default function App() {
 
   const saveAuthToken = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('cms_auth_token', authToken);
+    localStorage.setItem("cms_auth_token", authToken);
     setIsAuthSaved(true);
   };
 
   const clearAuthToken = () => {
-    localStorage.removeItem('cms_auth_token');
-    setAuthToken('');
+    localStorage.removeItem("cms_auth_token");
+    setAuthToken("");
     setIsAuthSaved(false);
   };
 
@@ -79,18 +76,18 @@ export default function App() {
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
-      if (!response.ok) throw new Error('Upload failed');
+      if (!response.ok) throw new Error("Upload failed");
       const data = await response.json();
       setEditingItem((prev: any) => ({ ...prev, imageUrl: data.imageUrl }));
-    } catch (err) {
-      alert('Error uploading screenshot to R2 bucket.');
+    } catch (_err) {
+      alert("Error uploading screenshot to R2 bucket.");
     } finally {
       setUploading(false);
     }
@@ -100,7 +97,7 @@ export default function App() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (activeTab === 'projects') {
+      if (activeTab === "projects") {
         const payload = {
           id: editingItem.id || null,
           category: editingItem.category,
@@ -112,17 +109,17 @@ export default function App() {
           imageUrl: editingItem.imageUrl || null,
           sortOrder: Number(editingItem.sortOrder || 0),
           achievements: editingItem.achievements || [],
-          skills: editingItem.skills || []
+          skills: editingItem.skills || [],
         };
         await client.saveProject(payload);
-      } else if (activeTab === 'skills') {
+      } else if (activeTab === "skills") {
         const payload = {
           id: editingItem.id || null,
           name: editingItem.name,
-          category: editingItem.category
+          category: editingItem.category,
         };
         await client.saveSkill(payload);
-      } else if (activeTab === 'timeline') {
+      } else if (activeTab === "timeline") {
         const payload = {
           id: editingItem.id || null,
           title: editingItem.title,
@@ -134,7 +131,7 @@ export default function App() {
           sortKey: Number(editingItem.sortKey || 0),
           isFeatured: !!editingItem.isFeatured,
           achievements: editingItem.achievements || [],
-          skills: editingItem.skills || []
+          skills: editingItem.skills || [],
         };
         await client.saveTimelineItem(payload);
       }
@@ -142,24 +139,24 @@ export default function App() {
       setEditingItem(null);
       fetchData();
     } catch (err) {
-      alert('Error saving record: ' + (err as Error).message);
+      alert(`Error saving record: ${(err as Error).message}`);
     }
   };
 
   // Generic Delete handler
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!confirm("Are you sure you want to delete this item?")) return;
     try {
-      if (activeTab === 'projects') {
+      if (activeTab === "projects") {
         await client.deleteProject({ id });
-      } else if (activeTab === 'skills') {
+      } else if (activeTab === "skills") {
         await client.deleteSkill({ id });
-      } else if (activeTab === 'timeline') {
+      } else if (activeTab === "timeline") {
         await client.deleteTimelineItem({ id });
       }
       fetchData();
     } catch (err) {
-      alert('Error deleting: ' + (err as Error).message);
+      alert(`Error deleting: ${(err as Error).message}`);
     }
   };
 
@@ -167,46 +164,46 @@ export default function App() {
     if (item) {
       // Map relations format to simple ID arrays for checkboxes/inputs
       const mapped = { ...item };
-      if (activeTab === 'projects' || activeTab === 'timeline') {
+      if (activeTab === "projects" || activeTab === "timeline") {
         mapped.skills = item.skills?.map((s: any) => s.skillId || s.skill?.id) || [];
         mapped.achievements = item.achievements?.map((a: any) => a.content) || [];
       }
-      if (activeTab === 'timeline') {
+      if (activeTab === "timeline") {
         mapped.isFeatured = item.isFeatured === 1 || !!item.isFeatured;
       }
       setEditingItem(mapped);
     } else {
       // Setup empty defaults
-      if (activeTab === 'projects') {
+      if (activeTab === "projects") {
         setEditingItem({
-          category: 'open-source',
-          title: '',
-          subtitle: '',
-          description: '',
-          githubUrl: '',
-          videoUrl: '',
-          imageUrl: '',
+          category: "open-source",
+          title: "",
+          subtitle: "",
+          description: "",
+          githubUrl: "",
+          videoUrl: "",
+          imageUrl: "",
           sortOrder: projects.length + 1,
-          achievements: [''],
-          skills: []
+          achievements: [""],
+          skills: [],
         });
-      } else if (activeTab === 'skills') {
+      } else if (activeTab === "skills") {
         setEditingItem({
-          name: '',
-          category: 'Programming Languages'
+          name: "",
+          category: "Programming Languages",
         });
-      } else if (activeTab === 'timeline') {
+      } else if (activeTab === "timeline") {
         setEditingItem({
-          title: '',
-          subtitle: '',
-          dateDisplay: '',
-          description: '',
-          category: 'hackathon',
-          outcome: '',
+          title: "",
+          subtitle: "",
+          dateDisplay: "",
+          description: "",
+          category: "hackathon",
+          outcome: "",
           sortKey: 202601,
           isFeatured: false,
-          achievements: [''],
-          skills: []
+          achievements: [""],
+          skills: [],
         });
       }
     }
@@ -225,27 +222,42 @@ export default function App() {
 
           <nav className="space-y-1">
             <button
-              onClick={() => { setActiveTab('projects'); setIsFormOpen(false); }}
+              onClick={() => {
+                setActiveTab("projects");
+                setIsFormOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'projects' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'
+                activeTab === "projects"
+                  ? "bg-blue-600 text-white"
+                  : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
               }`}
             >
               <FolderGit2 size={18} />
               Projects
             </button>
             <button
-              onClick={() => { setActiveTab('skills'); setIsFormOpen(false); }}
+              onClick={() => {
+                setActiveTab("skills");
+                setIsFormOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'skills' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'
+                activeTab === "skills"
+                  ? "bg-blue-600 text-white"
+                  : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
               }`}
             >
               <Layers size={18} />
               Skills
             </button>
             <button
-              onClick={() => { setActiveTab('timeline'); setIsFormOpen(false); }}
+              onClick={() => {
+                setActiveTab("timeline");
+                setIsFormOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'timeline' ? 'bg-blue-600 text-white' : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'
+                activeTab === "timeline"
+                  ? "bg-blue-600 text-white"
+                  : "text-neutral-400 hover:bg-neutral-800 hover:text-white"
               }`}
             >
               <Clock3 size={18} />
@@ -258,20 +270,32 @@ export default function App() {
         <div className="mt-8 border-t border-neutral-800 pt-6">
           {!isAuthSaved ? (
             <form onSubmit={saveAuthToken} className="space-y-2">
-              <label className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">Admin Password</label>
-              <input 
+              <label className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">
+                Admin Password
+              </label>
+              <input
                 type="password"
                 value={authToken}
-                onChange={e => setAuthToken(e.target.value)}
+                onChange={(e) => setAuthToken(e.target.value)}
                 placeholder="Enter password..."
                 className="w-full text-xs bg-neutral-800 border border-neutral-700 rounded p-2 text-white outline-none focus:border-blue-500"
               />
-              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs p-2 rounded cursor-pointer">Save</button>
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs p-2 rounded cursor-pointer"
+              >
+                Save
+              </button>
             </form>
           ) : (
             <div className="flex items-center justify-between gap-2 bg-neutral-800 p-3 rounded text-xs text-green-400 font-mono">
               <span>Token Configured</span>
-              <button onClick={clearAuthToken} className="text-neutral-500 hover:text-white cursor-pointer">[Clear]</button>
+              <button
+                onClick={clearAuthToken}
+                className="text-neutral-500 hover:text-white cursor-pointer"
+              >
+                [Clear]
+              </button>
             </div>
           )}
         </div>
@@ -281,8 +305,12 @@ export default function App() {
       <main className="flex-1 bg-neutral-50 dark:bg-neutral-950 p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-8 border-b border-neutral-200 dark:border-neutral-900 pb-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight capitalize text-neutral-900 dark:text-white">{activeTab} Manager</h2>
-            <p className="text-xs text-neutral-500 mt-1">Create, update, and delete entries in the portfolio database.</p>
+            <h2 className="text-2xl font-bold tracking-tight capitalize text-neutral-900 dark:text-white">
+              {activeTab} Manager
+            </h2>
+            <p className="text-xs text-neutral-500 mt-1">
+              Create, update, and delete entries in the portfolio database.
+            </p>
           </div>
           <button
             onClick={() => openForm()}
@@ -294,41 +322,80 @@ export default function App() {
         </header>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20 font-mono text-xs text-neutral-500">Loading data from Cloudflare D1...</div>
+          <div className="flex items-center justify-center py-20 font-mono text-xs text-neutral-500">
+            Loading data from Cloudflare D1...
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {/* --- PROJECTS TAB --- */}
-            {activeTab === 'projects' && projects.map((p: any) => (
-              <div key={p.id} className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/20 px-2 py-0.5 rounded">
-                      {p.category}
-                    </span>
-                    <span className="text-xs text-neutral-400 font-mono">Order: {p.sortOrder}</span>
+            {activeTab === "projects" &&
+              projects.map((p: any) => (
+                <div
+                  key={p.id}
+                  className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/20 px-2 py-0.5 rounded">
+                        {p.category}
+                      </span>
+                      <span className="text-xs text-neutral-400 font-mono">
+                        Order: {p.sortOrder}
+                      </span>
+                    </div>
+                    <h4 className="text-base font-bold text-neutral-900 dark:text-white">
+                      {p.title}
+                    </h4>
+                    <p className="text-xs text-neutral-500 leading-relaxed max-w-2xl">
+                      {p.description}
+                    </p>
                   </div>
-                  <h4 className="text-base font-bold text-neutral-900 dark:text-white">{p.title}</h4>
-                  <p className="text-xs text-neutral-500 leading-relaxed max-w-2xl">{p.description}</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openForm(p)}
+                      className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
+                    >
+                      <Edit3 size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => openForm(p)} className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"><Edit3 size={14} /></button>
-                  <button onClick={() => handleDelete(p.id)} className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"><Trash2 size={14} /></button>
-                </div>
-              </div>
-            ))}
+              ))}
 
             {/* --- SKILLS TAB --- */}
-            {activeTab === 'skills' && (
+            {activeTab === "skills" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 {skills.map((s: any) => (
-                  <div key={s.id} className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm flex justify-between items-center gap-4">
+                  <div
+                    key={s.id}
+                    className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm flex justify-between items-center gap-4"
+                  >
                     <div className="space-y-1 min-w-0">
-                      <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">{s.category}</span>
-                      <h4 className="text-sm font-bold text-neutral-900 dark:text-white truncate">{s.name}</h4>
+                      <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">
+                        {s.category}
+                      </span>
+                      <h4 className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        {s.name}
+                      </h4>
                     </div>
                     <div className="flex gap-1 shrink-0">
-                      <button onClick={() => openForm(s)} className="p-1.5 border border-neutral-200 dark:border-neutral-800 rounded hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"><Edit3 size={12} /></button>
-                      <button onClick={() => handleDelete(s.id)} className="p-1.5 border border-red-100 dark:border-red-950 text-red-500 rounded hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"><Trash2 size={12} /></button>
+                      <button
+                        onClick={() => openForm(s)}
+                        className="p-1.5 border border-neutral-200 dark:border-neutral-800 rounded hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
+                      >
+                        <Edit3 size={12} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(s.id)}
+                        className="p-1.5 border border-red-100 dark:border-red-950 text-red-500 rounded hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                      >
+                        <Trash2 size={12} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -336,25 +403,45 @@ export default function App() {
             )}
 
             {/* --- TIMELINE TAB --- */}
-            {activeTab === 'timeline' && timeline.map((t: any) => (
-              <div key={t.id} className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/20 px-2 py-0.5 rounded">
-                      {t.category}
-                    </span>
-                    <span className="text-xs text-neutral-400 font-mono">{t.dateDisplay}</span>
-                    {t.isFeatured === 1 && <span className="text-[9px] font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Featured</span>}
+            {activeTab === "timeline" &&
+              timeline.map((t: any) => (
+                <div
+                  key={t.id}
+                  className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/20 px-2 py-0.5 rounded">
+                        {t.category}
+                      </span>
+                      <span className="text-xs text-neutral-400 font-mono">{t.dateDisplay}</span>
+                      {t.isFeatured === 1 && (
+                        <span className="text-[9px] font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-base font-bold text-neutral-900 dark:text-white">
+                      {t.title}
+                    </h4>
+                    <p className="text-xs font-semibold text-neutral-500 font-mono">{t.subtitle}</p>
                   </div>
-                  <h4 className="text-base font-bold text-neutral-900 dark:text-white">{t.title}</h4>
-                  <p className="text-xs font-semibold text-neutral-500 font-mono">{t.subtitle}</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openForm(t)}
+                      className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
+                    >
+                      <Edit3 size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(t.id)}
+                      className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => openForm(t)} className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"><Edit3 size={14} /></button>
-                  <button onClick={() => handleDelete(t.id)} className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"><Trash2 size={14} /></button>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </main>
@@ -365,58 +452,86 @@ export default function App() {
           <div className="w-full max-w-2xl bg-white dark:bg-neutral-950 p-8 shadow-2xl flex flex-col justify-between overflow-y-auto">
             <div>
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-900">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">{editingItem.id ? 'Edit' : 'Create New'} {activeTab.slice(0, -1)}</h3>
-                <button onClick={() => { setIsFormOpen(false); setEditingItem(null); }} className="text-neutral-400 hover:text-neutral-600"><X size={20} /></button>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                  {editingItem.id ? "Edit" : "Create New"} {activeTab.slice(0, -1)}
+                </h3>
+                <button
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    setEditingItem(null);
+                  }}
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
               <form onSubmit={handleSave} className="space-y-6">
                 {/* --- SKILLS FORM --- */}
-                {activeTab === 'skills' && (
+                {activeTab === "skills" && (
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Skill Name</label>
-                      <input 
-                        type="text" 
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                        Skill Name
+                      </label>
+                      <input
+                        type="text"
                         required
-                        value={editingItem.name} 
-                        onChange={e => setEditingItem({ ...editingItem, name: e.target.value })}
+                        value={editingItem.name}
+                        onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
                         className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Category</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                        Category
+                      </label>
                       <select
                         value={editingItem.category}
-                        onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                        onChange={(e) =>
+                          setEditingItem({ ...editingItem, category: e.target.value })
+                        }
                         className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                       >
-                        {skillCategoryEnum.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        {skillCategoryEnum.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
                 )}
 
                 {/* --- PROJECTS FORM --- */}
-                {activeTab === 'projects' && (
+                {activeTab === "projects" && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Title</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Title
+                        </label>
+                        <input
+                          type="text"
                           required
-                          value={editingItem.title} 
-                          onChange={e => setEditingItem({ ...editingItem, title: e.target.value })}
+                          value={editingItem.title}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, title: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Subtitle</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Subtitle
+                        </label>
+                        <input
+                          type="text"
                           required
-                          value={editingItem.subtitle} 
-                          onChange={e => setEditingItem({ ...editingItem, subtitle: e.target.value })}
+                          value={editingItem.subtitle}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, subtitle: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
@@ -424,33 +539,49 @@ export default function App() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Category</label>
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Category
+                        </label>
                         <select
                           value={editingItem.category}
-                          onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, category: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         >
-                          {projectCategoryEnum.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                          {projectCategoryEnum.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Sort Order</label>
-                        <input 
-                          type="number" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Sort Order
+                        </label>
+                        <input
+                          type="number"
                           required
-                          value={editingItem.sortOrder} 
-                          onChange={e => setEditingItem({ ...editingItem, sortOrder: Number(e.target.value) })}
+                          value={editingItem.sortOrder}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, sortOrder: Number(e.target.value) })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Description</label>
-                      <textarea 
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                        Description
+                      </label>
+                      <textarea
                         required
-                        value={editingItem.description} 
-                        onChange={e => setEditingItem({ ...editingItem, description: e.target.value })}
+                        value={editingItem.description}
+                        onChange={(e) =>
+                          setEditingItem({ ...editingItem, description: e.target.value })
+                        }
                         rows={3}
                         className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white resize-none"
                       />
@@ -458,39 +589,56 @@ export default function App() {
 
                     {/* Screenshot Upload (R2 integration) */}
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">Screenshot</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">
+                        Screenshot
+                      </label>
                       <div className="flex gap-4 items-center">
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="/r2/projects/..."
-                          value={editingItem.imageUrl || ''} 
-                          onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })}
+                          value={editingItem.imageUrl || ""}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, imageUrl: e.target.value })
+                          }
                           className="flex-1 text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                         <label className="flex items-center gap-1 px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-lg text-xs font-semibold cursor-pointer">
                           <Upload size={14} />
-                          <span>{uploading ? 'Uploading...' : 'Upload R2'}</span>
-                          <input type="file" onChange={handleImageUpload} className="hidden" accept="image/*" />
+                          <span>{uploading ? "Uploading..." : "Upload R2"}</span>
+                          <input
+                            type="file"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            accept="image/*"
+                          />
                         </label>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">GitHub URL</label>
-                        <input 
-                          type="text" 
-                          value={editingItem.githubUrl || ''} 
-                          onChange={e => setEditingItem({ ...editingItem, githubUrl: e.target.value })}
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          GitHub URL
+                        </label>
+                        <input
+                          type="text"
+                          value={editingItem.githubUrl || ""}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, githubUrl: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Demo Video URL</label>
-                        <input 
-                          type="text" 
-                          value={editingItem.videoUrl || ''} 
-                          onChange={e => setEditingItem({ ...editingItem, videoUrl: e.target.value })}
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Demo Video URL
+                        </label>
+                        <input
+                          type="text"
+                          value={editingItem.videoUrl || ""}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, videoUrl: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
@@ -498,23 +646,27 @@ export default function App() {
 
                     {/* Achievements List */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">Achievements / bullet points</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">
+                        Achievements / bullet points
+                      </label>
                       {editingItem.achievements?.map((ach: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={ach}
-                            onChange={e => {
+                            onChange={(e) => {
                               const next = [...(editingItem.achievements || [])];
                               next[idx] = e.target.value;
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
                             className="flex-1 text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                           />
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             onClick={() => {
-                              const next = editingItem.achievements?.filter((_: any, i: number) => i !== idx);
+                              const next = editingItem.achievements?.filter(
+                                (_: any, i: number) => i !== idx,
+                              );
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
                             className="p-2 text-red-500 hover:bg-neutral-100 rounded"
@@ -523,9 +675,14 @@ export default function App() {
                           </button>
                         </div>
                       ))}
-                      <button 
-                        type="button" 
-                        onClick={() => setEditingItem({ ...editingItem, achievements: [...(editingItem.achievements || []), ''] })}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingItem({
+                            ...editingItem,
+                            achievements: [...(editingItem.achievements || []), ""],
+                          })
+                        }
                         className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
                       >
                         + Add Bullet Point
@@ -534,18 +691,25 @@ export default function App() {
 
                     {/* Tagged Skills Checklist */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">Tag Technologies</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">
+                        Tag Technologies
+                      </label>
                       <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
-                        {skills.map(s => {
+                        {skills.map((s) => {
                           const isChecked = editingItem.skills?.includes(s.id);
                           return (
-                            <label key={s.id} className="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-                              <input 
+                            <label
+                              key={s.id}
+                              className="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300"
+                            >
+                              <input
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => {
                                   const current = [...(editingItem.skills || [])];
-                                  const next = isChecked ? current.filter(id => id !== s.id) : [...current, s.id];
+                                  const next = isChecked
+                                    ? current.filter((id) => id !== s.id)
+                                    : [...current, s.id];
                                   setEditingItem({ ...editingItem, skills: next });
                                 }}
                               />
@@ -559,26 +723,34 @@ export default function App() {
                 )}
 
                 {/* --- TIMELINE FORM --- */}
-                {activeTab === 'timeline' && (
+                {activeTab === "timeline" && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Title / Role</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Title / Role
+                        </label>
+                        <input
+                          type="text"
                           required
-                          value={editingItem.title} 
-                          onChange={e => setEditingItem({ ...editingItem, title: e.target.value })}
+                          value={editingItem.title}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, title: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Subtitle / Company</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Subtitle / Company
+                        </label>
+                        <input
+                          type="text"
                           required
-                          value={editingItem.subtitle} 
-                          onChange={e => setEditingItem({ ...editingItem, subtitle: e.target.value })}
+                          value={editingItem.subtitle}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, subtitle: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
@@ -586,67 +758,98 @@ export default function App() {
 
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Date Display</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Date Display
+                        </label>
+                        <input
+                          type="text"
                           required
                           placeholder="e.g. May 2026"
-                          value={editingItem.dateDisplay} 
-                          onChange={e => setEditingItem({ ...editingItem, dateDisplay: e.target.value })}
+                          value={editingItem.dateDisplay}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, dateDisplay: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Sort Key (YYYYMM)</label>
-                        <input 
-                          type="number" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Sort Key (YYYYMM)
+                        </label>
+                        <input
+                          type="number"
                           required
-                          value={editingItem.sortKey} 
-                          onChange={e => setEditingItem({ ...editingItem, sortKey: Number(e.target.value) })}
+                          value={editingItem.sortKey}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, sortKey: Number(e.target.value) })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Category</label>
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Category
+                        </label>
                         <select
                           value={editingItem.category}
-                          onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, category: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         >
-                          {timelineCategoryEnum.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                          {timelineCategoryEnum.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Outcome / Award</label>
-                        <input 
-                          type="text" 
+                        <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                          Outcome / Award
+                        </label>
+                        <input
+                          type="text"
                           placeholder="e.g. Winner (Optional)"
-                          value={editingItem.outcome || ''} 
-                          onChange={e => setEditingItem({ ...editingItem, outcome: e.target.value })}
+                          value={editingItem.outcome || ""}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, outcome: e.target.value })
+                          }
                           className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                         />
                       </div>
                       <div className="flex items-center gap-2 pt-6">
-                        <input 
+                        <input
                           id="chk-featured"
-                          type="checkbox" 
-                          checked={editingItem.isFeatured} 
-                          onChange={e => setEditingItem({ ...editingItem, isFeatured: e.target.checked })}
+                          type="checkbox"
+                          checked={editingItem.isFeatured}
+                          onChange={(e) =>
+                            setEditingItem({ ...editingItem, isFeatured: e.target.checked })
+                          }
                           className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500 border-neutral-300"
                         />
-                        <label htmlFor="chk-featured" className="text-xs font-mono font-semibold text-neutral-700 dark:text-neutral-300">Featured (show on timeline page)</label>
+                        <label
+                          htmlFor="chk-featured"
+                          className="text-xs font-mono font-semibold text-neutral-700 dark:text-neutral-300"
+                        >
+                          Featured (show on timeline page)
+                        </label>
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">Description</label>
-                      <textarea 
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase">
+                        Description
+                      </label>
+                      <textarea
                         required
-                        value={editingItem.description} 
-                        onChange={e => setEditingItem({ ...editingItem, description: e.target.value })}
+                        value={editingItem.description}
+                        onChange={(e) =>
+                          setEditingItem({ ...editingItem, description: e.target.value })
+                        }
                         rows={3}
                         className="w-full text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none focus:border-blue-500 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white resize-none"
                       />
@@ -654,23 +857,27 @@ export default function App() {
 
                     {/* Achievements List */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">Achievements / bullet points</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">
+                        Achievements / bullet points
+                      </label>
                       {editingItem.achievements?.map((ach: string, idx: number) => (
                         <div key={idx} className="flex gap-2">
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={ach}
-                            onChange={e => {
+                            onChange={(e) => {
                               const next = [...(editingItem.achievements || [])];
                               next[idx] = e.target.value;
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
                             className="flex-1 text-xs font-mono border border-neutral-200 dark:border-neutral-800 p-2.5 rounded-lg outline-none bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white"
                           />
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             onClick={() => {
-                              const next = editingItem.achievements?.filter((_: any, i: number) => i !== idx);
+                              const next = editingItem.achievements?.filter(
+                                (_: any, i: number) => i !== idx,
+                              );
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
                             className="p-2 text-red-500 hover:bg-neutral-100 rounded"
@@ -679,9 +886,14 @@ export default function App() {
                           </button>
                         </div>
                       ))}
-                      <button 
-                        type="button" 
-                        onClick={() => setEditingItem({ ...editingItem, achievements: [...(editingItem.achievements || []), ''] })}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingItem({
+                            ...editingItem,
+                            achievements: [...(editingItem.achievements || []), ""],
+                          })
+                        }
                         className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer"
                       >
                         + Add Bullet Point
@@ -690,18 +902,25 @@ export default function App() {
 
                     {/* Tagged Skills Checklist */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">Tag Skills</label>
+                      <label className="text-[10px] font-mono font-bold text-neutral-400 uppercase block">
+                        Tag Skills
+                      </label>
                       <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
-                        {skills.map(s => {
+                        {skills.map((s) => {
                           const isChecked = editingItem.skills?.includes(s.id);
                           return (
-                            <label key={s.id} className="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300">
-                              <input 
+                            <label
+                              key={s.id}
+                              className="flex items-center gap-2 text-xs font-mono text-neutral-700 dark:text-neutral-300"
+                            >
+                              <input
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => {
                                   const current = [...(editingItem.skills || [])];
-                                  const next = isChecked ? current.filter(id => id !== s.id) : [...current, s.id];
+                                  const next = isChecked
+                                    ? current.filter((id) => id !== s.id)
+                                    : [...current, s.id];
                                   setEditingItem({ ...editingItem, skills: next });
                                 }}
                               />
@@ -724,7 +943,10 @@ export default function App() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setIsFormOpen(false); setEditingItem(null); }}
+                    onClick={() => {
+                      setIsFormOpen(false);
+                      setEditingItem(null);
+                    }}
                     className="px-6 py-3 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-950 rounded-lg text-sm font-semibold transition-colors cursor-pointer"
                   >
                     Cancel

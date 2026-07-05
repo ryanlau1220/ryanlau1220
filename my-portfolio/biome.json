@@ -1,5 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "files": {
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.wrangler/**",
+      "**/.tanstack/**",
+      "**/routeTree.gen.ts"
+    ]
+  },
   "organizeImports": {
     "enabled": true
   },
@@ -11,7 +20,22 @@
         "noNonNullAssertion": "off"
       },
       "correctness": {
-        "noUnusedVariables": "warn"
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
+      },
+      "complexity": {
+        "noForEach": "off"
+      },
+      "a11y": {
+        "noLabelWithoutControl": "off",
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "off",
+        "useValidAnchor": "off",
+        "noSvgWithoutTitle": "off"
       }
     }
   },

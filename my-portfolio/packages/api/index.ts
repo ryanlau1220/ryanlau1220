@@ -1,21 +1,21 @@
-import { z } from 'zod';
-import { oc } from '@orpc/contract';
+import { oc } from "@orpc/contract";
+import { z } from "zod";
 
 // --- Category Enums constants ---
 export const skillCategoryEnum = [
-  'Programming Languages',
-  'Backend',
-  'Frontend',
-  'Databases',
-  'Tools',
-  'DevOps',
-  'AI & Intelligence',
-  'Others'
+  "Programming Languages",
+  "Backend",
+  "Frontend",
+  "Databases",
+  "Tools",
+  "DevOps",
+  "AI & Intelligence",
+  "Others",
 ] as const;
 
-export const projectCategoryEnum = ['open-source', 'hackathon', 'internship', 'academic'] as const;
+export const projectCategoryEnum = ["open-source", "hackathon", "internship", "academic"] as const;
 
-export const timelineCategoryEnum = ['education', 'internship', 'hackathon', 'other'] as const;
+export const timelineCategoryEnum = ["education", "internship", "hackathon", "other"] as const;
 
 // --- Zod schemas for input validation ---
 
@@ -30,13 +30,13 @@ export const ProjectSchema = z.object({
   imageUrl: z.string().url().nullable().optional(),
   sortOrder: z.number().default(0),
   achievements: z.array(z.string()).default([]),
-  skills: z.array(z.number()).default([])
+  skills: z.array(z.number()).default([]),
 });
 
 export const SkillSchema = z.object({
   id: z.number().optional().nullable(),
   name: z.string().min(1),
-  category: z.enum(skillCategoryEnum)
+  category: z.enum(skillCategoryEnum),
 });
 
 export const TimelineSchema = z.object({
@@ -50,7 +50,7 @@ export const TimelineSchema = z.object({
   sortKey: z.number(),
   isFeatured: z.boolean().default(false),
   achievements: z.array(z.string()).default([]),
-  skills: z.array(z.number()).default([])
+  skills: z.array(z.number()).default([]),
 });
 
 export type ProjectInput = z.infer<typeof ProjectSchema>;
@@ -69,7 +69,9 @@ export const contract = oc.router({
 
   getTimeline: oc.output(z.array(z.any())),
   saveTimelineItem: oc.input(TimelineSchema).output(z.object({ id: z.number() })),
-  deleteTimelineItem: oc.input(z.object({ id: z.number() })).output(z.object({ success: z.boolean() }))
+  deleteTimelineItem: oc
+    .input(z.object({ id: z.number() }))
+    .output(z.object({ success: z.boolean() })),
 });
-export * from './router';
+export * from "./router";
 export type ContractRouter = typeof contract;

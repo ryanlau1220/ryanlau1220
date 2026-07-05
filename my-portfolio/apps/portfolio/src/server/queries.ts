@@ -1,104 +1,105 @@
-import { createServerFn } from '@tanstack/react-start';
-import { getDb } from './db';
+import { createServerFn } from "@tanstack/react-start";
+import { getDb } from "./db";
 
 // Fetch all database records and map to legacy type structures to keep the UI simple
-export const getPortfolioData = createServerFn({ method: 'GET' })
-  .handler(async () => {
-    const db = getDb();
-    if (!db) {
-      // Return fallback empty data if DB binding is missing during build checks
-      return { projects: [], experiences: [], events: [] };
-    }
+export const getPortfolioData = createServerFn({ method: "GET" }).handler(async () => {
+  const db = getDb();
+  if (!db) {
+    // Return fallback empty data if DB binding is missing during build checks
+    return { projects: [], experiences: [], events: [] };
+  }
 
-    try {
-      // 1. Fetch Projects with achievements and skills relations
-      const dbProjects = await db.query.projects.findMany({
-        with: {
-          achievements: true,
-          skills: {
-            with: {
-              skill: true
-            }
-          }
+  try {
+    // 1. Fetch Projects with achievements and skills relations
+    const dbProjects = await db.query.projects.findMany({
+      with: {
+        achievements: true,
+        skills: {
+          with: {
+            skill: true,
+          },
         },
-        orderBy: (projects: any, { asc }: any) => [asc(projects.sortOrder)]
-      });
+      },
+      orderBy: (projects: any, { asc }: any) => [asc(projects.sortOrder)],
+    });
 
-      const projects = dbProjects.map((p: any) => {
-        const technologies = p.skills.map((s: any) => s.skill.name);
-        const domains = Array.from(new Set(p.skills.map((s: any) => s.skill.category))) as string[];
+    const projects = dbProjects.map((p: any) => {
+      const technologies = p.skills.map((s: any) => s.skill.name);
+      const domains = Array.from(new Set(p.skills.map((s: any) => s.skill.category))) as string[];
+
+      return {
+        id: String(p.id),
+        category: p.category,
+        title: p.title,
+        subtitle: p.subtitle,
+        description: p.description,
+        achievements: p.achievements.map((a: any) => a.content),
+        githubUrl: p.githubUrl || undefined,
+        videoUrl: p.videoUrl || undefined,
+        imageUrl: p.imageUrl || undefined,
+        domains,
+        technologies,
+      };
+    });
+
+    // 2. Fetch Timeline items with achievements and skills relations
+    const dbTimeline = await db.query.timeline.findMany({
+      with: {
+        achievements: true,
+        skills: {
+          with: {
+            skill: true,
+          },
+        },
+      },
+      orderBy: (timeline: any, { desc }: any) => [desc(timeline.sortKey)],
+    });
+
+    // Split timeline items into experiences (education & internship) and events (hackathon & others)
+    const experiences = dbTimeline
+      .filter((t: any) => t.category === "education" || t.category === "internship")
+      .map((exp: any) => {
+        const technologies = exp.skills.map((s: any) => s.skill.name);
+        const domains = Array.from(
+          new Set(exp.skills.map((s: any) => s.skill.category)),
+        ) as string[];
 
         return {
-          id: String(p.id),
-          category: p.category,
-          title: p.title,
-          subtitle: p.subtitle,
-          description: p.description,
-          achievements: p.achievements.map((a: any) => a.content),
-          githubUrl: p.githubUrl || undefined,
-          videoUrl: p.videoUrl || undefined,
-          imageUrl: p.imageUrl || undefined,
+          id: exp.category === "education" ? `edu-${exp.id}` : `internship-${exp.id}`,
+          role: exp.title,
+          company: exp.subtitle,
+          period: exp.dateDisplay,
+          description: exp.description,
+          achievements: exp.achievements.map((a: any) => a.content),
           domains,
-          technologies
+          technologies,
+          sortKey: exp.sortKey,
         };
       });
 
-      // 2. Fetch Timeline items with achievements and skills relations
-      const dbTimeline = await db.query.timeline.findMany({
-        with: {
-          achievements: true,
-          skills: {
-            with: {
-              skill: true
-            }
-          }
-        },
-        orderBy: (timeline: any, { desc }: any) => [desc(timeline.sortKey)]
+    const events = dbTimeline
+      .filter((t: any) => t.category === "hackathon" || t.category === "other")
+      .map((evt: any) => {
+        const technologies = evt.skills.map((s: any) => s.skill.name);
+
+        return {
+          id: `event-${evt.id}`,
+          title: evt.title,
+          event: evt.subtitle,
+          date: evt.dateDisplay,
+          role: "Participant", // Default fallback
+          outcome: evt.outcome || undefined,
+          description: evt.description,
+          category: evt.category === "other" ? ("other" as const) : ("hackathon" as const),
+          featured: evt.isFeatured === 1,
+          technologies,
+          sortKey: evt.sortKey,
+        };
       });
 
-      // Split timeline items into experiences (education & internship) and events (hackathon & others)
-      const experiences = dbTimeline
-        .filter((t: any) => t.category === 'education' || t.category === 'internship')
-        .map((exp: any) => {
-          const technologies = exp.skills.map((s: any) => s.skill.name);
-          const domains = Array.from(new Set(exp.skills.map((s: any) => s.skill.category))) as string[];
-
-          return {
-            id: exp.category === 'education' ? `edu-${exp.id}` : `internship-${exp.id}`,
-            role: exp.title,
-            company: exp.subtitle,
-            period: exp.dateDisplay,
-            description: exp.description,
-            achievements: exp.achievements.map((a: any) => a.content),
-            domains,
-            technologies,
-            sortKey: exp.sortKey
-          };
-        });
-
-      const events = dbTimeline
-        .filter((t: any) => t.category === 'hackathon' || t.category === 'other')
-        .map((evt: any) => {
-          const technologies = evt.skills.map((s: any) => s.skill.name);
-
-          return {
-            id: `event-${evt.id}`,
-            title: evt.title,
-            event: evt.subtitle,
-            date: evt.dateDisplay,
-            role: 'Participant', // Default fallback
-            outcome: evt.outcome || undefined,
-            description: evt.description,
-            category: evt.category === 'other' ? ('other' as const) : ('hackathon' as const),
-            featured: evt.isFeatured === 1,
-            technologies,
-            sortKey: evt.sortKey
-          };
-        });
-
-      return { projects, experiences, events };
-    } catch (error) {
-      console.error('Failed to query portfolio data from D1:', error);
-      return { projects: [], experiences: [], events: [] };
-    }
-  });
+    return { projects, experiences, events };
+  } catch (error) {
+    console.error("Failed to query portfolio data from D1:", error);
+    return { projects: [], experiences: [], events: [] };
+  }
+});

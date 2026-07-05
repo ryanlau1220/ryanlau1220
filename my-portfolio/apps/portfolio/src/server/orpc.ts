@@ -1,11 +1,17 @@
-import { os } from '@orpc/server';
-import { contract } from '@portfolio/api';
-import { getDb } from './db';
-import { 
-  getDbSkills, saveDbSkill, deleteDbSkill,
-  getDbProjects, saveDbProject, deleteDbProject,
-  getDbTimeline, saveDbTimelineItem, deleteDbTimelineItem
-} from '@portfolio/api';
+import { os } from "@orpc/server";
+import { contract } from "@portfolio/api";
+import {
+  deleteDbProject,
+  deleteDbSkill,
+  deleteDbTimelineItem,
+  getDbProjects,
+  getDbSkills,
+  getDbTimeline,
+  saveDbProject,
+  saveDbSkill,
+  saveDbTimelineItem,
+} from "@portfolio/api";
+import { getDb } from "./db";
 
 const implementer = os.contract(contract);
 
@@ -55,5 +61,5 @@ export const router = implementer.router({
     const db = getDb();
     if (!db) throw new Error("DB connection unavailable");
     return await deleteDbTimelineItem(db, input.id);
-  })
+  }),
 });

@@ -1,5 +1,5 @@
-import { getEvent } from 'vinxi/http';
-import { createDb } from '@portfolio/db';
+import { createDb } from "@portfolio/db";
+import { getEvent } from "vinxi/http";
 
 export function getDb() {
   try {
@@ -8,7 +8,7 @@ export function getDb() {
     if (d1) {
       return createDb(d1);
     }
-  } catch (e) {
+  } catch (_e) {
     // Not in HTTP request context (e.g. static build check)
   }
   return null;

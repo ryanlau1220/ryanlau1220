@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Calendar, Briefcase, Award, GraduationCap, Laptop, ChevronDown } from 'lucide-react';
+import { Award, Briefcase, Calendar, ChevronDown, GraduationCap, Laptop } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 interface UnifiedTimelineItem {
   id: string;
   title: string;
@@ -8,7 +8,7 @@ interface UnifiedTimelineItem {
   outcome?: string;
   description: string;
   achievements?: string[];
-  category: 'hackathon' | 'education' | 'internship' | 'other';
+  category: "hackathon" | "education" | "internship" | "other";
   technologies: string[];
   sortKey: number;
 }
@@ -19,7 +19,7 @@ interface TimelineProps {
 }
 
 export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineProps) {
-  const [activeFilter, setActiveFilter] = useState<'edu-work' | 'hackathon'>('edu-work');
+  const [activeFilter, setActiveFilter] = useState<"edu-work" | "hackathon">("edu-work");
   const [expandedTimelineId, setExpandedTimelineId] = useState<string | null>(null);
 
   // Unified items list
@@ -35,9 +35,9 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
         date: exp.period,
         description: exp.description,
         achievements: exp.achievements,
-        category: exp.id.startsWith('edu-') ? 'education' : 'internship',
+        category: exp.id.startsWith("edu-") ? "education" : "internship",
         technologies: exp.technologies,
-        sortKey: exp.sortKey
+        sortKey: exp.sortKey,
       });
     });
 
@@ -52,7 +52,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
         description: evt.description,
         category: evt.category,
         technologies: evt.technologies,
-        sortKey: evt.sortKey
+        sortKey: evt.sortKey,
       });
     });
 
@@ -62,9 +62,10 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
 
   // Filter items
   const filteredItems = useMemo(() => {
-    return unifiedItems.filter(item => {
-      if (activeFilter === 'hackathon') return item.category === 'hackathon';
-      if (activeFilter === 'edu-work') return item.category === 'education' || item.category === 'internship';
+    return unifiedItems.filter((item) => {
+      if (activeFilter === "hackathon") return item.category === "hackathon";
+      if (activeFilter === "edu-work")
+        return item.category === "education" || item.category === "internship";
       return false;
     });
   }, [unifiedItems, activeFilter]);
@@ -78,16 +79,16 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
   }, [filteredItems]);
 
   const toggleItem = (itemId: string) => {
-    setExpandedTimelineId(prev => prev === itemId ? null : itemId);
+    setExpandedTimelineId((prev) => (prev === itemId ? null : itemId));
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'internship':
+      case "internship":
         return <Briefcase size={16} className="text-blue-500" />;
-      case 'education':
+      case "education":
         return <GraduationCap size={16} className="text-purple-500" />;
-      case 'hackathon':
+      case "hackathon":
         return <Award size={16} className="text-green-500" />;
       default:
         return <Laptop size={16} className="text-amber-500" />;
@@ -99,17 +100,17 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
       {/* Filter Buttons */}
       <div className="flex flex-wrap justify-center gap-2.5">
         {[
-          { id: 'edu-work', label: 'Education & Work' },
-          { id: 'hackathon', label: 'Hackathons' }
-        ].map(filter => (
+          { id: "edu-work", label: "Education & Work" },
+          { id: "hackathon", label: "Hackathons" },
+        ].map((filter) => (
           <button
             key={filter.id}
             type="button"
             onClick={() => setActiveFilter(filter.id as any)}
             className={`text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
               activeFilter === filter.id
-                ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold'
-                : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600'
+                ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"
+                : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
             }`}
           >
             {filter.label}
@@ -135,7 +136,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                 <div
                   key={item.id}
                   className={`relative flex flex-col md:flex-row items-start ${
-                    isEven ? 'md:flex-row-reverse' : ''
+                    isEven ? "md:flex-row-reverse" : ""
                   }`}
                 >
                   {/* Timeline Dot with Icon */}
@@ -177,7 +178,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                         <ChevronDown
                           size={16}
                           className={`text-neutral-400 dark:text-neutral-600 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
-                            expandedTimelineId === item.id ? 'rotate-180' : ''
+                            expandedTimelineId === item.id ? "rotate-180" : ""
                           }`}
                         />
                       </div>
@@ -186,8 +187,8 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                       <div
                         className={`grid transition-all duration-300 ease-in-out ${
                           expandedTimelineId === item.id
-                            ? 'grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900'
-                            : 'grid-rows-[0fr] opacity-0'
+                            ? "grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900"
+                            : "grid-rows-[0fr] opacity-0"
                         }`}
                       >
                         <div className="overflow-hidden space-y-4 select-text">
@@ -200,7 +201,10 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                           {item.achievements && item.achievements.length > 0 && (
                             <ul className="space-y-1.5 pt-1">
                               {item.achievements.map((ach: string, idx: number) => (
-                                <li key={idx} className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
+                                <li
+                                  key={idx}
+                                  className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed"
+                                >
                                   <span className="text-neutral-400 select-none">•</span>
                                   <span>{ach}</span>
                                 </li>
