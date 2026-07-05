@@ -2,10 +2,11 @@
   "name": "portfolio-monorepo",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "turbo run lint",
+    "lint": "biome check .",
     "typecheck": "turbo run typecheck",
     "format": "biome format --write ."
   },

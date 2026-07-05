@@ -11,6 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
@@ -50,9 +51,6 @@
     "wrangler": "^4.70.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
+    "onlyBuiltDependencies": ["esbuild", "lightningcss"]
   }
 }

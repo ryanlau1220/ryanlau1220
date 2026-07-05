@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./index.ts",
   "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@portfolio/db": "workspace:*",
     "@orpc/contract": "^0.18.0",
