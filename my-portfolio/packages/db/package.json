@@ -9,7 +9,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "pnpm exec tsx seed.ts",
-    "db:studio": "DB_URL=$(find ../../apps/portfolio/.wrangler -name '*.sqlite' ! -name 'metadata.sqlite' 2>/dev/null | head -1) && test -n \"$DB_URL\" && drizzle-kit studio || echo 'No SQLite database found. Run `pnpm run dev` in portfolio-app first.'",
+    "db:studio": "DB_URL=$(realpath $(find ../../apps/portfolio/.wrangler -name '*.sqlite' ! -name 'metadata.sqlite' 2>/dev/null | head -1) 2>/dev/null) && test -n \"$DB_URL\" && drizzle-kit studio || echo 'No SQLite database found. Run `pnpm run dev` in portfolio-app first.'",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
