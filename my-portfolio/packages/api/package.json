@@ -1,0 +1,19 @@
+{
+  "name": "@portfolio/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "@portfolio/db": "workspace:*",
+    "@orpc/contract": "^0.18.0",
+    "@orpc/server": "^0.18.0",
+    "@orpc/client": "^0.18.0",
+    "drizzle-orm": "^0.38.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}
