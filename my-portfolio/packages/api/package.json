@@ -9,10 +9,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@portfolio/db": "workspace:*",
-    "@orpc/contract": "^0.18.0",
-    "@orpc/server": "^0.18.0",
     "@orpc/client": "^0.18.0",
+    "@orpc/contract": "^0.18.0",
+    "@orpc/openapi": "^0.18.0",
+    "@orpc/server": "^0.18.0",
+    "@orpc/zod": "^0.18.0",
+    "@portfolio/db": "workspace:*",
     "drizzle-orm": "^0.38.3",
     "zod": "^3.24.1"
   },

@@ -16,9 +16,10 @@
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.26.0",
-    "@portfolio/db": "workspace:*",
-    "@portfolio/api": "workspace:*",
+    "@orpc/openapi": "^0.18.0",
     "@orpc/server": "^0.18.0",
+    "@portfolio/api": "workspace:*",
+    "@portfolio/db": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-router": "latest",
