@@ -13,10 +13,41 @@ interface UnifiedTimelineItem {
   sortKey: number;
 }
 
-interface TimelineProps {
-  experiences: any[];
-  events: any[];
+interface Experience {
+  id: string;
+  role: string;
+  company: string;
+  period: string;
+  description: string;
+  achievements: string[];
+  domains: string[];
+  technologies: string[];
+  sortKey: number;
 }
+
+interface TimelineEvent {
+  id: string;
+  title: string;
+  event: string;
+  date: string;
+  role: string;
+  outcome?: string;
+  description: string;
+  category: "hackathon" | "other";
+  featured: boolean;
+  technologies: string[];
+  sortKey: number;
+}
+
+interface TimelineProps {
+  experiences: Experience[];
+  events: TimelineEvent[];
+}
+
+const FILTER_OPTIONS: { id: "edu-work" | "hackathon"; label: string }[] = [
+  { id: "edu-work", label: "Education & Work" },
+  { id: "hackathon", label: "Hackathons" },
+];
 
 export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineProps) {
   const [activeFilter, setActiveFilter] = useState<"edu-work" | "hackathon">("edu-work");
@@ -27,7 +58,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
     const list: UnifiedTimelineItem[] = [];
 
     // Map experiences
-    EXPERIENCES.forEach((exp: any) => {
+    EXPERIENCES.forEach((exp) => {
       list.push({
         id: exp.id,
         title: exp.role,
@@ -42,7 +73,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
     });
 
     // Map events
-    EVENTS.forEach((evt: any) => {
+    EVENTS.forEach((evt) => {
       list.push({
         id: evt.id,
         title: evt.title,
@@ -99,14 +130,11 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
     <div className="w-full space-y-12">
       {/* Filter Buttons */}
       <div className="flex flex-wrap justify-center gap-2.5">
-        {[
-          { id: "edu-work", label: "Education & Work" },
-          { id: "hackathon", label: "Hackathons" },
-        ].map((filter) => (
+        {FILTER_OPTIONS.map((filter) => (
           <button
             key={filter.id}
             type="button"
-            onClick={() => setActiveFilter(filter.id as any)}
+            onClick={() => setActiveFilter(filter.id)}
             className={`text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
               activeFilter === filter.id
                 ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"

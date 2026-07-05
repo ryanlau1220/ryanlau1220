@@ -28,15 +28,56 @@ export const Route = createFileRoute("/")({
   component: PortfolioHome,
 });
 
+interface Project {
+  id: string;
+  category: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  achievements: string[];
+  githubUrl?: string;
+  videoUrl?: string;
+  imageUrl?: string;
+  demoUrl?: string;
+  domains: string[];
+  technologies: string[];
+}
+
+interface Experience {
+  id: string;
+  role: string;
+  company: string;
+  period: string;
+  description: string;
+  achievements: string[];
+  domains: string[];
+  technologies: string[];
+  sortKey: number;
+}
+
+interface Event {
+  id: string;
+  title: string;
+  event: string;
+  date: string;
+  role: string;
+  outcome?: string;
+  description: string;
+  category: "hackathon" | "other";
+  featured: boolean;
+  technologies: string[];
+  sortKey: number;
+}
+
 function PortfolioHome() {
   const {
     projects: PROJECTS,
     experiences: EXPERIENCES,
     events: EVENTS,
   } = Route.useLoaderData() as {
-    projects: any[];
-    experiences: any[];
-    events: any[];
+    projects: Project[];
+    experiences: Experience[];
+    events: Event[];
   };
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -312,7 +353,9 @@ function PortfolioHome() {
             <button
               key={filter.id}
               type="button"
-              onClick={() => setProjectFilter(filter.id as any)}
+              onClick={() =>
+                setProjectFilter(filter.id as "all" | "open-source" | "hackathon" | "internship")
+              }
               className={`text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
                 projectFilter === filter.id
                   ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"

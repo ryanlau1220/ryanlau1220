@@ -146,9 +146,9 @@ function main() {
 
   // 1. Gather all unique skills/technologies
   const skillSet = new Set<string>();
-  PROJECTS.forEach((p: any) => p.technologies?.forEach((t: any) => skillSet.add(t)));
-  EXPERIENCES.forEach((e: any) => e.technologies?.forEach((t: any) => skillSet.add(t)));
-  EVENTS.forEach((ev: any) => ev.technologies?.forEach((t: any) => skillSet.add(t)));
+  PROJECTS.forEach((p) => p.technologies?.forEach((t: string) => skillSet.add(t)));
+  EXPERIENCES.forEach((e) => e.technologies?.forEach((t: string) => skillSet.add(t)));
+  EVENTS.forEach((ev) => ev.technologies?.forEach((t: string) => skillSet.add(t)));
 
   const skillList = Array.from(skillSet).sort();
   const skillMap = new Map<string, number>();
@@ -166,7 +166,7 @@ function main() {
 
   // 2. Insert Projects
   sqlLines.push("-- Insert Projects & Achievements");
-  PROJECTS.forEach((proj: any, index) => {
+  PROJECTS.forEach((proj, index) => {
     const projectId = index + 1;
     const githubUrl = proj.githubUrl || null;
     const videoUrl = proj.videoUrl || null;
@@ -201,7 +201,7 @@ function main() {
   let timelineIdCounter = 1;
 
   // Track map to populate junction skills for experiences
-  EXPERIENCES.forEach((exp: any) => {
+  EXPERIENCES.forEach((exp) => {
     const timelineId = timelineIdCounter++;
     const category = exp.id.startsWith("edu-") ? "education" : "internship";
     const isFeatured = 0; // Default to false (0) for experiences
@@ -229,7 +229,7 @@ function main() {
   });
 
   // Events
-  EVENTS.forEach((evt: any) => {
+  EVENTS.forEach((evt) => {
     const timelineId = timelineIdCounter++;
     const isFeatured = evt.featured ? 1 : 0;
 

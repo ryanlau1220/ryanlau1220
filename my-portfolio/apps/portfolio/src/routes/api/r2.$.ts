@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/r2/$")({
           headers.set("etag", file.httpEtag);
 
           return new Response(file.body, { headers });
-        } catch (_e: any) {
+        } catch (_e: unknown) {
           return new Response("Error fetching file from R2", { status: 500 });
         }
       },

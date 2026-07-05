@@ -1,12 +1,20 @@
 import { createRequire } from "node:module";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { drizzle as drizzleD1 } from "drizzle-orm/d1";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "./schema";
 
 export * from "./schema";
 
-export function createDb(d1: any) {
+export interface D1Database {
+  prepare(sql: string): unknown;
+}
+
+export type DB = DrizzleD1Database<typeof schema> | BetterSQLite3Database<typeof schema>;
+
+export function createDb(d1: D1Database | null | undefined): DB | null {
   if (d1 && typeof d1.prepare === "function") {
-    return drizzleD1(d1, { schema });
+    return drizzleD1(d1, { schema }) as unknown as DB;
   }
 
   try {
@@ -55,7 +63,7 @@ export function createDb(d1: any) {
 
         if (sqlitePath) {
           const sqliteDb = new Database(sqlitePath);
-          return drizzleNode(sqliteDb, { schema });
+          return drizzleNode(sqliteDb, { schema }) as unknown as DB;
         }
       }
     }

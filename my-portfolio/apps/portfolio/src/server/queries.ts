@@ -20,12 +20,12 @@ export const getPortfolioData = createServerFn({ method: "GET" }).handler(async 
           },
         },
       },
-      orderBy: (projects: any, { asc }: any) => [asc(projects.sortOrder)],
+      orderBy: (projects, { asc }) => [asc(projects.sortOrder)],
     });
 
-    const projects = dbProjects.map((p: any) => {
-      const technologies = p.skills.map((s: any) => s.skill.name);
-      const domains = Array.from(new Set(p.skills.map((s: any) => s.skill.category))) as string[];
+    const projects = dbProjects.map((p) => {
+      const technologies = p.skills.map((s) => s.skill.name);
+      const domains = Array.from(new Set(p.skills.map((s) => s.skill.category))) as string[];
 
       return {
         id: String(p.id),
@@ -33,7 +33,7 @@ export const getPortfolioData = createServerFn({ method: "GET" }).handler(async 
         title: p.title,
         subtitle: p.subtitle,
         description: p.description,
-        achievements: p.achievements.map((a: any) => a.content),
+        achievements: p.achievements.map((a) => a.content),
         githubUrl: p.githubUrl || undefined,
         videoUrl: p.videoUrl || undefined,
         imageUrl: p.imageUrl || undefined,
@@ -52,17 +52,15 @@ export const getPortfolioData = createServerFn({ method: "GET" }).handler(async 
           },
         },
       },
-      orderBy: (timeline: any, { desc }: any) => [desc(timeline.sortKey)],
+      orderBy: (timeline, { desc }) => [desc(timeline.sortKey)],
     });
 
     // Split timeline items into experiences (education & internship) and events (hackathon & others)
     const experiences = dbTimeline
-      .filter((t: any) => t.category === "education" || t.category === "internship")
-      .map((exp: any) => {
-        const technologies = exp.skills.map((s: any) => s.skill.name);
-        const domains = Array.from(
-          new Set(exp.skills.map((s: any) => s.skill.category)),
-        ) as string[];
+      .filter((t) => t.category === "education" || t.category === "internship")
+      .map((exp) => {
+        const technologies = exp.skills.map((s) => s.skill.name);
+        const domains = Array.from(new Set(exp.skills.map((s) => s.skill.category))) as string[];
 
         return {
           id: exp.category === "education" ? `edu-${exp.id}` : `internship-${exp.id}`,
@@ -70,7 +68,7 @@ export const getPortfolioData = createServerFn({ method: "GET" }).handler(async 
           company: exp.subtitle,
           period: exp.dateDisplay,
           description: exp.description,
-          achievements: exp.achievements.map((a: any) => a.content),
+          achievements: exp.achievements.map((a) => a.content),
           domains,
           technologies,
           sortKey: exp.sortKey,
@@ -78,9 +76,9 @@ export const getPortfolioData = createServerFn({ method: "GET" }).handler(async 
       });
 
     const events = dbTimeline
-      .filter((t: any) => t.category === "hackathon" || t.category === "other")
-      .map((evt: any) => {
-        const technologies = evt.skills.map((s: any) => s.skill.name);
+      .filter((t) => t.category === "hackathon" || t.category === "other")
+      .map((evt) => {
+        const technologies = evt.skills.map((s) => s.skill.name);
 
         return {
           id: `event-${evt.id}`,

@@ -7,16 +7,17 @@ import {
   timelineAchievements,
   timelineSkills,
 } from "@portfolio/db";
+import type { DB } from "@portfolio/db";
 import { eq } from "drizzle-orm";
 import type { ProjectInput, SkillInput, TimelineInput } from "./index";
 
 // DB CRUD Implementations - designed to run with a Drizzle client instance (db)
 
-export async function getDbSkills(db: any) {
+export async function getDbSkills(db: DB) {
   return await db.query.skills.findMany();
 }
 
-export async function saveDbSkill(db: any, input: SkillInput) {
+export async function saveDbSkill(db: DB, input: SkillInput) {
   if (input.id) {
     await db
       .update(skills)
@@ -33,16 +34,16 @@ export async function saveDbSkill(db: any, input: SkillInput) {
       name: input.name,
       category: input.category,
     })
-    .returning({ id: skills.id });
-  return { id: result.id as number };
+    .returning();
+  return { id: result.id };
 }
 
-export async function deleteDbSkill(db: any, id: number) {
+export async function deleteDbSkill(db: DB, id: number) {
   await db.delete(skills).where(eq(skills.id, id));
   return { success: true };
 }
 
-export async function getDbProjects(db: any) {
+export async function getDbProjects(db: DB) {
   return await db.query.projects.findMany({
     with: {
       achievements: true,
@@ -52,11 +53,11 @@ export async function getDbProjects(db: any) {
         },
       },
     },
-    orderBy: (p: any, { asc }: any) => [asc(p.sortOrder)],
+    orderBy: (p, { asc }) => [asc(p.sortOrder)],
   });
 }
 
-export async function saveDbProject(db: any, input: ProjectInput) {
+export async function saveDbProject(db: DB, input: ProjectInput) {
   let projectId = input.id;
 
   if (projectId) {
@@ -104,7 +105,7 @@ export async function saveDbProject(db: any, input: ProjectInput) {
         imageUrl: input.imageUrl || null,
         sortOrder: input.sortOrder,
       })
-      .returning({ id: projects.id });
+      .returning();
 
     projectId = inserted.id;
 
@@ -124,12 +125,12 @@ export async function saveDbProject(db: any, input: ProjectInput) {
   return { id: projectId as number };
 }
 
-export async function deleteDbProject(db: any, id: number) {
+export async function deleteDbProject(db: DB, id: number) {
   await db.delete(projects).where(eq(projects.id, id));
   return { success: true };
 }
 
-export async function getDbTimeline(db: any) {
+export async function getDbTimeline(db: DB) {
   return await db.query.timeline.findMany({
     with: {
       achievements: true,
@@ -139,11 +140,11 @@ export async function getDbTimeline(db: any) {
         },
       },
     },
-    orderBy: (t: any, { desc }: any) => [desc(t.sortKey)],
+    orderBy: (t, { desc }) => [desc(t.sortKey)],
   });
 }
 
-export async function saveDbTimelineItem(db: any, input: TimelineInput) {
+export async function saveDbTimelineItem(db: DB, input: TimelineInput) {
   let timelineId = input.id;
 
   if (timelineId) {
@@ -193,7 +194,7 @@ export async function saveDbTimelineItem(db: any, input: TimelineInput) {
         sortKey: input.sortKey,
         isFeatured: input.isFeatured ? 1 : 0,
       })
-      .returning({ id: timeline.id });
+      .returning();
 
     timelineId = inserted.id;
 
@@ -215,7 +216,7 @@ export async function saveDbTimelineItem(db: any, input: TimelineInput) {
   return { id: timelineId as number };
 }
 
-export async function deleteDbTimelineItem(db: any, id: number) {
+export async function deleteDbTimelineItem(db: DB, id: number) {
   await db.delete(timeline).where(eq(timeline.id, id));
   return { success: true };
 }

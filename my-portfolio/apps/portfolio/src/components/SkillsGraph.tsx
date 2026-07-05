@@ -13,11 +13,25 @@ interface D3Link extends d3Force.SimulationLinkDatum<D3Node> {
   target: string | D3Node;
 }
 
+interface Project {
+  id: string;
+  category: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  achievements: string[];
+  githubUrl?: string;
+  videoUrl?: string;
+  imageUrl?: string;
+  domains: string[];
+  technologies: string[];
+}
+
 interface SkillsGraphProps {
   selectedSkill: string | null;
   onSelectSkill: (skill: string | null) => void;
   onRouteToProject?: (projectId: string) => void;
-  projects: any[];
+  projects: Project[];
 }
 
 export function SkillsGraph({
@@ -375,12 +389,11 @@ export function SkillsGraph({
       );
       // Also check p.domains directly (for projects that categorise themselves under this domain)
       return PROJECTS.filter(
-        (p: any) =>
-          p.domains.includes(selectedNode.id) ||
-          p.technologies.some((t: string) => domainTechs.has(t)),
+        (p) =>
+          p.domains.includes(selectedNode.id) || p.technologies.some((t) => domainTechs.has(t)),
       );
     }
-    return PROJECTS.filter((p: any) => p.technologies.includes(selectedNode.id));
+    return PROJECTS.filter((p) => p.technologies.includes(selectedNode.id));
   }, [selectedNode, techMap]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap

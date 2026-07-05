@@ -1,4 +1,5 @@
 import { projectCategoryEnum, skillCategoryEnum, timelineCategoryEnum } from "@portfolio/api";
+import type { ProjectInput, SkillInput, TimelineInput } from "@portfolio/api";
 import {
   Check,
   Clock3,
@@ -16,13 +17,73 @@ import { client } from "./client";
 
 type Tab = "projects" | "skills" | "timeline";
 
+// --- API response types ---
+interface SkillItem {
+  id: number;
+  name: string;
+  category: string;
+}
+
+interface SkillRelation {
+  skillId: number;
+  skill: SkillItem;
+}
+
+interface ProjectWithRelations {
+  id: number;
+  category: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  githubUrl: string | null;
+  videoUrl: string | null;
+  imageUrl: string | null;
+  sortOrder: number;
+  achievements: { id: number; content: string }[];
+  skills: SkillRelation[];
+}
+
+interface TimelineItemWithRelations {
+  id: number;
+  title: string;
+  subtitle: string;
+  dateDisplay: string;
+  description: string;
+  category: string;
+  outcome: string | null;
+  sortKey: number;
+  isFeatured: number;
+  achievements: { id: number; content: string }[];
+  skills: SkillRelation[];
+}
+
+// --- Form editing state type ---
+interface EditingItemForm {
+  id?: number | null;
+  category?: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  githubUrl?: string | null;
+  videoUrl?: string | null;
+  imageUrl?: string | null;
+  sortOrder?: number;
+  achievements?: string[];
+  skills?: number[];
+  name?: string;
+  dateDisplay?: string;
+  outcome?: string | null;
+  sortKey?: number;
+  isFeatured?: boolean;
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("projects");
 
   // Data state
-  const [projects, setProjects] = useState<any[]>([]);
-  const [skills, setSkills] = useState<any[]>([]);
-  const [timeline, setTimeline] = useState<any[]>([]);
+  const [projects, setProjects] = useState<ProjectWithRelations[]>([]);
+  const [skills, setSkills] = useState<SkillItem[]>([]);
+  const [timeline, setTimeline] = useState<TimelineItemWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Auth token state (simple protection)
@@ -30,7 +91,7 @@ export default function App() {
   const [isAuthSaved, setIsAuthSaved] = useState(() => !!localStorage.getItem("cms_auth_token"));
 
   // Active form state (editing or adding new)
-  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editingItem, setEditingItem] = useState<EditingItemForm | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -85,7 +146,10 @@ export default function App() {
       });
       if (!response.ok) throw new Error("Upload failed");
       const data = await response.json();
-      setEditingItem((prev: any) => ({ ...prev, imageUrl: data.imageUrl }));
+      setEditingItem((prev) => {
+        if (!prev) return null;
+        return { ...prev, imageUrl: data.imageUrl };
+      });
     } catch (_err) {
       alert("Error uploading screenshot to R2 bucket.");
     } finally {
@@ -96,6 +160,7 @@ export default function App() {
   // Generic Save handler
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editingItem) return;
     try {
       if (activeTab === "projects") {
         const payload = {
@@ -110,14 +175,14 @@ export default function App() {
           sortOrder: Number(editingItem.sortOrder || 0),
           achievements: editingItem.achievements || [],
           skills: editingItem.skills || [],
-        };
+        } as ProjectInput;
         await client.saveProject(payload);
       } else if (activeTab === "skills") {
         const payload = {
           id: editingItem.id || null,
           name: editingItem.name,
           category: editingItem.category,
-        };
+        } as SkillInput;
         await client.saveSkill(payload);
       } else if (activeTab === "timeline") {
         const payload = {
@@ -132,7 +197,7 @@ export default function App() {
           isFeatured: !!editingItem.isFeatured,
           achievements: editingItem.achievements || [],
           skills: editingItem.skills || [],
-        };
+        } as TimelineInput;
         await client.saveTimelineItem(payload);
       }
       setIsFormOpen(false);
@@ -160,16 +225,24 @@ export default function App() {
     }
   };
 
-  const openForm = (item: any = null) => {
+  const openForm = (
+    item: ProjectWithRelations | SkillItem | TimelineItemWithRelations | null = null,
+  ) => {
     if (item) {
       // Map relations format to simple ID arrays for checkboxes/inputs
-      const mapped = { ...item };
+      const typed = item as ProjectWithRelations | TimelineItemWithRelations;
+      const mapped = {
+        ...typed,
+        skills: [] as number[],
+        achievements: [] as string[],
+      } as unknown as EditingItemForm;
       if (activeTab === "projects" || activeTab === "timeline") {
-        mapped.skills = item.skills?.map((s: any) => s.skillId || s.skill?.id) || [];
-        mapped.achievements = item.achievements?.map((a: any) => a.content) || [];
+        mapped.skills = typed.skills?.map((s: SkillRelation) => s.skillId || s.skill?.id) || [];
+        mapped.achievements = typed.achievements?.map((a: { content: string }) => a.content) || [];
       }
       if (activeTab === "timeline") {
-        mapped.isFeatured = item.isFeatured === 1 || !!item.isFeatured;
+        const tl = typed as TimelineItemWithRelations;
+        mapped.isFeatured = tl.isFeatured === 1 || !!tl.isFeatured;
       }
       setEditingItem(mapped);
     } else {
@@ -329,7 +402,7 @@ export default function App() {
           <div className="grid grid-cols-1 gap-4">
             {/* --- PROJECTS TAB --- */}
             {activeTab === "projects" &&
-              projects.map((p: any) => (
+              projects.map((p: ProjectWithRelations) => (
                 <div
                   key={p.id}
                   className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
@@ -370,7 +443,7 @@ export default function App() {
             {/* --- SKILLS TAB --- */}
             {activeTab === "skills" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                {skills.map((s: any) => (
+                {skills.map((s: SkillItem) => (
                   <div
                     key={s.id}
                     className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-4 shadow-sm flex justify-between items-center gap-4"
@@ -404,7 +477,7 @@ export default function App() {
 
             {/* --- TIMELINE TAB --- */}
             {activeTab === "timeline" &&
-              timeline.map((t: any) => (
+              timeline.map((t: TimelineItemWithRelations) => (
                 <div
                   key={t.id}
                   className="border border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
@@ -665,7 +738,7 @@ export default function App() {
                             type="button"
                             onClick={() => {
                               const next = editingItem.achievements?.filter(
-                                (_: any, i: number) => i !== idx,
+                                (_: unknown, i: number) => i !== idx,
                               );
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
@@ -876,7 +949,7 @@ export default function App() {
                             type="button"
                             onClick={() => {
                               const next = editingItem.achievements?.filter(
-                                (_: any, i: number) => i !== idx,
+                                (_: unknown, i: number) => i !== idx,
                               );
                               setEditingItem({ ...editingItem, achievements: next });
                             }}
