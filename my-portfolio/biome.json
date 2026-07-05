@@ -6,6 +6,7 @@
       "**/dist/**",
       "**/.wrangler/**",
       "**/.tanstack/**",
+      "**/.turbo/**",
       "**/routeTree.gen.ts"
     ]
   },
