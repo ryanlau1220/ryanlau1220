@@ -59,19 +59,69 @@ export type TimelineInput = z.infer<typeof TimelineSchema>;
 
 // --- oRPC Contract ---
 export const contract = oc.router({
-  getSkills: oc.output(z.array(z.any())),
-  saveSkill: oc.input(SkillSchema).output(z.object({ id: z.number() })),
-  deleteSkill: oc.input(z.object({ id: z.number() })).output(z.object({ success: z.boolean() })),
+  getSkills: oc
+    .output(z.array(z.any()))
+    .route({ method: "GET", path: "/skills", summary: "List all skills", tags: ["skills"] }),
+  saveSkill: oc
+    .input(SkillSchema)
+    .output(z.object({ id: z.number() }))
+    .route({
+      method: "POST",
+      path: "/skills",
+      summary: "Create or update a skill",
+      tags: ["skills"],
+    }),
+  deleteSkill: oc
+    .input(z.object({ id: z.number() }))
+    .output(z.object({ success: z.boolean() }))
+    .route({ method: "DELETE", path: "/skills/{id}", summary: "Delete a skill", tags: ["skills"] }),
 
-  getProjects: oc.output(z.array(z.any())),
-  saveProject: oc.input(ProjectSchema).output(z.object({ id: z.number() })),
-  deleteProject: oc.input(z.object({ id: z.number() })).output(z.object({ success: z.boolean() })),
+  getProjects: oc
+    .output(z.array(z.any()))
+    .route({ method: "GET", path: "/projects", summary: "List all projects", tags: ["projects"] }),
+  saveProject: oc
+    .input(ProjectSchema)
+    .output(z.object({ id: z.number() }))
+    .route({
+      method: "POST",
+      path: "/projects",
+      summary: "Create or update a project",
+      tags: ["projects"],
+    }),
+  deleteProject: oc
+    .input(z.object({ id: z.number() }))
+    .output(z.object({ success: z.boolean() }))
+    .route({
+      method: "DELETE",
+      path: "/projects/{id}",
+      summary: "Delete a project",
+      tags: ["projects"],
+    }),
 
-  getTimeline: oc.output(z.array(z.any())),
-  saveTimelineItem: oc.input(TimelineSchema).output(z.object({ id: z.number() })),
+  getTimeline: oc.output(z.array(z.any())).route({
+    method: "GET",
+    path: "/timeline",
+    summary: "List all timeline items",
+    tags: ["timeline"],
+  }),
+  saveTimelineItem: oc
+    .input(TimelineSchema)
+    .output(z.object({ id: z.number() }))
+    .route({
+      method: "POST",
+      path: "/timeline",
+      summary: "Create or update a timeline item",
+      tags: ["timeline"],
+    }),
   deleteTimelineItem: oc
     .input(z.object({ id: z.number() }))
-    .output(z.object({ success: z.boolean() })),
+    .output(z.object({ success: z.boolean() }))
+    .route({
+      method: "DELETE",
+      path: "/timeline/{id}",
+      summary: "Delete a timeline item",
+      tags: ["timeline"],
+    }),
 });
 export * from "./router";
 export type ContractRouter = typeof contract;
