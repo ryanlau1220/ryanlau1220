@@ -48,7 +48,7 @@ export function SkillsGraph({
   const [zoom, setZoom] = useState(1);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [simKey, setSimKey] = useState(0);
+  const [_simKey, setSimKey] = useState(0);
 
   // Dragging state for node
   const draggedNodeRef = useRef<D3Node | null>(null);
@@ -241,6 +241,7 @@ export function SkillsGraph({
   const [simulationLinks, setSimulationLinks] = useState<D3Link[]>([]);
   const simulationRef = useRef<d3Force.Simulation<D3Node, D3Link> | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: _simKey intentionally used as restart trigger
   useEffect(() => {
     if (nodes.length === 0 || viewMode !== "graph") return;
 
@@ -317,7 +318,7 @@ export function SkillsGraph({
     return () => {
       simulation.stop();
     };
-  }, [nodes, links, simKey, viewMode]);
+  }, [nodes, links, _simKey, viewMode]);
 
   // Center the view on load and resize
   useEffect(() => {
@@ -394,7 +395,7 @@ export function SkillsGraph({
       );
     }
     return PROJECTS.filter((p) => p.technologies.includes(selectedNode.id));
-  }, [selectedNode, techMap]);
+  }, [selectedNode, techMap, PROJECTS]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
@@ -675,8 +676,17 @@ export function SkillsGraph({
                           if (hasMovedRef.current) return;
                           onSelectSkill(isSelected ? null : node.id);
                         }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (hasMovedRef.current) return;
+                            onSelectSkill(isSelected ? null : node.id);
+                          }
+                        }}
                         onMouseEnter={() => setHoveredNodeId(node.id)}
                         onMouseLeave={() => setHoveredNodeId(null)}
+                        tabIndex={0}
                         className="cursor-grab active:cursor-grabbing select-none group outline-none"
                       >
                         {/* Selected halo */}
@@ -824,9 +834,11 @@ export function SkillsGraph({
             aria-modal="false"
           >
             {/* Translucent backdrop to help the card stand out against any node */}
-            <div
-              className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto"
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto cursor-default"
               onClick={() => onSelectSkill(null)}
+              aria-label="Close details"
             />
             <div className="relative w-80 max-w-[92vw] pointer-events-auto bg-white/98 dark:bg-neutral-950/98 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-5 backdrop-blur-md border-t-2 border-t-blue-500">
               {renderDetailsCard()}

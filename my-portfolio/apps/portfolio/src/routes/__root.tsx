@@ -176,7 +176,7 @@ function RootLayout() {
     localStorage.setItem("theme", nextTheme);
   };
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
     const isHashLink = href.includes("#");
     if (isHashLink && location.pathname === "/") {
       e.preventDefault();
@@ -214,14 +214,14 @@ function RootLayout() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-neutral-200/85 dark:border-neutral-900/80 bg-white/70 dark:bg-neutral-950/70 backdrop-blur-md transition-all duration-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a
-            href="/#home"
+          <button
+            type="button"
             onClick={(e) => handleNavClick(e, "/#home")}
             className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight hover:opacity-85"
           >
             <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
             <span>Ryan Lau.</span>
-          </a>
+          </button>
 
           {/* Desktop Nav links */}
           <nav className="hidden md:flex items-center gap-6">

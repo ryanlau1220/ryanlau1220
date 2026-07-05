@@ -117,7 +117,7 @@ function PortfolioHome() {
     }
 
     return [0, "ellipsis-left", current, "ellipsis-right", total - 1];
-  }, [projectFilter, selectedSkill, currentProjectIdx]);
+  }, [projectFilter, selectedSkill, currentProjectIdx, PROJECTS]);
 
   const handleRouteToProject = (projectId: string) => {
     // Mark that we are intentionally setting the index; skip the auto-reset effect.
@@ -164,9 +164,10 @@ function PortfolioHome() {
       );
     }
     return list;
-  }, [projectFilter, selectedSkill]);
+  }, [projectFilter, selectedSkill, PROJECTS]);
 
   // Reset slideshow index when filters change — but skip if a direct project route just set the index
+  // biome-ignore lint/correctness/useExhaustiveDependencies: projectFilter and selectedSkill are intentional trigger-only deps
   useEffect(() => {
     if (skipResetRef.current) {
       skipResetRef.current = false;
@@ -211,7 +212,7 @@ function PortfolioHome() {
     }
   };
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const scrollToSection = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
@@ -243,21 +244,21 @@ function PortfolioHome() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
-            <a
-              href="#projects"
+            <button
+              type="button"
               onClick={(e) => scrollToSection(e, "projects")}
               className="inline-flex items-center gap-2 text-xs font-mono px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
             >
               <span>View Projects</span>
               <ArrowRight size={14} />
-            </a>
-            <a
-              href="#contact"
+            </button>
+            <button
+              type="button"
               onClick={(e) => scrollToSection(e, "contact")}
               className="inline-flex items-center gap-2 text-xs font-mono px-5 py-2.5 bg-white hover:bg-neutral-50 dark:bg-neutral-950 dark:hover:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-800 rounded-lg transition-colors font-semibold"
             >
               <span>Get in Touch</span>
-            </a>
+            </button>
           </div>
         </div>
       </section>

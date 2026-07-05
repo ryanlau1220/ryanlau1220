@@ -89,7 +89,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
 
     // Sort newest first
     return list.sort((a, b) => b.sortKey - a.sortKey);
-  }, []);
+  }, [EXPERIENCES, EVENTS]);
 
   // Filter items
   const filteredItems = useMemo(() => {
@@ -175,9 +175,10 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                   {/* Left / Right Card Spacing wrapper */}
                   <div className="w-full md:w-1/2 pl-16 md:pl-0 md:px-8">
                     {/* Card Container */}
-                    <div
+                    <button
+                      type="button"
                       onClick={() => toggleItem(item.id)}
-                      className="group relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm cursor-pointer select-none"
+                      className="group relative w-full text-left border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm cursor-pointer select-none"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -255,7 +256,7 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                           )}
                         </div>
                       </div>
-                    </div>
+                    </button>
                   </div>
 
                   {/* Empty placeholder for grid balancing on desktop */}

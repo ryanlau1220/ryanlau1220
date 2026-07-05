@@ -21,8 +21,7 @@
         "noNonNullAssertion": "off"
       },
       "correctness": {
-        "noUnusedVariables": "warn",
-        "useExhaustiveDependencies": "off"
+        "noUnusedVariables": "warn"
       },
       "suspicious": {
         "noExplicitAny": "error",
@@ -33,9 +32,6 @@
       },
       "a11y": {
         "noLabelWithoutControl": "off",
-        "useKeyWithClickEvents": "off",
-        "useButtonType": "off",
-        "useValidAnchor": "off",
         "noSvgWithoutTitle": "off"
       }
     }

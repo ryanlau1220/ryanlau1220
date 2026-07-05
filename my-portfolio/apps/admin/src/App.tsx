@@ -12,7 +12,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { client } from "./client";
 
 type Tab = "projects" | "skills" | "timeline";
@@ -96,7 +96,7 @@ export default function App() {
   const [uploading, setUploading] = useState(false);
 
   // Fetch all data
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [pRes, sRes, tRes] = await Promise.all([
@@ -112,11 +112,11 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const saveAuthToken = (e: React.FormEvent) => {
     e.preventDefault();
@@ -295,6 +295,7 @@ export default function App() {
 
           <nav className="space-y-1">
             <button
+              type="button"
               onClick={() => {
                 setActiveTab("projects");
                 setIsFormOpen(false);
@@ -309,6 +310,7 @@ export default function App() {
               Projects
             </button>
             <button
+              type="button"
               onClick={() => {
                 setActiveTab("skills");
                 setIsFormOpen(false);
@@ -323,6 +325,7 @@ export default function App() {
               Skills
             </button>
             <button
+              type="button"
               onClick={() => {
                 setActiveTab("timeline");
                 setIsFormOpen(false);
@@ -364,6 +367,7 @@ export default function App() {
             <div className="flex items-center justify-between gap-2 bg-neutral-800 p-3 rounded text-xs text-green-400 font-mono">
               <span>Token Configured</span>
               <button
+                type="button"
                 onClick={clearAuthToken}
                 className="text-neutral-500 hover:text-white cursor-pointer"
               >
@@ -386,6 +390,7 @@ export default function App() {
             </p>
           </div>
           <button
+            type="button"
             onClick={() => openForm()}
             className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer"
           >
@@ -425,12 +430,14 @@ export default function App() {
                   </div>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => openForm(p)}
                       className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
                     >
                       <Edit3 size={14} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(p.id)}
                       className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                     >
@@ -458,12 +465,14 @@ export default function App() {
                     </div>
                     <div className="flex gap-1 shrink-0">
                       <button
+                        type="button"
                         onClick={() => openForm(s)}
                         className="p-1.5 border border-neutral-200 dark:border-neutral-800 rounded hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
                       >
                         <Edit3 size={12} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleDelete(s.id)}
                         className="p-1.5 border border-red-100 dark:border-red-950 text-red-500 rounded hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                       >
@@ -501,12 +510,14 @@ export default function App() {
                   </div>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => openForm(t)}
                       className="p-2 border border-neutral-200 dark:border-neutral-800 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-950 cursor-pointer"
                     >
                       <Edit3 size={14} />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(t.id)}
                       className="p-2 border border-red-100 dark:border-red-950 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                     >
@@ -529,6 +540,7 @@ export default function App() {
                   {editingItem.id ? "Edit" : "Create New"} {activeTab.slice(0, -1)}
                 </h3>
                 <button
+                  type="button"
                   onClick={() => {
                     setIsFormOpen(false);
                     setEditingItem(null);
