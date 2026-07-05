@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import { drizzle as drizzleD1 } from "drizzle-orm/d1";
 import * as schema from "./schema";
 
@@ -10,10 +11,10 @@ export function createDb(d1: any) {
 
   try {
     // Dynamic CJS require to hide Node modules from Vite compile-time static analysis
-    const req = (globalThis as any).require;
+    const req = createRequire(import.meta.url);
     if (req) {
-      const { Database } = req("node:sqlite");
-      const { drizzle: drizzleNode } = req("drizzle-orm/node-sqlite");
+      const Database = req("better-sqlite3");
+      const { drizzle: drizzleNode } = req("drizzle-orm/better-sqlite3");
       const path = req("node:path");
       const fs = req("node:fs");
 

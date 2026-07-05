@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiUploadRouteImport } from './routes/api/upload'
+import { Route as ApiDocsRouteImport } from './routes/api/docs'
 import { Route as ApiR2SplatRouteImport } from './routes/api/r2.$'
 import { Route as ApiAdminSplatRouteImport } from './routes/api/admin.$'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const ApiUploadRoute = ApiUploadRouteImport.update({
   id: '/api/upload',
   path: '/api/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api/docs',
+  path: '/api/docs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiR2SplatRoute = ApiR2SplatRouteImport.update({
@@ -37,12 +43,14 @@ const ApiAdminSplatRoute = ApiAdminSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/docs': typeof ApiDocsRoute
   '/api/upload': typeof ApiUploadRoute
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/r2/$': typeof ApiR2SplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/docs': typeof ApiDocsRoute
   '/api/upload': typeof ApiUploadRoute
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/r2/$': typeof ApiR2SplatRoute
@@ -50,20 +58,28 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/docs': typeof ApiDocsRoute
   '/api/upload': typeof ApiUploadRoute
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/r2/$': typeof ApiR2SplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/upload' | '/api/admin/$' | '/api/r2/$'
+  fullPaths: '/' | '/api/docs' | '/api/upload' | '/api/admin/$' | '/api/r2/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/upload' | '/api/admin/$' | '/api/r2/$'
-  id: '__root__' | '/' | '/api/upload' | '/api/admin/$' | '/api/r2/$'
+  to: '/' | '/api/docs' | '/api/upload' | '/api/admin/$' | '/api/r2/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/docs'
+    | '/api/upload'
+    | '/api/admin/$'
+    | '/api/r2/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiDocsRoute: typeof ApiDocsRoute
   ApiUploadRoute: typeof ApiUploadRoute
   ApiAdminSplatRoute: typeof ApiAdminSplatRoute
   ApiR2SplatRoute: typeof ApiR2SplatRoute
@@ -85,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/docs': {
+      id: '/api/docs'
+      path: '/api/docs'
+      fullPath: '/api/docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/r2/$': {
       id: '/api/r2/$'
       path: '/api/r2/$'
@@ -104,6 +127,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiDocsRoute: ApiDocsRoute,
   ApiUploadRoute: ApiUploadRoute,
   ApiAdminSplatRoute: ApiAdminSplatRoute,
   ApiR2SplatRoute: ApiR2SplatRoute,
