@@ -1,8 +1,6 @@
 import * as d3Force from 'd3-force';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Network, RefreshCw, ZoomIn, ZoomOut, Maximize, List } from 'lucide-react';
-import { PROJECTS } from '../data/registry';
-
 interface D3Node extends d3Force.SimulationNodeDatum {
   id: string;
   name: string;
@@ -19,9 +17,10 @@ interface SkillsGraphProps {
   selectedSkill: string | null;
   onSelectSkill: (skill: string | null) => void;
   onRouteToProject?: (projectId: string) => void;
+  projects: any[];
 }
 
-export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: SkillsGraphProps) {
+export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject, projects: PROJECTS }: SkillsGraphProps) {
   const [viewMode, setViewMode] = useState<'graph' | 'list'>('graph');
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   
@@ -357,12 +356,12 @@ export function SkillsGraph({ selectedSkill, onSelectSkill, onRouteToProject }: 
           .map(([tech]) => tech)
       );
       // Also check p.domains directly (for projects that categorise themselves under this domain)
-      return PROJECTS.filter(p =>
+      return PROJECTS.filter((p: any) =>
         p.domains.includes(selectedNode.id) ||
-        p.technologies.some(t => domainTechs.has(t))
+        p.technologies.some((t: string) => domainTechs.has(t))
       );
     } else {
-      return PROJECTS.filter(p => p.technologies.includes(selectedNode.id));
+      return PROJECTS.filter((p: any) => p.technologies.includes(selectedNode.id));
     }
   }, [selectedNode, techMap]);
 

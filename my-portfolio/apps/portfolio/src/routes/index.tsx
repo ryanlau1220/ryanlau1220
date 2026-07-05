@@ -3,11 +3,21 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { Github, ExternalLink, Mail, Phone, MapPin, Award, CheckCircle, ArrowRight, Download, Linkedin, Cloud, Code2, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { SkillsGraph } from '../components/SkillsGraph';
 import { Timeline } from '../components/Timeline';
-import { PROJECTS } from '../data/registry';
+import { getPortfolioData } from '../server/queries';
 
-export const Route = createFileRoute('/')({ component: PortfolioHome });
+export const Route = createFileRoute('/')({
+  loader: async () => {
+    return getPortfolioData();
+  },
+  component: PortfolioHome
+});
 
 function PortfolioHome() {
+  const { projects: PROJECTS, experiences: EXPERIENCES, events: EVENTS } = Route.useLoaderData() as {
+    projects: any[];
+    experiences: any[];
+    events: any[];
+  };
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -230,7 +240,7 @@ function PortfolioHome() {
           </h3>
         </div>
         
-        <SkillsGraph selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} onRouteToProject={handleRouteToProject} />
+        <SkillsGraph selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} onRouteToProject={handleRouteToProject} projects={PROJECTS} />
       </section>
 
       {/* 4. PROJECTS SECTION */}
@@ -379,7 +389,7 @@ function PortfolioHome() {
                           Key Outcomes &amp; Technical Achievements
                         </span>
                         <ul className="space-y-2">
-                          {project.achievements.map((ach, idx) => (
+                          {project.achievements.map((ach: string, idx: number) => (
                             <li key={idx} className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
                               <CheckCircle size={14} className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5" />
                               <span>{ach}</span>
@@ -390,7 +400,7 @@ function PortfolioHome() {
 
                       {/* Technologies Badges */}
                       <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                        {project.technologies.map(tech => (
+                        {project.technologies.map((tech: string) => (
                           <button
                             key={tech}
                             type="button"
@@ -472,7 +482,7 @@ function PortfolioHome() {
           </h3>
         </div>
 
-        <Timeline />
+        <Timeline experiences={EXPERIENCES} events={EVENTS} />
       </section>
 
       {/* 6. CERTIFICATIONS & CREDENTIALS SECTION */}

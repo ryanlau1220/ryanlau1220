@@ -1,7 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Calendar, Briefcase, Award, GraduationCap, Laptop, ChevronDown } from 'lucide-react';
-import { EVENTS, EXPERIENCES } from '../data/registry';
-
 interface UnifiedTimelineItem {
   id: string;
   title: string;
@@ -15,7 +13,12 @@ interface UnifiedTimelineItem {
   sortKey: number;
 }
 
-export function Timeline() {
+interface TimelineProps {
+  experiences: any[];
+  events: any[];
+}
+
+export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineProps) {
   const [activeFilter, setActiveFilter] = useState<'edu-work' | 'hackathon'>('edu-work');
   const [expandedTimelineId, setExpandedTimelineId] = useState<string | null>(null);
 
@@ -24,7 +27,7 @@ export function Timeline() {
     const list: UnifiedTimelineItem[] = [];
 
     // Map experiences
-    EXPERIENCES.forEach(exp => {
+    EXPERIENCES.forEach((exp: any) => {
       list.push({
         id: exp.id,
         title: exp.role,
@@ -39,7 +42,7 @@ export function Timeline() {
     });
 
     // Map events
-    EVENTS.forEach(evt => {
+    EVENTS.forEach((evt: any) => {
       list.push({
         id: evt.id,
         title: evt.title,
@@ -196,7 +199,7 @@ export function Timeline() {
                           {/* Bullet Achievements (for Work / Ed) */}
                           {item.achievements && item.achievements.length > 0 && (
                             <ul className="space-y-1.5 pt-1">
-                              {item.achievements.map((ach, idx) => (
+                              {item.achievements.map((ach: string, idx: number) => (
                                 <li key={idx} className="text-[11px] text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed">
                                   <span className="text-neutral-400 select-none">•</span>
                                   <span>{ach}</span>
@@ -208,7 +211,7 @@ export function Timeline() {
                           {/* Tech Tags */}
                           {item.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-2">
-                              {item.technologies.map(tag => (
+                              {item.technologies.map((tag: string) => (
                                 <span
                                   key={tag}
                                   className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400"
