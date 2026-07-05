@@ -2,14 +2,12 @@ import { createDb } from "@portfolio/db";
 import { getEvent } from "vinxi/http";
 
 export function getDb() {
+  let d1: any = null;
   try {
     const event = getEvent();
-    const d1 = event.context.cloudflare?.env?.DB;
-    if (d1) {
-      return createDb(d1);
-    }
+    d1 = event.context.cloudflare?.env?.DB;
   } catch (_e) {
-    // Not in HTTP request context (e.g. static build check)
+    // Silent catch (runs outside of an active HTTP request scope)
   }
-  return null;
+  return createDb(d1);
 }
