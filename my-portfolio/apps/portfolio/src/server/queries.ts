@@ -3,7 +3,7 @@ import { getDb } from "./db";
 
 // Fetch all database records and map to legacy type structures to keep the UI simple
 export const getPortfolioData = createServerFn({ method: "GET" }).handler(async () => {
-  const db = getDb();
+  const db = await getDb();
   if (!db) {
     // Return fallback empty data if DB binding is missing during build checks
     return { projects: [], experiences: [], events: [] };

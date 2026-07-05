@@ -3,6 +3,7 @@ import type { DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "./schema";
 
 export * from "./schema";
+export { schema };
 
 export interface D1Database {
   prepare(sql: string): unknown;
