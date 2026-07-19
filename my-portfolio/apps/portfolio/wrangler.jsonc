@@ -1,7 +1,23 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "portfolio",
-  "compatibility_date": "2025-09-02",
-  "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "portfolio",
+	"compatibility_date": "2025-09-02",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	// Visitor Log bindings and vars are added after their Cloudflare resources are created.
+	// See VISITOR_LOG_SETUP.md for the exact production configuration.
+	"main": "@tanstack/react-start/server-entry",
+	"d1_databases": [
+		{
+			"binding": "portfolio_visitor_log",
+			"database_name": "portfolio-visitor-log",
+			"database_id": "9f5d850e-4b4c-4ce7-ba99-29450d22f933",
+			"remote": true
+		}
+	],
+	"vars": {
+		"TURNSTILE_SITE_KEY": "0x4AAAAAAD5OBIUxwrQ_UYo-",
+		"VISITOR_LOG_HOSTNAME": "portfolio.ryanlau1220.workers.dev"
+	}
 }

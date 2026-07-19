@@ -1,8 +1,18 @@
 import { HeadContent, Outlet, Scripts, createRootRoute, useLocation } from "@tanstack/react-router";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { VisitorLog } from "../components/VisitorLog";
 import { PROFILE } from "../data/registry";
 import appCss from "../styles.css?url";
+
+const PORTFOLIO_STACK = [
+  { label: "TanStack Start", href: "https://tanstack.com/start" },
+  { label: "React", href: "https://react.dev" },
+  { label: "TypeScript", href: "https://www.typescriptlang.org" },
+  { label: "Tailwind CSS", href: "https://tailwindcss.com" },
+  { label: "Vite", href: "https://vite.dev" },
+  { label: "Cloudflare Workers", href: "https://workers.cloudflare.com" },
+] as const;
 
 export const Route = createRootRoute({
   head: () => ({
@@ -106,7 +116,8 @@ function RootLayout() {
 
   // Listen to scroll progress
   useEffect(() => {
-    const handleScrollProgress = () => {
+    let animationFrame: number | null = null;
+    const updateScrollProgress = () => {
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (progressBarRef.current) {
         if (totalScroll > 0) {
@@ -118,11 +129,20 @@ function RootLayout() {
       }
     };
 
+    const handleScrollProgress = () => {
+      if (animationFrame !== null) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        updateScrollProgress();
+      });
+    };
+
     window.addEventListener("scroll", handleScrollProgress, { passive: true });
-    handleScrollProgress();
+    updateScrollProgress();
 
     return () => {
       window.removeEventListener("scroll", handleScrollProgress);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
     };
   }, []);
 
@@ -133,7 +153,8 @@ function RootLayout() {
       return;
     }
 
-    const handleScroll = () => {
+    let animationFrame: number | null = null;
+    const updateActiveSection = () => {
       const sections = document.querySelectorAll("section[id]");
       let currentSectionId = "#home";
       const scrollPos = window.scrollY + 120; // offset for header
@@ -157,13 +178,22 @@ function RootLayout() {
       setActiveHash((prev) => (prev !== currentSectionId ? currentSectionId : prev));
     };
 
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      if (animationFrame !== null) return;
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        updateActiveSection();
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     // Small delay to let child page mount and calculate coordinates correctly
     const timer = setTimeout(handleScroll, 150);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(timer);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
     };
   }, [location.pathname]);
 
@@ -298,9 +328,40 @@ function RootLayout() {
       </header>
 
       {/* Main Outlet */}
-      <main className="flex-1 pb-16">
+      <main className="flex-1">
         <Outlet />
       </main>
+
+      <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+              Built in public.
+            </p>
+            <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-500">
+              The tooling behind this portfolio, kept deliberately small.
+            </p>
+          </div>
+          <div
+            className="flex flex-wrap gap-1.5 md:justify-end"
+            aria-label="Portfolio technology stack"
+          >
+            {PORTFOLIO_STACK.map((technology) => (
+              <a
+                key={technology.label}
+                href={technology.href}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 transition-colors hover:border-blue-300 hover:text-blue-600 dark:hover:border-blue-800 dark:hover:text-blue-400"
+              >
+                {technology.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </footer>
+
+      <VisitorLog />
     </div>
   );
 }
