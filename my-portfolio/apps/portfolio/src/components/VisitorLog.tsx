@@ -1,12 +1,4 @@
-import {
-  CheckCircle2,
-  LoaderCircle,
-  MessageSquarePlus,
-  Radio,
-  Send,
-  ShieldCheck,
-  X,
-} from "lucide-react";
+import { CheckCircle2, LoaderCircle, MessageSquarePlus, Send, ShieldCheck, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { loadVisitorLog, submitVisitorLogEntry } from "../visitor-log.functions";
 import type { VisitorLogEntry, VisitorLogRealtimeConfig } from "../visitor-log.types";
@@ -14,7 +6,8 @@ import type { VisitorLogEntry, VisitorLogRealtimeConfig } from "../visitor-log.t
 const TURNSTILE_SCRIPT_URL =
   "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const PUSHER_SCRIPT_URL = "https://js.pusher.com/8.4.0/pusher.min.js";
-const MAX_MESSAGE_LENGTH = 280;
+const MAX_MESSAGE_WORDS = 100;
+const MAX_MESSAGE_CHARACTERS = 1_000;
 const INITIAL_FORM = { author: "", message: "", website: "" };
 const externalScripts = new Map<string, Promise<void>>();
 
@@ -27,6 +20,7 @@ interface TurnstileApi {
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
+      theme: "light" | "dark";
     },
   ): string | number;
   remove(widgetId: string | number): void;
@@ -98,20 +92,25 @@ function formatTimestamp(timestamp: string) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function countWords(value: string) {
+  const trimmed = value.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
+
 function VisitorLogMessages({ entries }: { entries: VisitorLogEntry[] }) {
   if (entries.length === 0) {
     return (
       <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-7 text-center">
-        <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400">No notes yet.</p>
+        <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400">No comments yet.</p>
         <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mt-1.5">
-          Be the first to leave a signal.
+          Be the first to leave one.
         </p>
       </div>
     );
   }
 
   return (
-    <ol className="space-y-2.5" aria-label="Recent visitor notes">
+    <ol className="space-y-2.5" aria-label="Recent comments">
       {entries.map((entry) => (
         <li
           key={entry.id}
@@ -165,7 +164,7 @@ function useRealtimeVisitorLog(
         channel.bind("visitor-log:created", onMessage);
       })
       .catch(() => {
-        // Realtime is an enhancement; the Visitor Log remains fully usable without it.
+        // Realtime is an enhancement; the guestbook remains fully usable without it.
       });
 
     return () => {
@@ -185,6 +184,7 @@ export function VisitorLog() {
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null);
   const [form, setForm] = useState(INITIAL_FORM);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileTheme, setTurnstileTheme] = useState<"light" | "dark">("dark");
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, startLoading] = useTransition();
@@ -193,6 +193,22 @@ export function VisitorLog() {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const turnstileMountRef = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetRef = useRef<string | number | null>(null);
+
+  const messageWordCount = countWords(form.message);
+
+  useEffect(() => {
+    const updateTheme = () => {
+      setTurnstileTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+    };
+
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -221,7 +237,7 @@ export function VisitorLog() {
       } catch {
         if (!cancelled) {
           setIsEnabled(false);
-          setError("The Visitor Log could not be reached. Please try again shortly.");
+          setError("The guestbook could not be reached. Please try again shortly.");
         }
       }
     });
@@ -249,6 +265,7 @@ export function VisitorLog() {
         turnstileWidgetRef.current = window.turnstile.render(mount, {
           sitekey: turnstileSiteKey,
           action: "visitor-log",
+          theme: turnstileTheme,
           callback: (token) => {
             setTurnstileToken(token);
             setError(null);
@@ -268,7 +285,7 @@ export function VisitorLog() {
       }
       setTurnstileToken("");
     };
-  }, [isLoading, isOpen, turnstileSiteKey]);
+  }, [isLoading, isOpen, turnstileSiteKey, turnstileTheme]);
 
   const handleRealtimeEntry = useCallback((entry: VisitorLogEntry) => {
     setEntries((current) => upsertEntry(current, entry));
@@ -285,6 +302,14 @@ export function VisitorLog() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!form.message.trim()) {
+      setError("Write a comment before posting.");
+      return;
+    }
+    if (messageWordCount > MAX_MESSAGE_WORDS) {
+      setError(`Comments can contain up to ${MAX_MESSAGE_WORDS} words.`);
+      return;
+    }
     if (!turnstileToken) {
       setError("Please complete the verification before posting.");
       return;
@@ -302,17 +327,17 @@ export function VisitorLog() {
           setEntries((current) => upsertEntry(current, result.entry!));
           setForm(INITIAL_FORM);
           setTurnstileToken("");
-          setNotice("Your note is live. Thank you for leaving a signal.");
+          setNotice("Your comment is live. Thank you for signing the guestbook.");
           if (turnstileWidgetRef.current !== null)
             window.turnstile?.reset(turnstileWidgetRef.current);
         } else {
-          setNotice("Your note was received. Thank you for stopping by.");
+          setNotice("Your comment was received. Thank you for stopping by.");
         }
       } catch (submissionError) {
         setError(
           submissionError instanceof Error
             ? submissionError.message
-            : "Your note could not be posted. Please try again.",
+            : "Your comment could not be posted. Please try again.",
         );
         if (turnstileWidgetRef.current !== null)
           window.turnstile?.reset(turnstileWidgetRef.current);
@@ -327,16 +352,14 @@ export function VisitorLog() {
         ref={openButtonRef}
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 z-40 group flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 px-3.5 py-3 text-neutral-800 dark:text-neutral-200 shadow-lg shadow-neutral-950/10 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer"
+        className="fixed bottom-5 right-5 z-40 flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 text-neutral-800 dark:text-neutral-200 shadow-lg shadow-neutral-950/10 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-controls="visitor-log"
+        aria-label="Open guestbook"
+        title="Guestbook"
       >
-        <span className="relative flex h-5 w-5 items-center justify-center">
-          <MessageSquarePlus size={16} className="text-blue-500" />
-          <span className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_7px_#3b82f6]" />
-        </span>
-        <span className="text-[11px] font-bold font-mono">Visitor Log</span>
+        <MessageSquarePlus size={18} className="text-blue-500" aria-hidden="true" />
       </button>
 
       {isOpen ? (
@@ -345,7 +368,7 @@ export function VisitorLog() {
             type="button"
             className="absolute inset-0 bg-neutral-950/25 dark:bg-black/60 backdrop-blur-[2px]"
             onClick={close}
-            aria-label="Close Visitor Log"
+            aria-label="Close guestbook"
           />
           <dialog
             open
@@ -357,24 +380,21 @@ export function VisitorLog() {
             <header className="flex items-start justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 px-5 py-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <Radio size={14} className="text-blue-500" aria-hidden="true" />
+                  <MessageSquarePlus size={16} className="text-blue-500" aria-hidden="true" />
                   <h2
                     id="visitor-log-title"
                     className="text-sm font-bold text-neutral-950 dark:text-white"
                   >
-                    Visitor Log
+                    Guestbook
                   </h2>
                 </div>
-                <p className="mt-1 text-[10px] font-mono uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-600">
-                  A small public signal board
-                </p>
               </div>
               <button
                 ref={closeButtonRef}
                 type="button"
                 onClick={close}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-white cursor-pointer"
-                aria-label="Close Visitor Log"
+                aria-label="Close guestbook"
               >
                 <X size={15} />
               </button>
@@ -384,7 +404,7 @@ export function VisitorLog() {
               {isLoading || isEnabled === null ? (
                 <div className="flex items-center justify-center gap-2 py-12 text-xs font-mono text-neutral-400">
                   <LoaderCircle size={14} className="animate-spin" />
-                  Loading signals…
+                  Loading comments…
                 </div>
               ) : !isEnabled ? (
                 <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-800 px-4 py-8 text-center">
@@ -393,24 +413,24 @@ export function VisitorLog() {
                     className="mx-auto text-neutral-400 dark:text-neutral-600"
                   />
                   <p className="mt-3 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                    Visitor Log is coming online.
+                    Guestbook is coming online.
                   </p>
                   <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
-                    Its protected message service is being configured. Please check back soon.
+                    Its protected comment form is being configured. Please check back soon.
                   </p>
                 </div>
               ) : (
                 <>
-                  <form onSubmit={handleSubmit} className="space-y-3">
+                  <form onSubmit={handleSubmit} className="space-y-2.5">
                     <div className="flex items-center justify-between gap-3">
                       <label
                         htmlFor="visitor-log-author"
                         className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-600"
                       >
-                        Leave a signal
+                        Leave a comment
                       </label>
                       <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-600">
-                        {form.message.length}/{MAX_MESSAGE_LENGTH}
+                        {messageWordCount}/{MAX_MESSAGE_WORDS} words
                       </span>
                     </div>
                     <input
@@ -424,19 +444,42 @@ export function VisitorLog() {
                       placeholder="Name (optional)"
                       className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-xs font-mono text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
                     />
-                    <textarea
-                      id="visitor-log-message"
-                      value={form.message}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, message: event.target.value }))
-                      }
-                      maxLength={MAX_MESSAGE_LENGTH}
-                      minLength={8}
-                      required
-                      rows={3}
-                      placeholder="A short note — plain text only, no links."
-                      className="w-full resize-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-xs leading-relaxed text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
-                    />
+                    <div className="relative">
+                      <textarea
+                        id="visitor-log-message"
+                        value={form.message}
+                        onChange={(event) =>
+                          setForm((current) => ({ ...current, message: event.target.value }))
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            event.currentTarget.form?.requestSubmit();
+                          }
+                        }}
+                        maxLength={MAX_MESSAGE_CHARACTERS}
+                        required
+                        rows={2}
+                        placeholder="Write a comment for me (Press Enter to send)"
+                        aria-label="Write a comment"
+                        className="w-full resize-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 pr-12 text-xs leading-relaxed text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
+                      />
+                      <button
+                        type="submit"
+                        disabled={
+                          isSubmitting || !turnstileToken || messageWordCount > MAX_MESSAGE_WORDS
+                        }
+                        className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-md bg-neutral-900 text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+                        aria-label="Post comment"
+                        title="Post comment"
+                      >
+                        {isSubmitting ? (
+                          <LoaderCircle size={13} className="animate-spin" />
+                        ) : (
+                          <Send size={13} />
+                        )}
+                      </button>
+                    </div>
                     <div
                       className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
                       aria-hidden="true"
@@ -468,35 +511,13 @@ export function VisitorLog() {
                         {notice}
                       </p>
                     ) : null}
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || !turnstileToken}
-                      className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-3.5 py-2 text-xs font-mono font-semibold text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
-                    >
-                      {isSubmitting ? (
-                        <LoaderCircle size={13} className="animate-spin" />
-                      ) : (
-                        <Send size={13} />
-                      )}
-                      {isSubmitting ? "Posting…" : "Post note"}
-                    </button>
-                    <p className="text-[10px] leading-relaxed text-neutral-400 dark:text-neutral-600">
-                      Verified notes publish immediately. Keep it kind and link-free.
-                    </p>
                   </form>
 
                   <div className="my-5 border-t border-neutral-100 dark:border-neutral-900" />
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <h3 className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
-                      Recent signals
+                      Recent comments
                     </h3>
-                    {realtime ? (
-                      <span className="inline-flex items-center gap-1 text-[9px] font-mono text-blue-600 dark:text-blue-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-                        LIVE
-                      </span>
-                    ) : null}
                   </div>
                   <VisitorLogMessages entries={entries} />
                 </>
