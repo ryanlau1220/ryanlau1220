@@ -66,6 +66,7 @@ export const PROJECTS: Project[] = [
       "Obsidian",
       "Vitest",
     ],
+    imageUrl: "/projects/llmwiki/image.png",
   },
   {
     id: "ledgertrace",
@@ -91,6 +92,7 @@ export const PROJECTS: Project[] = [
       "Stripe",
       "TRON",
     ],
+    imageUrl: "/projects/aimarathon/image.png",
     videoUrl: "https://youtu.be/1o_8vI79uZQ",
   },
   {
@@ -117,6 +119,7 @@ export const PROJECTS: Project[] = [
       "GLM-OCR",
       "Whisper.cpp",
     ],
+    imageUrl: "/projects/umhackathon/image.png",
     videoUrl: "https://youtu.be/B28F81tFSwQ",
   },
   {
@@ -150,6 +153,7 @@ export const PROJECTS: Project[] = [
       "ML Kit OCR",
       "Discord Webhooks",
     ],
+    imageUrl: "/projects/myaifuture/image.png",
     videoUrl: "https://youtu.be/WdT77Km9cOc",
   },
   {
@@ -177,6 +181,7 @@ export const PROJECTS: Project[] = [
       "Cloud Pub/Sub",
       "Google Cloud",
     ],
+    imageUrl: "/projects/kitahack/image.png",
     videoUrl: "https://youtu.be/ZXsvXQVFl1M",
   },
   {
@@ -207,6 +212,7 @@ export const PROJECTS: Project[] = [
       "Docker",
       "AWS",
     ],
+    imageUrl: "/projects/greatmalaysiaai/image.png",
     videoUrl: "https://youtu.be/DEYFJtiCJsI",
   },
   {
@@ -234,6 +240,7 @@ export const PROJECTS: Project[] = [
       "Oasis ROFL",
       "Gemini",
     ],
+    imageUrl: "/projects/devmatch/image.png",
     videoUrl: "https://youtu.be/XhHIwUfuJPs",
   },
   {
@@ -259,6 +266,7 @@ export const PROJECTS: Project[] = [
       "CSS3",
       "JavaScript",
     ],
+    imageUrl: "/projects/futurehack/image.png",
   },
   {
     id: "krypitalx",
