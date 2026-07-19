@@ -46,6 +46,12 @@ jobs:
       - name: Lint, type-check, and build
         run: pnpm run check
 
+      - name: Install Playwright browser
+        run: pnpm --filter portfolio-app exec playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: pnpm --filter portfolio-app test:e2e
+
   deploy:
     name: Deploy portfolio
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
