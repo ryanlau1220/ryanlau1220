@@ -7,6 +7,9 @@
       "**/.wrangler/**",
       "**/.tanstack/**",
       "**/.turbo/**",
+      "**/test-results/**",
+      "**/playwright-report/**",
+      "**/blob-report/**",
       "**/routeTree.gen.ts"
     ]
   },
