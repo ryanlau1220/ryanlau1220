@@ -1,0 +1,12 @@
+# Local-only Visitor Log settings. Copy to .dev.vars and replace every value.
+# Never commit apps/portfolio/.dev.vars.
+TURNSTILE_SITE_KEY="your-local-turnstile-site-key"
+TURNSTILE_SECRET_KEY="your-local-turnstile-secret-key"
+VISITOR_LOG_RATE_LIMIT_SALT="a-unique-random-local-salt"
+VISITOR_LOG_HOSTNAME="localhost"
+
+# Optional: use a separate Pusher app for development. Leave all four unset to disable realtime locally.
+PUSHER_APP_ID=""
+PUSHER_KEY=""
+PUSHER_SECRET=""
+PUSHER_CLUSTER=""
