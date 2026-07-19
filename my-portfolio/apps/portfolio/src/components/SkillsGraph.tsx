@@ -1,7 +1,13 @@
 import * as d3Force from "d3-force";
 import { List, Maximize, Network, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { type Project, SKILL_CATEGORIES, TECHNOLOGY_CATEGORIES } from "../data/registry";
+import {
+  type EventItem,
+  type Experience,
+  type Project,
+  SKILL_CATEGORIES,
+  TECHNOLOGY_CATEGORIES,
+} from "../data/registry";
 interface D3Node extends d3Force.SimulationNodeDatum {
   id: string;
   name: string;
@@ -19,6 +25,8 @@ interface SkillsGraphProps {
   onSelectSkill: (skill: string | null) => void;
   onRouteToProject?: (projectId: string) => void;
   projects: Project[];
+  experiences: Experience[];
+  events: EventItem[];
 }
 
 export function SkillsGraph({
@@ -26,8 +34,11 @@ export function SkillsGraph({
   onSelectSkill,
   onRouteToProject,
   projects: PROJECTS,
+  experiences: EXPERIENCES,
+  events: EVENTS,
 }: SkillsGraphProps) {
-  const [viewMode, setViewMode] = useState<"graph" | "list">("graph");
+  // The complete connected inventory is intentionally dense; begin with the scannable view.
+  const [viewMode, setViewMode] = useState<"graph" | "list">("list");
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
 
   // Pan & Zoom state
@@ -41,14 +52,24 @@ export function SkillsGraph({
   const draggedNodeRef = useRef<D3Node | null>(null);
   const hasMovedRef = useRef(false);
 
-  // 1. Build the graph from the canonical portfolio skill taxonomy.
+  // 1. Build the graph from skills that are actually connected to public work.
   const { nodes, links, domains, technologies, techMap } = useMemo(() => {
-    const uniqueDomains = new Set<string>(SKILL_CATEGORIES);
-    const uniqueTech = new Set<string>(Object.keys(TECHNOLOGY_CATEGORIES));
+    const connectedTechnologies = new Set(
+      [...PROJECTS, ...EXPERIENCES, ...EVENTS].flatMap((item) => item.technologies),
+    );
+    const uniqueTech = new Set(
+      Object.keys(TECHNOLOGY_CATEGORIES).filter((technology) =>
+        connectedTechnologies.has(technology as keyof typeof TECHNOLOGY_CATEGORIES),
+      ),
+    );
+    const uniqueDomains = new Set<string>();
+    uniqueTech.forEach((technology) => {
+      uniqueDomains.add(TECHNOLOGY_CATEGORIES[technology as keyof typeof TECHNOLOGY_CATEGORIES]);
+    });
     const connections = new Set<string>(); // "source-target" string set
 
     Object.entries(TECHNOLOGY_CATEGORIES).forEach(([tech, cat]) => {
-      connections.add(`${tech}::${cat}`);
+      if (uniqueTech.has(tech)) connections.add(`${tech}::${cat}`);
     });
 
     // Count links for scaling node sizes
@@ -91,7 +112,7 @@ export function SkillsGraph({
       technologies: Array.from(uniqueTech).sort(),
       techMap: TECHNOLOGY_CATEGORIES,
     };
-  }, []);
+  }, [PROJECTS, EXPERIENCES, EVENTS]);
 
   // 2. D3 force simulation layout
   const [simulationNodes, setSimulationNodes] = useState<D3Node[]>([]);
@@ -235,7 +256,7 @@ export function SkillsGraph({
     );
   }, [selectedSkill, nodes]);
 
-  // Find linked projects — for domain nodes, find projects that contain any tech in that domain
+  // Find linked projects — for domain nodes, find projects that contain any tech in that domain.
   const activeProjects = useMemo(() => {
     if (!selectedNode) return [];
     if (selectedNode.type === "domain") {
@@ -245,16 +266,38 @@ export function SkillsGraph({
           .filter(([, cat]) => cat === selectedNode.id)
           .map(([tech]) => tech),
       );
-      // Also check p.domains directly (for projects that categorise themselves under this domain)
-      return PROJECTS.filter(
-        (p) =>
-          p.domains.includes(selectedNode.id) || p.technologies.some((t) => domainTechs.has(t)),
+      return PROJECTS.filter((project) =>
+        project.technologies.some((tech) => domainTechs.has(tech)),
       );
     }
     return PROJECTS.filter((p) =>
       p.technologies.some((technology) => technology === selectedNode.id),
     );
   }, [selectedNode, techMap, PROJECTS]);
+
+  const activeTimelineItems = useMemo(() => {
+    if (!selectedNode) return [];
+    const domainTechnologies =
+      selectedNode.type === "domain"
+        ? new Set(
+            Object.entries(techMap)
+              .filter(([, category]) => category === selectedNode.id)
+              .map(([technology]) => technology),
+          )
+        : null;
+    const matches = (technologies: string[]) =>
+      domainTechnologies
+        ? technologies.some((technology) => domainTechnologies.has(technology))
+        : technologies.includes(selectedNode.id);
+
+    return [...EXPERIENCES, ...EVENTS]
+      .filter((item) => matches(item.technologies))
+      .map((item) => ({
+        id: item.id,
+        title:
+          "company" in item ? `${item.role} · ${item.company}` : `${item.title} · ${item.event}`,
+      }));
+  }, [selectedNode, techMap, EXPERIENCES, EVENTS]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
@@ -330,16 +373,7 @@ export function SkillsGraph({
 
   // Categorize technologies for the traditional list view — derived dynamically from techMap so it's always in sync
   const categorizedSkills = useMemo(() => {
-    const order = [
-      "Programming Languages",
-      "Backend",
-      "Frontend",
-      "Databases",
-      "Tools",
-      "DevOps",
-      "AI & Intelligence",
-      "Quality & Testing",
-    ];
+    const order = SKILL_CATEGORIES;
     const buckets: Record<string, string[]> = {};
     order.forEach((cat) => {
       buckets[cat] = [];
@@ -409,6 +443,28 @@ export function SkillsGraph({
                     →
                   </span>
                 </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3">
+          <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider block mb-2">
+            Linked Timeline ({activeTimelineItems.length})
+          </span>
+          {activeTimelineItems.length === 0 ? (
+            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 italic">
+              No timeline entries listed for this skill.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-1.5 max-h-[96px] overflow-y-auto pr-1">
+              {activeTimelineItems.map((item) => (
+                <span
+                  key={item.id}
+                  className="text-[10px] font-mono px-2 py-1 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400"
+                >
+                  {item.title}
+                </span>
               ))}
             </div>
           )}
