@@ -5,8 +5,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import type { VisitorLogEntry, VisitorLogSnapshot } from "./visitor-log.types";
 
 const MAX_AUTHOR_LENGTH = 40;
-const MIN_MESSAGE_LENGTH = 8;
-const MAX_MESSAGE_LENGTH = 280;
+const MAX_MESSAGE_WORDS = 100;
+const MAX_MESSAGE_CHARACTERS = 1_000;
 const MAX_RECENT_MESSAGES = 18;
 const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -40,6 +40,11 @@ function normalizeMessage(value: string) {
     .replace(/\r\n?/g, "\n")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n");
+}
+
+function countWords(value: string) {
+  const trimmed = value.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
 function containsDisallowedControlCharacter(value: string) {
@@ -81,7 +86,7 @@ function assertSameOrigin() {
   const origin = request.headers.get("origin");
 
   if (origin && origin !== new URL(request.url).origin) {
-    throw new Error("Visitor Log requests must come from this site.");
+    throw new Error("Guestbook requests must come from this site.");
   }
 }
 
@@ -97,13 +102,17 @@ function readSubmission(data: SubmitVisitorLogInput) {
   if (author.length > MAX_AUTHOR_LENGTH) {
     throw new Error(`Name must be ${MAX_AUTHOR_LENGTH} characters or fewer.`);
   }
-  if (message.length < MIN_MESSAGE_LENGTH || message.length > MAX_MESSAGE_LENGTH) {
-    throw new Error(
-      `Your note must be between ${MIN_MESSAGE_LENGTH} and ${MAX_MESSAGE_LENGTH} characters.`,
-    );
+  if (!message) {
+    throw new Error("Write a comment before posting.");
+  }
+  if (message.length > MAX_MESSAGE_CHARACTERS) {
+    throw new Error("Your comment is too long.");
+  }
+  if (countWords(message) > MAX_MESSAGE_WORDS) {
+    throw new Error(`Comments can contain up to ${MAX_MESSAGE_WORDS} words.`);
   }
   if (containsDisallowedControlCharacter(message) || URL_OR_MARKUP_PATTERN.test(message)) {
-    throw new Error("Notes cannot contain links, HTML, or control characters.");
+    throw new Error("Comments cannot contain links, HTML, or control characters.");
   }
   if (!turnstileToken) {
     throw new Error("Please complete the verification before posting.");
@@ -180,13 +189,13 @@ async function assertRateLimit(
   ]);
 
   if ((recent?.count ?? 0) >= 2) {
-    throw new Error("Please wait a few minutes before posting another note.");
+    throw new Error("Please wait a few minutes before posting another comment.");
   }
   if ((daily?.count ?? 0) >= 6) {
-    throw new Error("You have reached today’s Visitor Log limit. Please come back tomorrow.");
+    throw new Error("You have reached today’s comment limit. Please come back tomorrow.");
   }
   if (duplicate) {
-    throw new Error("That note has already been posted.");
+    throw new Error("That comment has already been posted.");
   }
 }
 
@@ -221,7 +230,7 @@ async function publishRealtimeEntry(entry: VisitorLogEntry) {
       body,
     });
   } catch {
-    // Realtime delivery is deliberately best-effort; a saved note must not be discarded for it.
+    // Realtime delivery is deliberately best-effort; a saved comment must not be discarded for it.
   }
 }
 
@@ -254,7 +263,7 @@ export const submitVisitorLogEntry = createServerFn({ method: "POST" })
     assertSameOrigin();
     const config = getRuntimeConfig();
     if (!config.enabled || !(config.database && config.secretKey && config.rateLimitSalt)) {
-      throw new Error("Visitor Log is not configured yet.");
+      throw new Error("Guestbook is not configured yet.");
     }
 
     const submission = readSubmission(data);
@@ -279,7 +288,7 @@ export const submitVisitorLogEntry = createServerFn({ method: "POST" })
       .bind(entry.id, entry.author, entry.message, entry.createdAt, now, visitorHash)
       .run();
 
-    if (!writeResult.success) throw new Error("Your note could not be saved. Please try again.");
+    if (!writeResult.success) throw new Error("Your comment could not be saved. Please try again.");
 
     await publishRealtimeEntry(entry);
     return { entry };
