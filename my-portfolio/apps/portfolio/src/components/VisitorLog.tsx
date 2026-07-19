@@ -232,7 +232,7 @@ export function VisitorLog() {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!(isOpen && turnstileSiteKey && turnstileMountRef.current)) return;
+    if (!(isOpen && !isLoading && turnstileSiteKey && turnstileMountRef.current)) return;
 
     let cancelled = false;
     const mount = turnstileMountRef.current;
@@ -240,7 +240,12 @@ export function VisitorLog() {
 
     void loadExternalScript(TURNSTILE_SCRIPT_URL)
       .then(() => {
-        if (cancelled || !window.turnstile) return;
+        if (cancelled) return;
+        if (!window.turnstile) {
+          setError("Verification could not initialise. Please refresh and try again.");
+          return;
+        }
+
         turnstileWidgetRef.current = window.turnstile.render(mount, {
           sitekey: turnstileSiteKey,
           action: "visitor-log",
@@ -263,7 +268,7 @@ export function VisitorLog() {
       }
       setTurnstileToken("");
     };
-  }, [isOpen, turnstileSiteKey]);
+  }, [isLoading, isOpen, turnstileSiteKey]);
 
   const handleRealtimeEntry = useCallback((entry: VisitorLogEntry) => {
     setEntries((current) => upsertEntry(current, entry));
