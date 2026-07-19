@@ -108,13 +108,22 @@ function RecoveryArtwork() {
         alt="Friendly Ciallo illustration"
         width={640}
         height={553}
-        className="relative h-full w-full rounded-xl border border-neutral-200 object-cover shadow-sm transition-transform duration-700 ease-in-out group-hover:rotate-180 motion-reduce:transition-none dark:border-neutral-800"
+        className="relative h-full w-full rounded-xl border border-neutral-200 object-cover shadow-sm transition-transform duration-700 ease-in-out group-hover:rotate-[360deg] motion-reduce:transition-none dark:border-neutral-800"
       />
     </div>
   );
 }
 
 function RootErrorComponent({ reset }: { reset: () => void }) {
+  const handleRetry = () => {
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("__errorBoundary");
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+    reset();
+  };
+
   return (
     <div className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-5xl items-center px-6 py-16">
       <section className="grid w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 md:grid-cols-[1.05fr_0.95fr]">
@@ -132,7 +141,7 @@ function RootErrorComponent({ reset }: { reset: () => void }) {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={reset}
+              onClick={handleRetry}
               className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
             >
               <RefreshCw size={14} aria-hidden="true" />
@@ -174,9 +183,14 @@ function RootLayout() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [activeHash, setActiveHash] = useState("#home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isClientReady, setIsClientReady] = useState(false);
   const location = useLocation();
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsClientReady(true);
+  }, []);
 
   // Initialize theme state on client
   useEffect(() => {
@@ -309,7 +323,10 @@ function RootLayout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 selection:bg-blue-500/10 selection:text-blue-500">
+    <div
+      className="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 selection:bg-blue-500/10 selection:text-blue-500"
+      data-app-ready={isClientReady ? "true" : "false"}
+    >
       <a
         href="#main-content"
         className="sr-only fixed left-4 top-4 z-[60] rounded-md bg-neutral-900 px-3 py-2 text-xs font-mono font-semibold text-white focus:not-sr-only dark:bg-white dark:text-neutral-950"

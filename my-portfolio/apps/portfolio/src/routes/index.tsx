@@ -49,6 +49,18 @@ export const Route = createFileRoute("/")({
   component: PortfolioHome,
 });
 
+function DevelopmentErrorBoundaryTrigger() {
+  if (
+    import.meta.env.DEV &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("__errorBoundary")
+  ) {
+    throw new Error("Manually triggered error boundary");
+  }
+
+  return null;
+}
+
 function PortfolioHome() {
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -248,6 +260,7 @@ function PortfolioHome() {
 
   return (
     <div className="w-full">
+      <DevelopmentErrorBoundaryTrigger />
       {/* 1. HERO SECTION */}
       <section
         id="home"
@@ -889,7 +902,7 @@ function PortfolioHome() {
             type="button"
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setActiveImage(null)}
-            aria-label="Close expanded screenshot"
+            aria-label="Close expanded screenshot by clicking outside"
           />
           <div className="relative flex max-h-full w-full max-w-7xl items-center justify-center">
             <p id="expanded-screenshot-title" className="sr-only">
