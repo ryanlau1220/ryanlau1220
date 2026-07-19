@@ -372,13 +372,22 @@ function PortfolioHome() {
                         className="relative min-h-[260px] w-full overflow-hidden bg-neutral-100 p-3 text-left dark:bg-black sm:min-h-[320px] sm:p-4 md:flex md:min-h-full md:items-center md:justify-center md:p-5"
                         aria-label={`Expand ${project.title} screenshot`}
                       >
+                        <span
+                          aria-hidden="true"
+                          className="absolute -inset-8 scale-110 bg-cover bg-center opacity-25 blur-3xl dark:opacity-35"
+                          style={{ backgroundImage: `url(${project.imageUrl!})` }}
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-white/35 dark:bg-neutral-950/20"
+                        />
                         <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                           Project preview
                         </span>
                         <img
                           src={project.imageUrl}
                           alt={`${project.title} product screenshot`}
-                          className="h-full w-full rounded-lg border border-neutral-200 object-contain shadow-lg transition-transform duration-500 group-hover:scale-[1.015] dark:border-neutral-800"
+                          className="relative z-10 h-full w-full rounded-lg border border-white/50 object-contain shadow-xl transition-transform duration-500 group-hover:scale-[1.015] dark:border-white/10"
                           loading="lazy"
                         />
                         <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
