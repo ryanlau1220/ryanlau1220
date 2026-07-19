@@ -275,6 +275,8 @@ function PortfolioHome() {
           onSelectSkill={setSelectedSkill}
           onRouteToProject={handleRouteToProject}
           projects={PROJECTS}
+          experiences={EXPERIENCES}
+          events={EVENTS}
         />
       </section>
 
@@ -475,9 +477,12 @@ function PortfolioHome() {
                         </ul>
                       </div>
 
-                      {/* Technologies Badges */}
+                      {/* Curated project skills — complete technology relationships stay in the Skills Map. */}
                       <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                        {project.technologies.map((tech: string) => (
+                        <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
+                          Top skills
+                        </span>
+                        {project.featuredTechnologies.map((tech: string) => (
                           <button
                             key={tech}
                             type="button"
