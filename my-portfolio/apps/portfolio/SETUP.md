@@ -1,6 +1,6 @@
-# Visitor Log setup
+# Guestbook setup
 
-The Visitor Log is intentionally disabled until its Cloudflare resources and secrets are configured. The UI stays present, but it cannot accept messages without every required protection in place.
+The Guestbook is intentionally disabled until its Cloudflare resources and secrets are configured. The UI stays present, but it cannot accept comments without every required protection in place.
 
 ## 1. Create and bind D1
 
@@ -55,7 +55,7 @@ The Worker validates the token server-side, checks the Turnstile action and host
 
 ## 3. Enable optional Pusher realtime updates
 
-The guestbook works without Pusher. To show new verified notes instantly to other open visitors, create a Pusher Channels application and set:
+The guestbook works without Pusher. To show new verified comments instantly to other open visitors, create a Pusher Channels application and set:
 
 ```sh
 pnpm exec wrangler secret put PUSHER_APP_ID
@@ -64,16 +64,16 @@ pnpm exec wrangler secret put PUSHER_SECRET
 pnpm exec wrangler secret put PUSHER_CLUSTER
 ```
 
-Only the public key and cluster are sent to the browser. The application ID and secret remain inside the Worker, which publishes a `visitor-log:created` event only after a note passes verification, validation, and D1 rate checks.
+Only the public key and cluster are sent to the browser. The application ID and secret remain inside the Worker, which publishes a `visitor-log:created` event only after a comment passes verification, validation, and D1 rate checks.
 
 ## Safeguards included
 
 - Turnstile server-side validation with a single-use token.
 - Same-origin write requests.
 - Hidden honeypot field for unsophisticated bots.
-- Plain-text notes only: links and markup are rejected.
-- 8–280 character note limit and 40 character name limit.
+- Plain-text comments only: links and markup are rejected.
+- 100-word comment limit, a 1,000-character safety cap, and a 40-character name limit.
 - Maximum two posts per ten minutes and six posts per visitor per day.
-- Duplicate-note prevention for one day.
+- Duplicate-comment prevention for one day.
 
-Direct publishing still needs occasional owner attention. If a note must be removed before an owner-only moderation view is added, delete it directly from `visitor_log_entries` with the Cloudflare D1 dashboard or Wrangler.
+Direct publishing still needs occasional owner attention. If a comment must be removed before an owner-only moderation view is added, delete it directly from `visitor_log_entries` with the Cloudflare D1 dashboard or Wrangler.
