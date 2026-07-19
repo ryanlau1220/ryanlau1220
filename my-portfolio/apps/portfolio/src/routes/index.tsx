@@ -766,7 +766,7 @@ function PortfolioHome() {
                 <textarea
                   id="form-msg"
                   required
-                  rows={5}
+                  rows={7}
                   value={contactForm.message}
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                   className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white resize-none"
