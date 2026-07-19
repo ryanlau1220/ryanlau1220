@@ -129,6 +129,8 @@ function PortfolioHome() {
     return list;
   }, [projectFilter, selectedSkill]);
 
+  const activeProjectIndex = Math.min(currentProjectIdx, Math.max(filteredProjects.length - 1, 0));
+
   // Reset slideshow index when filters change — but skip if a direct project route just set the index
   // biome-ignore lint/correctness/useExhaustiveDependencies: projectFilter and selectedSkill are intentional trigger-only deps
   useEffect(() => {
@@ -329,7 +331,7 @@ function PortfolioHome() {
               No projects found matching the filters.
             </p>
           ) : (
-            <div className="flex items-center gap-2 sm:gap-6">
+            <div className="flex items-stretch gap-6">
               {/* Left Arrow Button */}
               <button
                 type="button"
@@ -338,7 +340,7 @@ function PortfolioHome() {
                     (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
                   )
                 }
-                className={`p-2.5 sm:p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
+                className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
                   filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
                 }`}
                 aria-label="Previous project"
@@ -348,7 +350,7 @@ function PortfolioHome() {
 
               {/* Project Card */}
               {(() => {
-                const project = filteredProjects[currentProjectIdx] || filteredProjects[0];
+                const project = filteredProjects[activeProjectIndex];
                 if (!project) return null;
                 const hasImage = !!project.imageUrl;
                 return (
@@ -490,7 +492,7 @@ function PortfolioHome() {
               <button
                 type="button"
                 onClick={() => setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)}
-                className={`p-2.5 sm:p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
+                className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
                   filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
                 }`}
                 aria-label="Next project"
@@ -500,9 +502,37 @@ function PortfolioHome() {
             </div>
           )}
 
+          {filteredProjects.length > 1 && (
+            <div className="mt-4 flex items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-900/50 md:hidden">
+              <button
+                type="button"
+                onClick={() =>
+                  setCurrentProjectIdx(
+                    (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
+                  )
+                }
+                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
+              >
+                <ChevronLeft size={15} aria-hidden="true" />
+                Previous
+              </button>
+              <span className="shrink-0 px-2 text-[10px] font-mono font-semibold tabular-nums text-neutral-500 dark:text-neutral-400">
+                {activeProjectIndex + 1} / {filteredProjects.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)}
+                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
+              >
+                Next
+                <ChevronRight size={15} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
           {/* Numeric Pagination Indicator */}
           {filteredProjects.length > 1 && (
-            <div className="flex justify-center items-center gap-1.5 mt-8 select-none">
+            <div className="mt-8 hidden select-none items-center justify-center gap-1.5 md:flex">
               {paginationPages.map((page, idx) => {
                 if (typeof page === "string") {
                   return (
@@ -515,7 +545,7 @@ function PortfolioHome() {
                   );
                 }
 
-                const isActive = page === currentProjectIdx;
+                const isActive = page === activeProjectIndex;
                 return (
                   <button
                     key={`page-${page}`}
