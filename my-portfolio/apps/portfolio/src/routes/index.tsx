@@ -37,9 +37,14 @@ function PortfolioHome() {
     "all" | "open-source" | "hackathon" | "internship"
   >("all");
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
+  const [timelineFocusRequest, setTimelineFocusRequest] = useState<{
+    id: string;
+    requestId: number;
+  } | null>(null);
   // Guard: when routing to a specific project we set filters + index simultaneously;
   // this ref prevents the filter-change effect from immediately resetting index to 0.
   const skipResetRef = useRef(false);
+  const timelineRequestIdRef = useRef(0);
 
   // Dynamic numeric pagination pages list
   const paginationPages = useMemo(() => {
@@ -85,6 +90,11 @@ function PortfolioHome() {
         element.scrollIntoView({ behavior: "smooth" });
       }
     }, 80);
+  };
+
+  const handleRouteToTimeline = (timelineId: string) => {
+    timelineRequestIdRef.current += 1;
+    setTimelineFocusRequest({ id: timelineId, requestId: timelineRequestIdRef.current });
   };
 
   // Scroll to hash element on mount if present
@@ -274,6 +284,7 @@ function PortfolioHome() {
           selectedSkill={selectedSkill}
           onSelectSkill={setSelectedSkill}
           onRouteToProject={handleRouteToProject}
+          onRouteToTimeline={handleRouteToTimeline}
           projects={PROJECTS}
           experiences={EXPERIENCES}
           events={EVENTS}
@@ -285,25 +296,14 @@ function PortfolioHome() {
         id="projects"
         className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
-          <div>
-            <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
-              Featured Projects
-            </h3>
-          </div>
-          {selectedSkill && (
-            <button
-              type="button"
-              onClick={() => setSelectedSkill(null)}
-              className="text-xs font-mono text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-            >
-              Clear skill filter ({selectedSkill})
-            </button>
-          )}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
+            Featured Projects
+          </h3>
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap gap-2 mb-10">
+        <div className="flex flex-wrap items-center gap-2 mb-10">
           {[
             { id: "all", label: "All Projects" },
             { id: "internship", label: "Internships" },
@@ -325,6 +325,15 @@ function PortfolioHome() {
               {filter.label}
             </button>
           ))}
+          {selectedSkill && (
+            <button
+              type="button"
+              onClick={() => setSelectedSkill(null)}
+              className="text-xs px-4 py-2 rounded-full border border-blue-200 dark:border-blue-900/70 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-mono hover:bg-blue-100 dark:hover:bg-blue-950/60 transition-colors cursor-pointer"
+            >
+              Clear: {selectedSkill}
+            </button>
+          )}
         </div>
 
         <div className="relative">
@@ -592,7 +601,7 @@ function PortfolioHome() {
           </h3>
         </div>
 
-        <Timeline experiences={EXPERIENCES} events={EVENTS} />
+        <Timeline experiences={EXPERIENCES} events={EVENTS} focusRequest={timelineFocusRequest} />
       </section>
 
       {/* 6. CERTIFICATIONS & CREDENTIALS SECTION */}
