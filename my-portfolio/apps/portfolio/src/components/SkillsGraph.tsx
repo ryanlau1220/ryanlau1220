@@ -24,6 +24,7 @@ interface SkillsGraphProps {
   selectedSkill: string | null;
   onSelectSkill: (skill: string | null) => void;
   onRouteToProject?: (projectId: string) => void;
+  onRouteToTimeline?: (timelineId: string) => void;
   projects: Project[];
   experiences: Experience[];
   events: EventItem[];
@@ -33,6 +34,7 @@ export function SkillsGraph({
   selectedSkill,
   onSelectSkill,
   onRouteToProject,
+  onRouteToTimeline,
   projects: PROJECTS,
   experiences: EXPERIENCES,
   events: EVENTS,
@@ -457,14 +459,19 @@ export function SkillsGraph({
               No timeline entries listed for this skill.
             </p>
           ) : (
-            <div className="flex flex-wrap gap-1.5 max-h-[96px] overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-[120px] overflow-y-auto pr-1">
               {activeTimelineItems.map((item) => (
-                <span
+                <button
                   key={item.id}
-                  className="text-[10px] font-mono px-2 py-1 rounded bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400"
+                  type="button"
+                  onClick={() => onRouteToTimeline?.(item.id)}
+                  className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-1 group"
                 >
-                  {item.title}
-                </span>
+                  <span className="truncate">{item.title}</span>
+                  <span className="text-[9px] text-neutral-400 dark:text-neutral-600 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
+                    →
+                  </span>
+                </button>
               ))}
             </div>
           )}

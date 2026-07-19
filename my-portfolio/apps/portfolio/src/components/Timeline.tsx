@@ -1,5 +1,5 @@
 import { Award, Briefcase, Calendar, ChevronDown, GraduationCap, Laptop } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 interface UnifiedTimelineItem {
   id: string;
   title: string;
@@ -42,6 +42,7 @@ interface TimelineEvent {
 interface TimelineProps {
   experiences: Experience[];
   events: TimelineEvent[];
+  focusRequest?: { id: string; requestId: number } | null;
 }
 
 const FILTER_OPTIONS: { id: "edu-work" | "hackathon"; label: string }[] = [
@@ -49,9 +50,14 @@ const FILTER_OPTIONS: { id: "edu-work" | "hackathon"; label: string }[] = [
   { id: "hackathon", label: "Hackathons" },
 ];
 
-export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineProps) {
+export function Timeline({
+  experiences: EXPERIENCES,
+  events: EVENTS,
+  focusRequest = null,
+}: TimelineProps) {
   const [activeFilter, setActiveFilter] = useState<"edu-work" | "hackathon">("edu-work");
   const [expandedTimelineId, setExpandedTimelineId] = useState<string | null>(null);
+  const handledFocusRequestIdRef = useRef(0);
 
   // Unified items list
   const unifiedItems = useMemo((): UnifiedTimelineItem[] => {
@@ -102,12 +108,39 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
   }, [unifiedItems, activeFilter]);
 
   useEffect(() => {
+    if (focusRequest && focusRequest.requestId !== handledFocusRequestIdRef.current) return;
     if (filteredItems.length > 0) {
       setExpandedTimelineId(filteredItems[0].id);
     } else {
       setExpandedTimelineId(null);
     }
-  }, [filteredItems]);
+  }, [filteredItems, focusRequest]);
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    if (focusRequest.requestId === handledFocusRequestIdRef.current) return;
+
+    const target = unifiedItems.find((item) => item.id === focusRequest.id);
+    if (!target) return;
+
+    setActiveFilter(target.category === "hackathon" ? "hackathon" : "edu-work");
+  }, [focusRequest, unifiedItems]);
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    if (focusRequest.requestId === handledFocusRequestIdRef.current) return;
+
+    const target = filteredItems.find((item) => item.id === focusRequest.id);
+    if (!target) return;
+
+    setExpandedTimelineId(target.id);
+    handledFocusRequestIdRef.current = focusRequest.requestId;
+    const timer = window.setTimeout(() => {
+      document.getElementById(target.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 180);
+
+    return () => window.clearTimeout(timer);
+  }, [filteredItems, focusRequest]);
 
   const toggleItem = (itemId: string) => {
     setExpandedTimelineId((prev) => (prev === itemId ? null : itemId));
@@ -163,7 +196,8 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
               return (
                 <div
                   key={item.id}
-                  className={`relative flex flex-col md:flex-row items-start ${
+                  id={item.id}
+                  className={`relative flex flex-col md:flex-row items-start scroll-mt-28 ${
                     isEven ? "md:flex-row-reverse" : ""
                   }`}
                 >
