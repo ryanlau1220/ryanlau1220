@@ -72,7 +72,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -207,8 +207,6 @@ function RootLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 selection:bg-blue-500/10 selection:text-blue-500">
-      <HeadContent />
-
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-neutral-200/85 dark:border-neutral-900/80 bg-white/70 dark:bg-neutral-950/70 backdrop-blur-md transition-all duration-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -303,8 +301,6 @@ function RootLayout() {
       <main className="flex-1 pb-16">
         <Outlet />
       </main>
-
-      <Scripts />
     </div>
   );
 }
