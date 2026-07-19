@@ -244,6 +244,9 @@ export function Timeline({ experiences: EXPERIENCES, events: EVENTS }: TimelineP
                           {/* Tech Tags */}
                           {item.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-2">
+                              <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
+                                Skills &amp; applied domains
+                              </span>
                               {item.technologies.map((tag: string) => (
                                 <span
                                   key={tag}
