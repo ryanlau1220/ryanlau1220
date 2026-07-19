@@ -103,7 +103,7 @@ function GuestbookMessages({ entries }: { entries: GuestbookEntry[] }) {
     return (
       <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-7 text-center">
         <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400">No comments yet.</p>
-        <p className="text-[11px] text-neutral-400 dark:text-neutral-600 mt-1.5">
+        <p className="text-[11px] text-neutral-400 dark:text-neutral-400 mt-1.5">
           Be the first to leave one.
         </p>
       </div>
@@ -122,7 +122,7 @@ function GuestbookMessages({ entries }: { entries: GuestbookEntry[] }) {
               {entry.author}
             </span>
             <time
-              className="shrink-0 text-neutral-400 dark:text-neutral-600"
+              className="shrink-0 text-neutral-400 dark:text-neutral-400"
               dateTime={entry.createdAt}
             >
               {formatTimestamp(entry.createdAt)}
@@ -439,12 +439,12 @@ export function Guestbook() {
                 <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-800 px-4 py-8 text-center">
                   <ShieldCheck
                     size={20}
-                    className="mx-auto text-neutral-400 dark:text-neutral-600"
+                    className="mx-auto text-neutral-400 dark:text-neutral-400"
                   />
                   <p className="mt-3 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                     Guestbook is coming online.
                   </p>
-                  <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-500">
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
                     Its protected comment form is being configured. Please check back soon.
                   </p>
                 </div>
@@ -454,11 +454,11 @@ export function Guestbook() {
                     <div className="flex items-center justify-between gap-3">
                       <label
                         htmlFor="visitor-log-author"
-                        className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-600"
+                        className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-400"
                       >
                         Leave a comment
                       </label>
-                      <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-600">
+                      <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-400">
                         {messageWordCount}/{MAX_MESSAGE_WORDS} words
                       </span>
                     </div>
@@ -544,7 +544,7 @@ export function Guestbook() {
 
                   <div className="my-5 border-t border-neutral-100 dark:border-neutral-900" />
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <h3 className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
+                    <h3 className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-400 dark:text-neutral-400">
                       Recent comments
                     </h3>
                   </div>

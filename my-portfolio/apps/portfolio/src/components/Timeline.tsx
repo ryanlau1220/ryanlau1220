@@ -217,16 +217,16 @@ export function Timeline({
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           {/* Floating Date Badge */}
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase tracking-wider mb-2">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-400 uppercase tracking-wider mb-2">
                             <Calendar size={11} />
                             {item.date}
                           </span>
 
                           {/* Header details */}
-                          <h4 className="text-base font-bold text-neutral-900 dark:text-neutral-100 mt-1 leading-snug">
+                          <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 mt-1 leading-snug">
                             {item.title}
-                          </h4>
-                          <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-500 font-mono mt-0.5">
+                          </h3>
+                          <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">
                             {item.subtitle}
                           </p>
 
@@ -240,7 +240,7 @@ export function Timeline({
 
                         <ChevronDown
                           size={16}
-                          className={`text-neutral-400 dark:text-neutral-600 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
+                          className={`text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
                             expandedTimelineId === item.id ? "rotate-180" : ""
                           }`}
                         />
@@ -278,7 +278,7 @@ export function Timeline({
                           {/* Tech Tags */}
                           {item.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-2">
-                              <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
+                              <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">
                                 Skills &amp; applied domains
                               </span>
                               {item.technologies.map((tag: string) => (

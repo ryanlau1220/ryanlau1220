@@ -18,10 +18,32 @@ import {
   Play,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SkillsGraph } from "../components/SkillsGraph";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { Timeline } from "../components/Timeline";
 import { CERTIFICATIONS, EVENTS, EXPERIENCES, PROFILE, PROJECTS } from "../data/registry";
+
+const SkillsGraph = lazy(() =>
+  import("../components/SkillsGraph").then((module) => ({ default: module.SkillsGraph })),
+);
+
+const PROJECT_IMAGE_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  "llm-wiki": { width: 1920, height: 947 },
+  ledgertrace: { width: 1920, height: 947 },
+  umhackathon: { width: 1279, height: 1079 },
+  "myai-future": { width: 1920, height: 947 },
+  kitahack: { width: 1618, height: 844 },
+  greatmalaysiaai: { width: 1129, height: 559 },
+  devmatch: { width: 1920, height: 947 },
+  futurehack: { width: 1920, height: 947 },
+};
+
+function getProjectPreviewUrl(imageUrl: string) {
+  return imageUrl.replace("image.png", "preview.webp");
+}
+
+function getMobileProjectPreviewUrl(imageUrl: string) {
+  return imageUrl.replace("image.png", "preview-mobile.webp");
+}
 
 export const Route = createFileRoute("/")({
   component: PortfolioHome,
@@ -33,6 +55,7 @@ function PortfolioHome() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
+  const [shouldLoadSkills, setShouldLoadSkills] = useState(false);
   const [projectFilter, setProjectFilter] = useState<
     "all" | "open-source" | "hackathon" | "internship"
   >("all");
@@ -45,6 +68,8 @@ function PortfolioHome() {
   // this ref prevents the filter-change effect from immediately resetting index to 0.
   const skipResetRef = useRef(false);
   const timelineRequestIdRef = useRef(0);
+  const skillsSectionRef = useRef<HTMLElement | null>(null);
+  const imageCloseButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Dynamic numeric pagination pages list
   const paginationPages = useMemo(() => {
@@ -113,14 +138,40 @@ function PortfolioHome() {
   }, []);
 
   useEffect(() => {
+    const section = skillsSectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") {
+      setShouldLoadSkills(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setShouldLoadSkills(true);
+        observer.disconnect();
+      },
+      { rootMargin: "320px 0px" },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (!activeImage) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusFrame = window.requestAnimationFrame(() => imageCloseButtonRef.current?.focus());
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setActiveImage(null);
     };
 
     document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", closeOnEscape);
+      previouslyFocused?.focus();
+    };
   }, [activeImage]);
 
   // Filter projects by selected category and skill (technologies or domains)
@@ -244,9 +295,9 @@ function PortfolioHome() {
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
           <div>
-            <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2 font-sans">
+            <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2 font-sans">
               Who I Am
-            </h3>
+            </h2>
           </div>
           <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
             {PROFILE.about.map((paragraph) => (
@@ -272,23 +323,42 @@ function PortfolioHome() {
       {/* 3. SKILLS SECTION */}
       <section
         id="skills"
+        ref={skillsSectionRef}
         className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="text-center space-y-3 mb-10">
-          <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
             Skill Connections
-          </h3>
+          </h2>
         </div>
 
-        <SkillsGraph
-          selectedSkill={selectedSkill}
-          onSelectSkill={setSelectedSkill}
-          onRouteToProject={handleRouteToProject}
-          onRouteToTimeline={handleRouteToTimeline}
-          projects={PROJECTS}
-          experiences={EXPERIENCES}
-          events={EVENTS}
-        />
+        {shouldLoadSkills ? (
+          <Suspense
+            fallback={
+              <div
+                className="flex min-h-[500px] items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-300"
+                aria-live="polite"
+              >
+                Loading skill connections…
+              </div>
+            }
+          >
+            <SkillsGraph
+              selectedSkill={selectedSkill}
+              onSelectSkill={setSelectedSkill}
+              onRouteToProject={handleRouteToProject}
+              onRouteToTimeline={handleRouteToTimeline}
+              projects={PROJECTS}
+              experiences={EXPERIENCES}
+              events={EVENTS}
+            />
+          </Suspense>
+        ) : (
+          <div
+            className="min-h-[500px] rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/50"
+            aria-hidden="true"
+          />
+        )}
       </section>
 
       {/* 4. PROJECTS SECTION */}
@@ -297,9 +367,9 @@ function PortfolioHome() {
         className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
         <div className="mb-8">
-          <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
+          <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
             Featured Projects
-          </h3>
+          </h2>
         </div>
 
         {/* Category Filters */}
@@ -364,6 +434,7 @@ function PortfolioHome() {
                 const project = filteredProjects[activeProjectIndex];
                 if (!project) return null;
                 const hasImage = !!project.imageUrl;
+                const imageDimensions = PROJECT_IMAGE_DIMENSIONS[project.id];
                 return (
                   <div
                     key={project.id}
@@ -380,14 +451,9 @@ function PortfolioHome() {
                             alt: `${project.title} product screenshot`,
                           })
                         }
-                        className="relative min-h-[260px] w-full overflow-hidden bg-neutral-100 p-3 text-left dark:bg-black sm:min-h-[320px] sm:p-4 md:flex md:min-h-full md:items-center md:justify-center md:p-5"
+                        className="relative min-h-[260px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-white to-blue-50/70 p-3 text-left dark:from-black dark:via-neutral-950 dark:to-blue-950/20 sm:min-h-[320px] sm:p-4 md:flex md:min-h-full md:items-center md:justify-center md:p-5"
                         aria-label={`Expand ${project.title} screenshot`}
                       >
-                        <span
-                          aria-hidden="true"
-                          className="absolute -inset-8 scale-110 bg-cover bg-center opacity-25 blur-3xl dark:opacity-35"
-                          style={{ backgroundImage: `url(${project.imageUrl!})` }}
-                        />
                         <span
                           aria-hidden="true"
                           className="absolute inset-0 bg-white/35 dark:bg-neutral-950/20"
@@ -395,12 +461,21 @@ function PortfolioHome() {
                         <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                           Project preview
                         </span>
-                        <img
-                          src={project.imageUrl}
-                          alt={`${project.title} product screenshot`}
-                          className="relative z-10 h-full w-full rounded-lg border border-white/50 object-contain shadow-xl transition-transform duration-500 group-hover:scale-[1.015] dark:border-white/10"
-                          loading="lazy"
-                        />
+                        <picture className="relative z-10 h-full w-full">
+                          <source
+                            media="(max-width: 639px)"
+                            srcSet={getMobileProjectPreviewUrl(project.imageUrl!)}
+                          />
+                          <img
+                            src={getProjectPreviewUrl(project.imageUrl!)}
+                            alt={`${project.title} product screenshot`}
+                            width={imageDimensions?.width}
+                            height={imageDimensions?.height}
+                            className="h-full w-full rounded-lg border border-white/50 object-contain shadow-xl transition-transform duration-500 group-hover:scale-[1.015] dark:border-white/10"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </picture>
                         <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                           <Maximize2 size={15} aria-hidden="true" />
                         </span>
@@ -420,9 +495,9 @@ function PortfolioHome() {
                           <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
                             {project.subtitle}
                           </span>
-                          <h4 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
+                          <h3 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
                             {project.title}
-                          </h4>
+                          </h3>
                         </div>
                         <div className="flex items-center gap-3">
                           {project.videoUrl && (
@@ -596,9 +671,9 @@ function PortfolioHome() {
         className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="text-center space-y-3 mb-12">
-          <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
             Education &amp; Experience
-          </h3>
+          </h2>
         </div>
 
         <Timeline experiences={EXPERIENCES} events={EVENTS} focusRequest={timelineFocusRequest} />
@@ -610,9 +685,9 @@ function PortfolioHome() {
         className="max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
         <div className="text-center space-y-3 mb-12">
-          <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
             Credentials &amp; Certifications
-          </h3>
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -645,9 +720,9 @@ function PortfolioHome() {
                     <Icon size={22} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
+                    <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
                       {certification.title}
-                    </h4>
+                    </h3>
                     <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
                       {certification.description}
                     </p>
@@ -667,9 +742,9 @@ function PortfolioHome() {
       <section id="contact" className="max-w-6xl mx-auto py-24 px-6 select-text">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
-            <h3 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
+            <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
               Let's Connect
-            </h3>
+            </h2>
             <p className="text-xs text-neutral-500 mt-2">
               Have a question or looking to recruit? Drop me an email directly or submit the contact
               form.
@@ -731,7 +806,9 @@ function PortfolioHome() {
                   </label>
                   <input
                     id="form-name"
+                    name="name"
                     type="text"
+                    autoComplete="name"
                     required
                     value={contactForm.name}
                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
@@ -747,7 +824,9 @@ function PortfolioHome() {
                   </label>
                   <input
                     id="form-email"
+                    name="email"
                     type="email"
+                    autoComplete="email"
                     required
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
@@ -765,6 +844,7 @@ function PortfolioHome() {
                 </label>
                 <textarea
                   id="form-msg"
+                  name="message"
                   required
                   rows={7}
                   value={contactForm.message}
@@ -796,21 +876,32 @@ function PortfolioHome() {
         <dialog
           open
           className="fixed inset-0 z-[100] m-0 flex h-screen w-screen max-w-none items-center justify-center border-0 bg-transparent p-4 sm:p-8"
-          aria-label={`${activeImage.alt} expanded`}
+          aria-modal="true"
+          aria-labelledby="expanded-screenshot-title"
+          onKeyDown={(event) => {
+            if (event.key === "Tab") {
+              event.preventDefault();
+              imageCloseButtonRef.current?.focus();
+            }
+          }}
         >
           <button
             type="button"
-            onClick={() => setActiveImage(null)}
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setActiveImage(null)}
             aria-label="Close expanded screenshot"
           />
           <div className="relative flex max-h-full w-full max-w-7xl items-center justify-center">
+            <p id="expanded-screenshot-title" className="sr-only">
+              {activeImage.alt}
+            </p>
             <img
               src={activeImage.src}
               alt={activeImage.alt}
               className="max-h-[88vh] w-auto max-w-full rounded-xl border border-white/15 bg-neutral-950 object-contain shadow-2xl"
             />
             <button
+              ref={imageCloseButtonRef}
               type="button"
               onClick={() => setActiveImage(null)}
               className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
