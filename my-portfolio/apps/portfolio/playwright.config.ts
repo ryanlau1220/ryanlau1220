@@ -16,7 +16,8 @@ export default defineConfig({
     { name: "mobile-chromium", use: { ...devices["Pixel 5"] } },
   ],
   webServer: {
-    command: "pnpm exec vite dev --host 127.0.0.1 --port 3100",
+    command:
+      "pnpm exec wrangler dev --config dist/server/wrangler.json --local --ip 127.0.0.1 --port 3100 --inspector-port 9231 --log-level warn",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     timeout: 120_000,

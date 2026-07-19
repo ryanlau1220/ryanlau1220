@@ -50,8 +50,13 @@ export const Route = createFileRoute("/")({
 });
 
 function DevelopmentErrorBoundaryTrigger() {
+  const isLocalE2ERunner =
+    typeof window !== "undefined" &&
+    window.location.hostname === "127.0.0.1" &&
+    window.location.port === "3100";
+
   if (
-    import.meta.env.DEV &&
+    (import.meta.env.DEV || isLocalE2ERunner) &&
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).has("__errorBoundary")
   ) {
