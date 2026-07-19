@@ -13,8 +13,10 @@ import {
   Linkedin,
   Mail,
   MapPin,
+  Maximize2,
   Phone,
   Play,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SkillsGraph } from "../components/SkillsGraph";
@@ -30,6 +32,7 @@ function PortfolioHome() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
   const [projectFilter, setProjectFilter] = useState<
     "all" | "open-source" | "hackathon" | "internship"
   >("all");
@@ -98,6 +101,17 @@ function PortfolioHome() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!activeImage) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setActiveImage(null);
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [activeImage]);
 
   // Filter projects by selected category and skill (technologies or domains)
   const filteredProjects = useMemo(() => {
@@ -341,25 +355,44 @@ function PortfolioHome() {
                   <div
                     key={project.id}
                     className={`flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col ${
-                      hasImage ? "md:flex-row" : "p-6 sm:p-8 space-y-6"
+                      hasImage ? "md:grid md:grid-cols-[1.15fr_1fr]" : "p-6 sm:p-8 space-y-6"
                     }`}
                   >
                     {hasImage && (
-                      <div className="w-full md:w-1/2 h-48 sm:h-64 md:h-auto min-h-[220px] md:min-h-[380px] relative overflow-hidden bg-neutral-50 dark:bg-neutral-900/40 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setActiveImage({
+                            src: project.imageUrl!,
+                            alt: `${project.title} product screenshot`,
+                          })
+                        }
+                        className="relative min-h-[260px] w-full overflow-hidden bg-neutral-100 p-3 text-left dark:bg-black sm:min-h-[320px] sm:p-4 md:flex md:min-h-full md:items-center md:justify-center md:p-5"
+                        aria-label={`Expand ${project.title} screenshot`}
+                      >
+                        <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                          Project preview
+                        </span>
                         <img
                           src={project.imageUrl}
-                          alt={project.title}
-                          className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none transition-transform duration-500 group-hover:scale-[1.02]"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
+                          alt={`${project.title} product screenshot`}
+                          className="h-full w-full rounded-lg border border-neutral-200 object-contain shadow-lg transition-transform duration-500 group-hover:scale-[1.015] dark:border-neutral-800"
+                          loading="lazy"
                         />
-                      </div>
+                        <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                          <Maximize2 size={15} aria-hidden="true" />
+                        </span>
+                      </button>
                     )}
 
                     <div
-                      className={`w-full ${hasImage ? "md:w-1/2 p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
+                      className={`w-full ${hasImage ? "p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
                     >
+                      {!hasImage && (
+                        <span className="inline-flex w-fit rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300">
+                          Internship work · Product visuals confidential
+                        </span>
+                      )}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                           <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
@@ -705,6 +738,36 @@ function PortfolioHome() {
           </div>
         </div>
       </section>
+
+      {activeImage && (
+        <dialog
+          open
+          className="fixed inset-0 z-[100] m-0 flex h-screen w-screen max-w-none items-center justify-center border-0 bg-transparent p-4 sm:p-8"
+          aria-label={`${activeImage.alt} expanded`}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveImage(null)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            aria-label="Close expanded screenshot"
+          />
+          <div className="relative flex max-h-full w-full max-w-7xl items-center justify-center">
+            <img
+              src={activeImage.src}
+              alt={activeImage.alt}
+              className="max-h-[88vh] w-auto max-w-full rounded-xl border border-white/15 bg-neutral-950 object-contain shadow-2xl"
+            />
+            <button
+              type="button"
+              onClick={() => setActiveImage(null)}
+              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+              aria-label="Close expanded screenshot"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </dialog>
+      )}
     </div>
   );
 }
