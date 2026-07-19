@@ -4,7 +4,7 @@
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   // Local secrets belong in .dev.vars; production setup is documented in SETUP.md.
-  "main": "@tanstack/react-start/server-entry",
+  "main": "./src/server.ts",
   "d1_databases": [
     {
       "binding": "VISITOR_LOG_DB",
