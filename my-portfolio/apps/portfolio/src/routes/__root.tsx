@@ -1,7 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRoute, useLocation } from "@tanstack/react-router";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { VisitorLog } from "../components/VisitorLog";
+import { Guestbook } from "../components/Guestbook";
 import { PROFILE } from "../data/registry";
 import appCss from "../styles.css?url";
 
@@ -329,7 +329,7 @@ function RootLayout() {
         </div>
       </footer>
 
-      <VisitorLog />
+      <Guestbook />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { createHash, createHmac } from "node:crypto";
 import { env } from "cloudflare:workers";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import type { VisitorLogEntry, VisitorLogSnapshot } from "./visitor-log.types";
+import type { GuestbookEntry, GuestbookSnapshot } from "./guestbook.types";
 
 const MAX_AUTHOR_LENGTH = 40;
 const MAX_MESSAGE_WORDS = 100;
@@ -12,14 +12,14 @@ const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const URL_OR_MARKUP_PATTERN = /(?:https?:\/\/|www\.|<\/?[a-z][^>]*>)/i;
 
-interface SubmitVisitorLogInput {
+interface SubmitGuestbookCommentInput {
   author?: unknown;
   message?: unknown;
   turnstileToken?: unknown;
   website?: unknown;
 }
 
-interface VisitorLogRow {
+interface GuestbookRow {
   id: string;
   author: string;
   message: string;
@@ -90,7 +90,7 @@ function assertSameOrigin() {
   }
 }
 
-function readSubmission(data: SubmitVisitorLogInput) {
+function readCommentSubmission(data: SubmitGuestbookCommentInput) {
   const rawAuthor = typeof data.author === "string" ? data.author : "";
   const rawMessage = typeof data.message === "string" ? data.message : "";
   const turnstileToken = typeof data.turnstileToken === "string" ? data.turnstileToken.trim() : "";
@@ -162,7 +162,7 @@ function getVisitorHash(salt: string) {
 }
 
 async function assertRateLimit(
-  database: VisitorLogD1Database,
+  database: GuestbookD1Database,
   visitorHash: string,
   message: string,
   now: number,
@@ -199,7 +199,7 @@ async function assertRateLimit(
   }
 }
 
-async function publishRealtimeEntry(entry: VisitorLogEntry) {
+async function publishRealtimeComment(entry: GuestbookEntry) {
   const appId = env.PUSHER_APP_ID?.trim();
   const key = env.PUSHER_KEY?.trim();
   const secret = env.PUSHER_SECRET?.trim();
@@ -234,8 +234,8 @@ async function publishRealtimeEntry(entry: VisitorLogEntry) {
   }
 }
 
-export const loadVisitorLog = createServerFn({ method: "GET" }).handler(
-  async (): Promise<VisitorLogSnapshot> => {
+export const loadGuestbook = createServerFn({ method: "GET" }).handler(
+  async (): Promise<GuestbookSnapshot> => {
     const config = getRuntimeConfig();
     if (!config.enabled || !config.database) {
       return { enabled: false, turnstileSiteKey: null, realtime: null, entries: [] };
@@ -246,7 +246,7 @@ export const loadVisitorLog = createServerFn({ method: "GET" }).handler(
         "SELECT id, author, message, created_at AS createdAt FROM visitor_log_entries ORDER BY created_at_ms DESC LIMIT ?",
       )
       .bind(MAX_RECENT_MESSAGES)
-      .all<VisitorLogRow>();
+      .all<GuestbookRow>();
 
     return {
       enabled: true,
@@ -257,16 +257,16 @@ export const loadVisitorLog = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const submitVisitorLogEntry = createServerFn({ method: "POST" })
-  .validator((data: SubmitVisitorLogInput) => data)
-  .handler(async ({ data }): Promise<{ entry: VisitorLogEntry | null }> => {
+export const submitGuestbookComment = createServerFn({ method: "POST" })
+  .validator((data: SubmitGuestbookCommentInput) => data)
+  .handler(async ({ data }): Promise<{ entry: GuestbookEntry | null }> => {
     assertSameOrigin();
     const config = getRuntimeConfig();
     if (!config.enabled || !(config.database && config.secretKey && config.rateLimitSalt)) {
       throw new Error("Guestbook is not configured yet.");
     }
 
-    const submission = readSubmission(data);
+    const submission = readCommentSubmission(data);
     if (submission.isBot) return { entry: null };
 
     await verifyTurnstile(submission.turnstileToken, config.secretKey, env.VISITOR_LOG_HOSTNAME);
@@ -275,7 +275,7 @@ export const submitVisitorLogEntry = createServerFn({ method: "POST" })
     const visitorHash = getVisitorHash(config.rateLimitSalt);
     await assertRateLimit(config.database, visitorHash, submission.message, now);
 
-    const entry: VisitorLogEntry = {
+    const entry: GuestbookEntry = {
       id: crypto.randomUUID(),
       author: submission.author,
       message: submission.message,
@@ -290,6 +290,6 @@ export const submitVisitorLogEntry = createServerFn({ method: "POST" })
 
     if (!writeResult.success) throw new Error("Your comment could not be saved. Please try again.");
 
-    await publishRealtimeEntry(entry);
+    await publishRealtimeComment(entry);
     return { entry };
   });

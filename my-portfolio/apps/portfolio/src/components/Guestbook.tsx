@@ -1,7 +1,7 @@
 import { CheckCircle2, LoaderCircle, MessageSquarePlus, Send, ShieldCheck, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { loadVisitorLog, submitVisitorLogEntry } from "../visitor-log.functions";
-import type { VisitorLogEntry, VisitorLogRealtimeConfig } from "../visitor-log.types";
+import { loadGuestbook, submitGuestbookComment } from "../guestbook.functions";
+import type { GuestbookEntry, GuestbookRealtimeConfig } from "../guestbook.types";
 
 const TURNSTILE_SCRIPT_URL =
   "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -66,7 +66,7 @@ function loadExternalScript(src: string) {
   return promise;
 }
 
-function isVisitorLogEntry(value: unknown): value is VisitorLogEntry {
+function isGuestbookEntry(value: unknown): value is GuestbookEntry {
   if (!value || typeof value !== "object") return false;
   const entry = value as Record<string, unknown>;
   return (
@@ -77,7 +77,7 @@ function isVisitorLogEntry(value: unknown): value is VisitorLogEntry {
   );
 }
 
-function upsertEntry(entries: VisitorLogEntry[], entry: VisitorLogEntry) {
+function upsertEntry(entries: GuestbookEntry[], entry: GuestbookEntry) {
   return [entry, ...entries.filter((current) => current.id !== entry.id)].slice(0, 18);
 }
 
@@ -97,7 +97,7 @@ function countWords(value: string) {
   return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
-function VisitorLogMessages({ entries }: { entries: VisitorLogEntry[] }) {
+function GuestbookMessages({ entries }: { entries: GuestbookEntry[] }) {
   if (entries.length === 0) {
     return (
       <div className="border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl px-4 py-7 text-center">
@@ -136,10 +136,10 @@ function VisitorLogMessages({ entries }: { entries: VisitorLogEntry[] }) {
   );
 }
 
-function useRealtimeVisitorLog(
+function useRealtimeGuestbook(
   isOpen: boolean,
-  realtime: VisitorLogRealtimeConfig | null,
-  onEntry: (entry: VisitorLogEntry) => void,
+  realtime: GuestbookRealtimeConfig | null,
+  onEntry: (entry: GuestbookEntry) => void,
 ) {
   useEffect(() => {
     if (!(isOpen && realtime)) return;
@@ -150,7 +150,7 @@ function useRealtimeVisitorLog(
     const onMessage = (data: unknown) => {
       try {
         const entry = typeof data === "string" ? JSON.parse(data) : data;
-        if (isVisitorLogEntry(entry)) onEntry(entry);
+        if (isGuestbookEntry(entry)) onEntry(entry);
       } catch {
         // Ignore malformed third-party events rather than interrupting the local guestbook.
       }
@@ -176,11 +176,11 @@ function useRealtimeVisitorLog(
   }, [isOpen, onEntry, realtime]);
 }
 
-export function VisitorLog() {
+export function Guestbook() {
   const [isOpen, setIsOpen] = useState(false);
-  const [entries, setEntries] = useState<VisitorLogEntry[]>([]);
+  const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
-  const [realtime, setRealtime] = useState<VisitorLogRealtimeConfig | null>(null);
+  const [realtime, setRealtime] = useState<GuestbookRealtimeConfig | null>(null);
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null);
   const [form, setForm] = useState(INITIAL_FORM);
   const [turnstileToken, setTurnstileToken] = useState("");
@@ -228,7 +228,7 @@ export function VisitorLog() {
     startLoading(async () => {
       try {
         setError(null);
-        const snapshot = await loadVisitorLog();
+        const snapshot = await loadGuestbook();
         if (cancelled) return;
         setIsEnabled(snapshot.enabled);
         setEntries(snapshot.entries);
@@ -287,11 +287,11 @@ export function VisitorLog() {
     };
   }, [isLoading, isOpen, turnstileSiteKey, turnstileTheme]);
 
-  const handleRealtimeEntry = useCallback((entry: VisitorLogEntry) => {
+  const handleRealtimeEntry = useCallback((entry: GuestbookEntry) => {
     setEntries((current) => upsertEntry(current, entry));
   }, []);
 
-  useRealtimeVisitorLog(isOpen, realtime, handleRealtimeEntry);
+  useRealtimeGuestbook(isOpen, realtime, handleRealtimeEntry);
 
   const close = () => {
     setIsOpen(false);
@@ -319,7 +319,7 @@ export function VisitorLog() {
       try {
         setError(null);
         setNotice(null);
-        const result = await submitVisitorLogEntry({
+        const result = await submitGuestbookComment({
           data: { ...form, turnstileToken },
         });
 
@@ -519,7 +519,7 @@ export function VisitorLog() {
                       Recent comments
                     </h3>
                   </div>
-                  <VisitorLogMessages entries={entries} />
+                  <GuestbookMessages entries={entries} />
                 </>
               )}
             </div>
