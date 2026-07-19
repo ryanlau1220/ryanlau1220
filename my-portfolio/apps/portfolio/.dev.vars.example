@@ -1,4 +1,4 @@
-# Local-only Visitor Log settings. Copy to .dev.vars and replace every value.
+# Local-only Guestbook settings. Copy to .dev.vars and replace every value.
 # Never commit apps/portfolio/.dev.vars.
 TURNSTILE_SITE_KEY="your-local-turnstile-site-key"
 TURNSTILE_SECRET_KEY="your-local-turnstile-secret-key"
