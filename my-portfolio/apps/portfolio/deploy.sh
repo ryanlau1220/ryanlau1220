@@ -1,13 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Manual production fallback. GitHub Actions is the primary deployment path.
+set -euo pipefail
 
-echo "🧹 Cleaning previous build..."
-rm -rf dist
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$script_dir"
 
 echo "🏗️ Building production client & server assets..."
 pnpm run build
 
+echo "🗃️ Applying pending D1 migrations..."
+pnpm exec wrangler d1 migrations apply VISITOR_LOG_DB --remote
+
 echo "🚀 Deploying to Cloudflare Workers..."
-npx wrangler deploy
+pnpm exec wrangler deploy
