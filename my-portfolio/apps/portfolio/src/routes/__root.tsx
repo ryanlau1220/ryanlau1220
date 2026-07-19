@@ -33,6 +33,20 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      {
+        rel: "preload",
+        href: "/fonts/geist-latin.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        href: "/fonts/geist-mono-latin.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
     scripts: [
@@ -228,6 +242,12 @@ function RootLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 selection:bg-blue-500/10 selection:text-blue-500">
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-[60] rounded-md bg-neutral-900 px-3 py-2 text-xs font-mono font-semibold text-white focus:not-sr-only dark:bg-white dark:text-neutral-950"
+      >
+        Skip to content
+      </a>
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-neutral-200/85 dark:border-neutral-900/80 bg-white/70 dark:bg-neutral-950/70 backdrop-blur-md transition-all duration-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -264,7 +284,7 @@ function RootLayout() {
               type="button"
               onClick={toggleTheme}
               className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-500 hover:text-neutral-900 dark:hover:text-white cursor-pointer transition-colors"
-              title="Toggle theme"
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
             >
               {theme === "light" ? <Moon size={15} /> : <Sun size={15} />}
             </button>
@@ -276,6 +296,7 @@ function RootLayout() {
               type="button"
               onClick={toggleTheme}
               className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-500 cursor-pointer"
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
             >
               {theme === "light" ? <Moon size={15} /> : <Sun size={15} />}
             </button>
@@ -284,6 +305,9 @@ function RootLayout() {
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 cursor-pointer"
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -293,7 +317,7 @@ function RootLayout() {
         {/* Mobile menu drawer */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-neutral-200 dark:border-neutral-900 bg-white dark:bg-neutral-950 p-6 space-y-4 animate-fade-in">
-            <nav className="flex flex-col gap-4">
+            <nav id="mobile-navigation" className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -319,12 +343,12 @@ function RootLayout() {
       </header>
 
       {/* Main Outlet */}
-      <main className="flex-1">
+      <main id="main-content" className="flex-1" tabIndex={-1}>
         <Outlet />
       </main>
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
-        <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-500">
+        <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
           © Ryan Lau Jun Hong · Built with TanStack Start, Cloudflare Workers &amp; Pusher.
         </div>
       </footer>
