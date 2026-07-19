@@ -5,15 +5,6 @@ import { VisitorLog } from "../components/VisitorLog";
 import { PROFILE } from "../data/registry";
 import appCss from "../styles.css?url";
 
-const PORTFOLIO_STACK = [
-  { label: "TanStack Start", href: "https://tanstack.com/start" },
-  { label: "React", href: "https://react.dev" },
-  { label: "TypeScript", href: "https://www.typescriptlang.org" },
-  { label: "Tailwind CSS", href: "https://tailwindcss.com" },
-  { label: "Vite", href: "https://vite.dev" },
-  { label: "Cloudflare Workers", href: "https://workers.cloudflare.com" },
-] as const;
-
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -333,31 +324,8 @@ function RootLayout() {
       </main>
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-              Built in public.
-            </p>
-            <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-500">
-              The tooling behind this portfolio, kept deliberately small.
-            </p>
-          </div>
-          <div
-            className="flex flex-wrap gap-1.5 md:justify-end"
-            aria-label="Portfolio technology stack"
-          >
-            {PORTFOLIO_STACK.map((technology) => (
-              <a
-                key={technology.label}
-                href={technology.href}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2.5 py-1 text-[10px] font-mono text-neutral-600 dark:text-neutral-400 transition-colors hover:border-blue-300 hover:text-blue-600 dark:hover:border-blue-800 dark:hover:text-blue-400"
-              >
-                {technology.label}
-              </a>
-            ))}
-          </div>
+        <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-500">
+          © Ryan Lau Jun Hong · Built with TanStack Start, Cloudflare Workers &amp; Pusher.
         </div>
       </footer>
 
