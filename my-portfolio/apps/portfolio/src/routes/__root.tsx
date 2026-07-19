@@ -1,6 +1,7 @@
 import { HeadContent, Outlet, Scripts, createRootRoute, useLocation } from "@tanstack/react-router";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { PROFILE } from "../data/registry";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -8,28 +9,25 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ryan Lau Jun Hong | Portfolio" },
+      { title: PROFILE.seo.title },
       {
         name: "description",
-        content:
-          "Ryan Lau Jun Hong is a Software Engineering student at Asia Pacific University (APU) building AI systems, middleware, and full-stack solutions.",
+        content: PROFILE.seo.description,
       },
       // Open Graph (Social Previews)
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "Ryan Lau Jun Hong | Portfolio" },
+      { property: "og:title", content: PROFILE.seo.title },
       {
         property: "og:description",
-        content:
-          "Software Engineering student specializing in DevOps, AI automation, and secure Backend architectures.",
+        content: PROFILE.seo.socialDescription,
       },
-      { property: "og:url", content: "https://portfolio.ryanlau1220.workers.dev" },
+      { property: "og:url", content: PROFILE.seo.siteUrl },
       // Twitter Card
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Ryan Lau Jun Hong | Portfolio" },
+      { name: "twitter:title", content: PROFILE.seo.title },
       {
         name: "twitter:description",
-        content:
-          "Software Engineering student specializing in DevOps, AI automation, and secure Backend architectures.",
+        content: PROFILE.seo.socialDescription,
       },
     ],
     links: [
@@ -220,7 +218,7 @@ function RootLayout() {
             className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight hover:opacity-85"
           >
             <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
-            <span>Ryan Lau.</span>
+            <span>{PROFILE.shortName}</span>
           </button>
 
           {/* Desktop Nav links */}

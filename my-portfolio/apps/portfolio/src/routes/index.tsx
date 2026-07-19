@@ -19,66 +19,13 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SkillsGraph } from "../components/SkillsGraph";
 import { Timeline } from "../components/Timeline";
-import { getPortfolioData } from "../server/queries";
+import { CERTIFICATIONS, EVENTS, EXPERIENCES, PROFILE, PROJECTS } from "../data/registry";
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    return getPortfolioData();
-  },
   component: PortfolioHome,
 });
 
-interface Project {
-  id: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  achievements: string[];
-  githubUrl?: string;
-  videoUrl?: string;
-  imageUrl?: string;
-  demoUrl?: string;
-  domains: string[];
-  technologies: string[];
-}
-
-interface Experience {
-  id: string;
-  role: string;
-  company: string;
-  period: string;
-  description: string;
-  achievements: string[];
-  domains: string[];
-  technologies: string[];
-  sortKey: number;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  event: string;
-  date: string;
-  role: string;
-  outcome?: string;
-  description: string;
-  category: "hackathon" | "other";
-  featured: boolean;
-  technologies: string[];
-  sortKey: number;
-}
-
 function PortfolioHome() {
-  const {
-    projects: PROJECTS,
-    experiences: EXPERIENCES,
-    events: EVENTS,
-  } = Route.useLoaderData() as {
-    projects: Project[];
-    experiences: Experience[];
-    events: Event[];
-  };
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -97,7 +44,7 @@ function PortfolioHome() {
       const matchCat = projectFilter === "all" || p.category === projectFilter;
       const matchSkill =
         !selectedSkill ||
-        p.technologies.includes(selectedSkill) ||
+        p.technologies.some((technology) => technology === selectedSkill) ||
         p.domains.includes(selectedSkill);
       return matchCat && matchSkill;
     }).length; // Match the dynamic filteredProjects length computation below
@@ -117,7 +64,7 @@ function PortfolioHome() {
     }
 
     return [0, "ellipsis-left", current, "ellipsis-right", total - 1];
-  }, [projectFilter, selectedSkill, currentProjectIdx, PROJECTS]);
+  }, [projectFilter, selectedSkill, currentProjectIdx]);
 
   const handleRouteToProject = (projectId: string) => {
     // Mark that we are intentionally setting the index; skip the auto-reset effect.
@@ -160,11 +107,13 @@ function PortfolioHome() {
     }
     if (selectedSkill) {
       list = list.filter(
-        (p) => p.technologies.includes(selectedSkill) || p.domains.includes(selectedSkill),
+        (p) =>
+          p.technologies.some((technology) => technology === selectedSkill) ||
+          p.domains.includes(selectedSkill),
       );
     }
     return list;
-  }, [projectFilter, selectedSkill, PROJECTS]);
+  }, [projectFilter, selectedSkill]);
 
   // Reset slideshow index when filters change — but skip if a direct project route just set the index
   // biome-ignore lint/correctness/useExhaustiveDependencies: projectFilter and selectedSkill are intentional trigger-only deps
@@ -188,7 +137,7 @@ function PortfolioHome() {
             Accept: "application/json",
           },
           body: JSON.stringify({
-            access_key: "4cf3d562-875e-40d3-aac8-04ad869ec935",
+            access_key: PROFILE.contact.web3FormsAccessKey,
             name: contactForm.name,
             email: contactForm.email,
             message: contactForm.message,
@@ -201,11 +150,11 @@ function PortfolioHome() {
           setContactForm({ name: "", email: "", message: "" });
           setTimeout(() => setFormSubmitted(false), 5000);
         } else {
-          alert("Failed to send message. Please email directly to liujunhong20@gmail.com");
+          alert(`Failed to send message. Please email directly to ${PROFILE.contact.email}`);
         }
       } catch (error) {
         console.error(error);
-        alert("Failed to send message. Please email directly to liujunhong20@gmail.com");
+        alert(`Failed to send message. Please email directly to ${PROFILE.contact.email}`);
       } finally {
         setIsSubmitting(false);
       }
@@ -231,16 +180,15 @@ function PortfolioHome() {
 
         <div className="max-w-3xl mx-auto text-center space-y-6 relative z-10 select-text">
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
-            Ryan Lau Jun Hong
+            {PROFILE.name}
           </h1>
 
           <p className="text-lg sm:text-xl font-medium text-neutral-600 dark:text-neutral-400 font-mono">
-            Software Engineer
+            {PROFILE.role}
           </p>
 
           <p className="max-w-lg mx-auto text-sm sm:text-base text-neutral-500 dark:text-neutral-500 leading-relaxed font-sans">
-            Focusing on DevOps pipelines, AI-driven automation, and secure, high-performance Backend
-            architectures.
+            {PROFILE.heroSummary}
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
@@ -275,20 +223,13 @@ function PortfolioHome() {
             </h3>
           </div>
           <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            <p>
-              I am a Software Engineering student passionate about exploring latest technologies and
-              building reliable systems. My engineering approach centers on designing clean
-              architectures, solving technical complexity, and optimizing performance.
-            </p>
-            <p>
-              I am deeply interested in DevOps automation, distributed ledgers, and intelligent AI
-              pipelines, constantly experimenting with cutting-edge tools to build high-performance
-              backend systems.
-            </p>
+            {PROFILE.about.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
 
             <div className="pt-4">
               <a
-                href="/Ryan Lau_Resume.pdf"
+                href={PROFILE.resumePath}
                 download
                 target="_blank"
                 className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
@@ -589,78 +530,50 @@ function PortfolioHome() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <a
-            href="https://drive.google.com/drive/folders/1yL_hl6eykQmJX-as3KJKMA0w7seN5c_L?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
-          >
-            <div className="space-y-4">
-              <div className="h-10 w-10 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <Award size={22} />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-neutral-900 dark:text-white">Certificates</h4>
-                <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                  A compilation of my learning journey and development roadmap.
-                </p>
-              </div>
-            </div>
-            <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
-              <span>View certifications</span>
-              <ExternalLink size={10} />
-            </div>
-          </a>
+          {CERTIFICATIONS.map((certification) => {
+            const Icon =
+              certification.icon === "award"
+                ? Award
+                : certification.icon === "code"
+                  ? Code2
+                  : Cloud;
+            const iconClassName =
+              certification.icon === "award"
+                ? "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40 text-blue-600 dark:text-blue-400"
+                : certification.icon === "code"
+                  ? "bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300"
+                  : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400";
 
-          <a
-            href="https://g.dev/ryanlau1220"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
-          >
-            <div className="space-y-4">
-              <div className="h-10 w-10 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg flex items-center justify-center text-neutral-700 dark:text-neutral-300">
-                <Code2 size={22} />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
-                  Google Developer
-                </h4>
-                <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                  Developer profile showcasing my Google Cloud pathways and developer milestones.
-                </p>
-              </div>
-            </div>
-            <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
-              <span>View developer profile</span>
-              <ExternalLink size={10} />
-            </div>
-          </a>
-
-          <a
-            href="https://skillsprofile.skillbuilder.aws/user/ryanlau1220"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
-          >
-            <div className="space-y-4">
-              <div className="h-10 w-10 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-lg flex items-center justify-center text-amber-600 dark:text-amber-400">
-                <Cloud size={22} />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
-                  AWS Skill Builder
-                </h4>
-                <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                  AWS cloud training logs, simulation scores, and platform learning tracks.
-                </p>
-              </div>
-            </div>
-            <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
-              <span>Verify AWS profile</span>
-              <ExternalLink size={10} />
-            </div>
-          </a>
+            return (
+              <a
+                key={certification.title}
+                href={certification.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  <div
+                    className={`h-10 w-10 border rounded-lg flex items-center justify-center ${iconClassName}`}
+                  >
+                    <Icon size={22} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
+                      {certification.title}
+                    </h4>
+                    <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+                      {certification.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
+                  <span>{certification.cta}</span>
+                  <ExternalLink size={10} />
+                </div>
+              </a>
+            );
+          })}
         </div>
       </section>
 
@@ -679,26 +592,26 @@ function PortfolioHome() {
             <div className="mt-8 space-y-4 font-mono text-xs text-neutral-600 dark:text-neutral-400">
               <div className="flex items-center gap-3">
                 <Mail size={14} className="text-neutral-400" />
-                <a href="mailto:liujunhong20@gmail.com" className="hover:text-blue-500">
-                  liujunhong20@gmail.com
+                <a href={`mailto:${PROFILE.contact.email}`} className="hover:text-blue-500">
+                  {PROFILE.contact.email}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Phone size={14} className="text-neutral-400" />
-                <a href="tel:+601110768752" className="hover:text-blue-500">
-                  +601110768752
+                <a href={`tel:${PROFILE.contact.phone}`} className="hover:text-blue-500">
+                  {PROFILE.contact.phone}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <MapPin size={14} className="text-neutral-400" />
-                <span>Bukit Jalil, Kuala Lumpur</span>
+                <span>{PROFILE.contact.location}</span>
               </div>
             </div>
 
             {/* Resume & Social Links */}
             <div className="flex flex-wrap gap-2.5 mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-900">
               <a
-                href="https://github.com/ryanlau1220"
+                href={PROFILE.contact.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"
@@ -708,7 +621,7 @@ function PortfolioHome() {
                 <span>GitHub</span>
               </a>
               <a
-                href="https://www.linkedin.com/in/ryanlau1220/"
+                href={PROFILE.contact.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"

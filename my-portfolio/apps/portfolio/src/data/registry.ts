@@ -8,7 +8,7 @@ export interface Project {
   githubUrl?: string;
   demoUrl?: string;
   domains: string[];
-  technologies: string[];
+  technologies: Technology[];
   imageUrl?: string;
   videoUrl?: string;
 }
@@ -21,7 +21,7 @@ export interface Experience {
   description: string;
   achievements: string[];
   domains: string[];
-  technologies: string[];
+  technologies: Technology[];
   sortKey: number;
 }
 
@@ -33,9 +33,9 @@ export interface EventItem {
   role: string;
   outcome?: string;
   description: string;
-  category: "hackathon" | "education" | "internship" | "other";
+  category: "hackathon" | "other";
   featured: boolean;
-  technologies: string[];
+  technologies: Technology[];
   sortKey: number;
 }
 
@@ -66,7 +66,6 @@ export const PROJECTS: Project[] = [
       "Obsidian",
       "Vitest",
     ],
-    imageUrl: "/projects/llmwiki/screenshot.png",
   },
   {
     id: "ledgertrace",
@@ -92,7 +91,6 @@ export const PROJECTS: Project[] = [
       "Stripe",
       "TRON",
     ],
-    imageUrl: "/projects/aimarathon/screenshot.png",
     videoUrl: "https://youtu.be/1o_8vI79uZQ",
   },
   {
@@ -119,7 +117,6 @@ export const PROJECTS: Project[] = [
       "GLM-OCR",
       "Whisper.cpp",
     ],
-    imageUrl: "/projects/umhackathon/screenshot.png",
     videoUrl: "https://youtu.be/B28F81tFSwQ",
   },
   {
@@ -153,7 +150,6 @@ export const PROJECTS: Project[] = [
       "ML Kit OCR",
       "Discord Webhooks",
     ],
-    imageUrl: "/projects/myaifuture/screenshot.png",
     videoUrl: "https://youtu.be/WdT77Km9cOc",
   },
   {
@@ -181,7 +177,6 @@ export const PROJECTS: Project[] = [
       "Cloud Pub/Sub",
       "Google Cloud",
     ],
-    imageUrl: "/projects/kitahack/screenshot.png",
     videoUrl: "https://youtu.be/ZXsvXQVFl1M",
   },
   {
@@ -212,7 +207,6 @@ export const PROJECTS: Project[] = [
       "Docker",
       "AWS",
     ],
-    imageUrl: "/projects/greatmalaysiaai/screenshot.png",
     videoUrl: "https://youtu.be/DEYFJtiCJsI",
   },
   {
@@ -240,7 +234,6 @@ export const PROJECTS: Project[] = [
       "Oasis ROFL",
       "Gemini",
     ],
-    imageUrl: "/projects/devmatch/screenshot.png",
     videoUrl: "https://youtu.be/XhHIwUfuJPs",
   },
   {
@@ -266,7 +259,6 @@ export const PROJECTS: Project[] = [
       "CSS3",
       "JavaScript",
     ],
-    imageUrl: "/projects/futurehack/screenshot.png",
   },
   {
     id: "krypitalx",
@@ -470,3 +462,176 @@ export const EVENTS: EventItem[] = [
     sortKey: 202602,
   },
 ];
+
+export const SKILL_CATEGORIES = [
+  "Programming Languages",
+  "Backend",
+  "Frontend",
+  "Databases",
+  "Tools",
+  "DevOps",
+  "AI & Intelligence",
+  "Quality & Testing",
+] as const;
+
+export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
+
+// Every technology used by the public portfolio belongs to exactly one graph category.
+export const TECHNOLOGY_CATEGORIES = {
+  TypeScript: "Programming Languages",
+  Go: "Programming Languages",
+  Dart: "Programming Languages",
+  Python: "Programming Languages",
+  Java: "Programming Languages",
+  "R Programming": "Programming Languages",
+  Solidity: "Programming Languages",
+  Kotlin: "Programming Languages",
+  JavaScript: "Programming Languages",
+  PHP: "Programming Languages",
+
+  "Hono.js": "Backend",
+  Keycloak: "Backend",
+  "Drizzle ORM": "Backend",
+  Bun: "Backend",
+  Elysia: "Backend",
+  ORPC: "Backend",
+  Express: "Backend",
+  Firebase: "Backend",
+  "Firebase Genkit": "Backend",
+  Prisma: "Backend",
+  GORM: "Backend",
+  FastAPI: "Backend",
+  BullMQ: "Backend",
+
+  React: "Frontend",
+  "Next.js": "Frontend",
+  "TanStack Start": "Frontend",
+  "TanStack Query": "Frontend",
+  Flutter: "Frontend",
+  "Redux Toolkit": "Frontend",
+  "Framer Motion": "Frontend",
+  GSAP: "Frontend",
+  "Tailwind CSS": "Frontend",
+  "Jetpack Compose": "Frontend",
+  HTML5: "Frontend",
+  HTML: "Frontend",
+  CSS3: "Frontend",
+  CSS: "Frontend",
+  Leaflet: "Frontend",
+
+  PostgreSQL: "Databases",
+  MySQL: "Databases",
+  pgvector: "Databases",
+  Redis: "Databases",
+  SQLite: "Databases",
+  DynamoDB: "Databases",
+  Room: "Databases",
+  SQLCipher: "Databases",
+  PostGIS: "Databases",
+  Firestore: "Databases",
+
+  Git: "Tools",
+  Jira: "Tools",
+  Turborepo: "Tools",
+  Vite: "Tools",
+  Obsidian: "Tools",
+  Hardhat: "Tools",
+  "The Graph": "Tools",
+  "Discord Webhooks": "Tools",
+  "Cloud Storage": "Tools",
+  "Cloud Pub/Sub": "Tools",
+  "Telegram Bot": "Tools",
+  "Cloudflare Tunnel": "Tools",
+  "ERP Systems": "Tools",
+
+  Docker: "DevOps",
+  "Docker Compose": "DevOps",
+  "Google Cloud": "DevOps",
+  GCP: "DevOps",
+  AWS: "DevOps",
+  "GitHub Actions": "DevOps",
+  TRON: "DevOps",
+  OAuth: "DevOps",
+  "AWS Amplify": "DevOps",
+  Stripe: "DevOps",
+  "Sui SDK": "DevOps",
+  zkLogin: "DevOps",
+  "Oasis ROFL": "DevOps",
+  Atlas: "DevOps",
+  Blnk: "DevOps",
+  Viem: "DevOps",
+
+  Ollama: "AI & Intelligence",
+  Gemini: "AI & Intelligence",
+  "Vertex AI": "AI & Intelligence",
+  "Amazon Bedrock": "AI & Intelligence",
+  "Amazon Comprehend": "AI & Intelligence",
+  "Amazon Translate": "AI & Intelligence",
+  "Amazon Transcribe": "AI & Intelligence",
+  "Amazon Polly": "AI & Intelligence",
+  BERT: "AI & Intelligence",
+  PyTorch: "AI & Intelligence",
+  "Hugging Face Transformers": "AI & Intelligence",
+  "ILMU-GLM-5.1": "AI & Intelligence",
+  "Whisper.cpp": "AI & Intelligence",
+  "GLM-OCR": "AI & Intelligence",
+  "ML Kit OCR": "AI & Intelligence",
+
+  Vitest: "Quality & Testing",
+  "Biometric Auth": "Quality & Testing",
+} as const satisfies Record<string, SkillCategory>;
+
+export type Technology = keyof typeof TECHNOLOGY_CATEGORIES;
+
+export const PROFILE = {
+  name: "Ryan Lau Jun Hong",
+  shortName: "Ryan Lau.",
+  role: "Software Engineer",
+  heroSummary:
+    "Focusing on DevOps pipelines, AI-driven automation, and secure, high-performance Backend architectures.",
+  about: [
+    "I am a Software Engineering student passionate about exploring latest technologies and building reliable systems. My engineering approach centers on designing clean architectures, solving technical complexity, and optimizing performance.",
+    "I am deeply interested in DevOps automation, distributed ledgers, and intelligent AI pipelines, constantly experimenting with cutting-edge tools to build high-performance backend systems.",
+  ],
+  resumePath: "/Ryan Lau_Resume.pdf",
+  contact: {
+    email: "liujunhong20@gmail.com",
+    phone: "+601110768752",
+    location: "Bukit Jalil, Kuala Lumpur",
+    githubUrl: "https://github.com/ryanlau1220",
+    linkedinUrl: "https://www.linkedin.com/in/ryanlau1220/",
+    web3FormsAccessKey: "4cf3d562-875e-40d3-aac8-04ad869ec935",
+  },
+  seo: {
+    title: "Ryan Lau Jun Hong | Portfolio",
+    description:
+      "Ryan Lau Jun Hong is a Software Engineering student at Asia Pacific University (APU) building AI systems, middleware, and full-stack solutions.",
+    socialDescription:
+      "Software Engineering student specializing in DevOps, AI automation, and secure Backend architectures.",
+    siteUrl: "https://portfolio.ryanlau1220.workers.dev",
+  },
+} as const;
+
+export const CERTIFICATIONS = [
+  {
+    title: "Certificates",
+    description: "A compilation of my learning journey and development roadmap.",
+    href: "https://drive.google.com/drive/folders/1yL_hl6eykQmJX-as3KJKMA0w7seN5c_L?usp=sharing",
+    cta: "View certifications",
+    icon: "award",
+  },
+  {
+    title: "Google Developer",
+    description: "Developer profile showcasing my Google Cloud pathways and developer milestones.",
+    href: "https://g.dev/ryanlau1220",
+    cta: "View developer profile",
+    icon: "code",
+  },
+  {
+    title: "AWS Skill Builder",
+    description: "AWS cloud training logs, simulation scores, and platform learning tracks.",
+    href: "https://skillsprofile.skillbuilder.aws/user/ryanlau1220",
+    cta: "Verify AWS profile",
+    icon: "cloud",
+  },
+] as const;

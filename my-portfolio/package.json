@@ -9,14 +9,13 @@
     "lint": "biome check .",
     "typecheck": "turbo run typecheck",
     "check": "pnpm run lint && turbo run typecheck build",
-    "format": "biome format --write .",
-    "db:studio": "pnpm --filter @portfolio/db db:studio"
+    "format": "biome format --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "turbo": "^2.3.3"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "lightningcss", "better-sqlite3"]
+    "onlyBuiltDependencies": ["esbuild", "lightningcss"]
   }
 }

@@ -1,6 +1,7 @@
 import * as d3Force from "d3-force";
 import { List, Maximize, Network, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { type Project, SKILL_CATEGORIES, TECHNOLOGY_CATEGORIES } from "../data/registry";
 interface D3Node extends d3Force.SimulationNodeDatum {
   id: string;
   name: string;
@@ -11,20 +12,6 @@ interface D3Node extends d3Force.SimulationNodeDatum {
 interface D3Link extends d3Force.SimulationLinkDatum<D3Node> {
   source: string | D3Node;
   target: string | D3Node;
-}
-
-interface Project {
-  id: string;
-  category: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  achievements: string[];
-  githubUrl?: string;
-  videoUrl?: string;
-  imageUrl?: string;
-  domains: string[];
-  technologies: string[];
 }
 
 interface SkillsGraphProps {
@@ -54,143 +41,13 @@ export function SkillsGraph({
   const draggedNodeRef = useRef<D3Node | null>(null);
   const hasMovedRef = useRef(false);
 
-  // 1. Group domains as the eight main categories, and map all 45 technologies
+  // 1. Build the graph from the canonical portfolio skill taxonomy.
   const { nodes, links, domains, technologies, techMap } = useMemo(() => {
-    const techToCategoryMap: Record<string, string> = {
-      // 1. Programming Languages
-      TypeScript: "Programming Languages",
-      Go: "Programming Languages",
-      Dart: "Programming Languages",
-      Python: "Programming Languages",
-      Java: "Programming Languages",
-      R: "Programming Languages",
-      Solidity: "Programming Languages",
-      Kotlin: "Programming Languages",
-      JavaScript: "Programming Languages",
-      PHP: "Programming Languages",
-
-      // 2. Backend
-      "Node.js": "Backend",
-      "Hono.js": "Backend",
-      Keycloak: "Backend",
-      "Drizzle ORM": "Backend",
-      Bun: "Backend",
-      Elysia: "Backend",
-      ORPC: "Backend",
-      Express: "Backend",
-      Firebase: "Backend",
-      "Firebase Genkit": "Backend",
-      Prisma: "Backend",
-      GORM: "Backend",
-      FastAPI: "Backend",
-      BullMQ: "Backend",
-
-      // 3. Frontend
-      React: "Frontend",
-      "Next.js": "Frontend",
-      "TanStack Start": "Frontend",
-      "TanStack Query": "Frontend",
-      Flutter: "Frontend",
-      "Redux Toolkit": "Frontend",
-      "Framer Motion": "Frontend",
-      GSAP: "Frontend",
-      Recharts: "Frontend",
-      "Tailwind CSS": "Frontend",
-      "Jetpack Compose": "Frontend",
-      HTML5: "Frontend",
-      CSS3: "Frontend",
-      Leaflet: "Frontend",
-
-      // 4. Databases
-      PostgreSQL: "Databases",
-      MySQL: "Databases",
-      Supabase: "Databases",
-      pgvector: "Databases",
-      Redis: "Databases",
-      SQLite: "Databases",
-      DynamoDB: "Databases",
-      Room: "Databases",
-      SQLCipher: "Databases",
-      PostGIS: "Databases",
-      Firestore: "Databases",
-
-      // 5. Tools
-      Git: "Tools",
-      Linux: "Tools",
-      Jira: "Tools",
-      Biome: "Tools",
-      PNPM: "Tools",
-      Turborepo: "Tools",
-      Vite: "Tools",
-      Obsidian: "Tools",
-      Hardhat: "Tools",
-      "The Graph": "Tools",
-      "Discord Webhooks": "Tools",
-      "Cloud Storage": "Tools",
-      "Cloud Pub/Sub": "Tools",
-      "Telegram Bot": "Tools",
-      "Cloudflare Tunnel": "Tools",
-
-      // 6. DevOps
-      Docker: "DevOps",
-      "Docker Compose": "DevOps",
-      "Google Cloud": "DevOps",
-      GCP: "DevOps",
-      AWS: "DevOps",
-      Cloudflare: "DevOps",
-      Vercel: "DevOps",
-      "Oracle Cloud": "DevOps",
-      "GitHub Actions": "DevOps",
-      TRON: "DevOps",
-      OAuth: "DevOps",
-      "AWS Amplify": "DevOps",
-      Stripe: "DevOps",
-      "Sui SDK": "DevOps",
-      zkLogin: "DevOps",
-      "Oasis ROFL": "DevOps",
-      Atlas: "DevOps",
-      Blnk: "DevOps",
-      Viem: "DevOps",
-
-      // 7. AI & Intelligence
-      Ollama: "AI & Intelligence",
-      Gemini: "AI & Intelligence",
-      OpenCV: "AI & Intelligence",
-      LangChain: "AI & Intelligence",
-      "Vertex AI": "AI & Intelligence",
-      "Amazon Bedrock": "AI & Intelligence",
-      "Amazon Comprehend": "AI & Intelligence",
-      "Amazon Translate": "AI & Intelligence",
-      "Amazon Transcribe": "AI & Intelligence",
-      "Amazon Polly": "AI & Intelligence",
-      BERT: "AI & Intelligence",
-      PyTorch: "AI & Intelligence",
-      "Hugging Face Transformers": "AI & Intelligence",
-      "ILMU-GLM-5.1": "AI & Intelligence",
-      "Whisper.cpp": "AI & Intelligence",
-      "GLM-OCR": "AI & Intelligence",
-      "ML Kit OCR": "AI & Intelligence",
-
-      // 8. Quality & Testing
-      Vitest: "Quality & Testing",
-      "Biometric Auth": "Quality & Testing",
-      Postman: "Quality & Testing",
-    };
-
-    const uniqueDomains = new Set<string>([
-      "Programming Languages",
-      "Backend",
-      "Frontend",
-      "Databases",
-      "Tools",
-      "DevOps",
-      "AI & Intelligence",
-      "Quality & Testing",
-    ]);
-    const uniqueTech = new Set<string>(Object.keys(techToCategoryMap));
+    const uniqueDomains = new Set<string>(SKILL_CATEGORIES);
+    const uniqueTech = new Set<string>(Object.keys(TECHNOLOGY_CATEGORIES));
     const connections = new Set<string>(); // "source-target" string set
 
-    Object.entries(techToCategoryMap).forEach(([tech, cat]) => {
+    Object.entries(TECHNOLOGY_CATEGORIES).forEach(([tech, cat]) => {
       connections.add(`${tech}::${cat}`);
     });
 
@@ -232,7 +89,7 @@ export function SkillsGraph({
       links: linkList,
       domains: Array.from(uniqueDomains).sort(),
       technologies: Array.from(uniqueTech).sort(),
-      techMap: techToCategoryMap,
+      techMap: TECHNOLOGY_CATEGORIES,
     };
   }, []);
 
@@ -394,7 +251,9 @@ export function SkillsGraph({
           p.domains.includes(selectedNode.id) || p.technologies.some((t) => domainTechs.has(t)),
       );
     }
-    return PROJECTS.filter((p) => p.technologies.includes(selectedNode.id));
+    return PROJECTS.filter((p) =>
+      p.technologies.some((technology) => technology === selectedNode.id),
+    );
   }, [selectedNode, techMap, PROJECTS]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
