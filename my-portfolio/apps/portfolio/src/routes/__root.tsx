@@ -67,24 +67,52 @@ export const Route = createRootRoute({
   }),
   component: RootComponent,
   errorComponent: RootErrorComponent,
-  notFoundComponent: () => {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
-        <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Page Not Found</h2>
-        <p className="text-sm text-neutral-500 mt-2 max-w-sm">
-          The page or resource you are looking for does not exist, or the screenshot file has not
-          been uploaded yet.
-        </p>
-        <a
-          href="/"
-          className="mt-6 text-xs font-mono px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Return Home
-        </a>
-      </div>
-    );
-  },
+  notFoundComponent: NotFoundComponent,
 });
+
+function NotFoundComponent() {
+  return (
+    <div className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-4xl items-center px-6 py-16">
+      <section className="grid w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 md:grid-cols-[1.05fr_0.95fr]">
+        <div className="flex flex-col justify-center p-8 sm:p-12">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
+            404 · Wrong turn
+          </p>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-950 dark:text-white sm:text-4xl">
+            Page not found.
+          </h1>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+            The page or resource you are looking for does not exist, or the screenshot file has not
+            been uploaded yet.
+          </p>
+          <a
+            href="/"
+            className="mt-8 inline-flex w-fit items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+          >
+            <House size={14} aria-hidden="true" />
+            Return home
+          </a>
+        </div>
+        <RecoveryArtwork />
+      </section>
+    </div>
+  );
+}
+
+function RecoveryArtwork() {
+  return (
+    <div className="group relative min-h-72 overflow-hidden border-t border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900/40 md:border-l md:border-t-0">
+      <div className="absolute inset-0 bg-grid opacity-60 dark:opacity-40" aria-hidden="true" />
+      <img
+        src="/images/error-ciallo.jpg"
+        alt="Friendly Ciallo illustration"
+        width={640}
+        height={553}
+        className="relative h-full w-full rounded-xl border border-neutral-200 object-cover shadow-sm transition-transform duration-700 ease-in-out group-hover:rotate-180 motion-reduce:transition-none dark:border-neutral-800"
+      />
+    </div>
+  );
+}
 
 function RootErrorComponent({ reset }: { reset: () => void }) {
   return (
@@ -119,16 +147,7 @@ function RootErrorComponent({ reset }: { reset: () => void }) {
             </a>
           </div>
         </div>
-        <div className="relative min-h-72 border-t border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900/40 md:border-l md:border-t-0">
-          <div className="absolute inset-0 bg-grid opacity-60 dark:opacity-40" aria-hidden="true" />
-          <img
-            src="/images/error-ciallo.jpg"
-            alt="Friendly Ciallo illustration"
-            width={640}
-            height={553}
-            className="relative h-full w-full rounded-xl border border-neutral-200 object-cover shadow-sm dark:border-neutral-800"
-          />
-        </div>
+        <RecoveryArtwork />
       </section>
     </div>
   );
