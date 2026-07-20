@@ -217,7 +217,7 @@ export function Timeline({
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           {/* Floating Date Badge */}
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-400 uppercase tracking-wider mb-2">
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase tracking-wider mb-2">
                             <Calendar size={11} />
                             {item.date}
                           </span>
@@ -240,7 +240,7 @@ export function Timeline({
 
                         <ChevronDown
                           size={16}
-                          className={`text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
+                          className={`text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 transition-transform duration-300 transform shrink-0 ml-4 mt-1 ${
                             expandedTimelineId === item.id ? "rotate-180" : ""
                           }`}
                         />
@@ -278,7 +278,7 @@ export function Timeline({
                           {/* Tech Tags */}
                           {item.technologies.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 pt-2">
-                              <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400">
+                              <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                                 Skills &amp; applied domains
                               </span>
                               {item.technologies.map((tag: string) => (

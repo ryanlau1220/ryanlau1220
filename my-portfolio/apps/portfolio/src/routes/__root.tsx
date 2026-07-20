@@ -355,7 +355,7 @@ function RootLayout() {
                 className={`text-xs font-mono transition-colors hover:text-neutral-900 dark:hover:text-white ${
                   isActive(link.href)
                     ? "text-neutral-900 dark:text-white font-bold"
-                    : "text-neutral-500 dark:text-neutral-500"
+                    : "text-neutral-500 dark:text-neutral-400"
                 }`}
               >
                 {link.label}

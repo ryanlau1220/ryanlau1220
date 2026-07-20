@@ -402,12 +402,12 @@ export function SkillsGraph({
             <button
               type="button"
               onClick={() => onSelectSkill(null)}
-              className="text-[10px] font-mono text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 hover:underline cursor-pointer"
+              className="text-[10px] font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:underline cursor-pointer"
             >
               [Clear]
             </button>
           </div>
-          <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-400 uppercase tracking-wider block mt-0.5">
+          <span className="text-[9px] font-mono text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mt-0.5">
             {selectedNode.type === "domain" ? "Skill Domain" : "Technology / Skill"}
           </span>
         </div>
@@ -420,11 +420,11 @@ export function SkillsGraph({
         )}
 
         <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3 flex-1 flex flex-col min-h-0">
-          <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-400 uppercase tracking-wider block mb-2">
+          <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
             Linked Projects ({activeProjects.length})
           </span>
           {activeProjects.length === 0 ? (
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-400 italic">
+            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 italic">
               No projects listed for this skill.
             </p>
           ) : (
@@ -441,7 +441,7 @@ export function SkillsGraph({
                   className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-1 group"
                 >
                   <span className="truncate">{proj.title}</span>
-                  <span className="text-[9px] text-neutral-400 dark:text-neutral-400 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
+                  <span className="text-[9px] text-neutral-600 dark:text-neutral-400 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
                     →
                   </span>
                 </button>
@@ -451,11 +451,11 @@ export function SkillsGraph({
         </div>
 
         <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3">
-          <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-400 uppercase tracking-wider block mb-2">
+          <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
             Linked Timeline ({activeTimelineItems.length})
           </span>
           {activeTimelineItems.length === 0 ? (
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-400 italic">
+            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 italic">
               No timeline entries listed for this skill.
             </p>
           ) : (
@@ -468,7 +468,7 @@ export function SkillsGraph({
                   className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-1 group"
                 >
                   <span className="truncate">{item.title}</span>
-                  <span className="text-[9px] text-neutral-400 dark:text-neutral-400 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
+                  <span className="text-[9px] text-neutral-600 dark:text-neutral-400 shrink-0 font-mono font-normal group-hover:translate-x-0.5 transition-transform">
                     →
                   </span>
                 </button>
@@ -715,7 +715,7 @@ export function SkillsGraph({
               <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 select-text">
                 {categorizedSkills.map((category) => (
                   <div key={category.name} className="space-y-3">
-                    <h4 className="text-xs font-bold text-neutral-400 dark:text-neutral-400 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
+                    <h4 className="text-xs font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-widest font-mono border-b border-neutral-100 dark:border-neutral-900 pb-2">
                       {category.name}
                     </h4>
                     <div className="flex flex-wrap gap-2">

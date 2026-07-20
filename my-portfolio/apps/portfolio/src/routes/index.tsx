@@ -282,7 +282,7 @@ function PortfolioHome() {
             {PROFILE.role}
           </p>
 
-          <p className="max-w-lg mx-auto text-sm sm:text-base text-neutral-500 dark:text-neutral-500 leading-relaxed font-sans">
+          <p className="max-w-lg mx-auto text-sm sm:text-base text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans">
             {PROFILE.heroSummary}
           </p>
 
@@ -560,7 +560,7 @@ function PortfolioHome() {
 
                       {/* Achievements List */}
                       <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-900 pt-4">
-                        <span className="text-[10px] font-mono font-bold text-neutral-400 dark:text-neutral-600 uppercase tracking-wider block mb-2">
+                        <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
                           Key Outcomes &amp; Technical Achievements
                         </span>
                         <ul className="space-y-2">
@@ -581,7 +581,7 @@ function PortfolioHome() {
 
                       {/* Curated project skills — complete technology relationships stay in the Skills Map. */}
                       <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                        <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-600">
+                        <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
                           Top skills
                         </span>
                         {project.featuredTechnologies.map((tech: string) => (
@@ -654,7 +654,7 @@ function PortfolioHome() {
                   return (
                     <span
                       key={`ellipsis-${idx}`}
-                      className="text-xs text-neutral-400 dark:text-neutral-600 px-1 font-mono"
+                      className="text-xs text-neutral-600 dark:text-neutral-400 px-1 font-mono"
                     >
                       ...
                     </span>
@@ -817,7 +817,7 @@ function PortfolioHome() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label
-                    className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                    className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
                     htmlFor="form-name"
                   >
                     Name
@@ -835,7 +835,7 @@ function PortfolioHome() {
                 </div>
                 <div className="space-y-1">
                   <label
-                    className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                    className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
                     htmlFor="form-email"
                   >
                     Email
@@ -855,7 +855,7 @@ function PortfolioHome() {
 
               <div className="space-y-1">
                 <label
-                  className="text-[10px] font-bold font-mono text-neutral-400 dark:text-neutral-600 uppercase"
+                  className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
                   htmlFor="form-msg"
                 >
                   Message
