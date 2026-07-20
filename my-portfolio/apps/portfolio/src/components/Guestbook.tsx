@@ -8,7 +8,6 @@ const TURNSTILE_SCRIPT_URL =
 const PUSHER_SCRIPT_URL = "https://js.pusher.com/8.4.0/pusher.min.js";
 const MAX_MESSAGE_WORDS = 100;
 const MAX_MESSAGE_CHARACTERS = 1_000;
-const GUESTBOOK_SEEN_STORAGE_KEY = "portfolio:guestbook-seen:v1";
 const INITIAL_FORM = { author: "", message: "", website: "" };
 const externalScripts = new Map<string, Promise<void>>();
 
@@ -177,9 +176,8 @@ function useRealtimeGuestbook(
   }, [isOpen, onEntry, realtime]);
 }
 
-export function Guestbook() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [hasUnseenGuestbook, setHasUnseenGuestbook] = useState(false);
+export function Guestbook({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [realtime, setRealtime] = useState<GuestbookRealtimeConfig | null>(null);
@@ -191,21 +189,11 @@ export function Guestbook() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, startLoading] = useTransition();
   const [isSubmitting, startSubmitting] = useTransition();
-  const openButtonRef = useRef<HTMLButtonElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const turnstileMountRef = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetRef = useRef<string | number | null>(null);
 
   const messageWordCount = countWords(form.message);
-
-  useEffect(() => {
-    try {
-      setHasUnseenGuestbook(localStorage.getItem(GUESTBOOK_SEEN_STORAGE_KEY) === null);
-    } catch {
-      // When storage is unavailable, retain the non-persistent first-visit indicator.
-      setHasUnseenGuestbook(true);
-    }
-  }, []);
 
   useEffect(() => {
     const updateTheme = () => {
@@ -308,17 +296,6 @@ export function Guestbook() {
     setIsOpen(false);
     setNotice(null);
     setError(null);
-    openButtonRef.current?.focus();
-  };
-
-  const openGuestbook = () => {
-    setIsOpen(true);
-    setHasUnseenGuestbook(false);
-    try {
-      localStorage.setItem(GUESTBOOK_SEEN_STORAGE_KEY, "1");
-    } catch {
-      // The guestbook remains usable when browser storage is unavailable.
-    }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -367,194 +344,165 @@ export function Guestbook() {
     });
   };
 
-  return (
-    <>
+  return isOpen ? (
+    <div className="fixed inset-0 z-[70] flex items-end justify-center p-3 sm:items-center sm:justify-end sm:p-5">
       <button
-        ref={openButtonRef}
         type="button"
-        onClick={openGuestbook}
-        className="fixed bottom-5 right-5 z-40 flex h-11 w-11 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 text-neutral-800 dark:text-neutral-200 shadow-lg shadow-neutral-950/10 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer"
-        aria-haspopup="dialog"
-        aria-expanded={isOpen}
-        aria-controls="visitor-log"
-        aria-label={hasUnseenGuestbook ? "Open guestbook (new)" : "Open guestbook"}
-        title="Guestbook"
+        className="absolute inset-0 bg-neutral-950/25 dark:bg-black/60 backdrop-blur-[2px]"
+        onClick={close}
+        aria-label="Close guestbook"
+      />
+      <dialog
+        open
+        id="visitor-log"
+        aria-modal="true"
+        aria-labelledby="visitor-log-title"
+        className="relative m-0 flex max-h-[min(760px,calc(100vh-1.5rem))] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-0 shadow-2xl shadow-neutral-950/20"
       >
-        <span className="relative flex h-5 w-5 items-center justify-center">
-          <MessageSquarePlus size={18} className="text-blue-500" aria-hidden="true" />
-          {hasUnseenGuestbook ? (
-            <span
-              className="absolute -right-1 -top-1 h-2 w-2 rounded-full border-2 border-white bg-red-500 dark:border-neutral-950"
-              aria-hidden="true"
-            />
-          ) : null}
-        </span>
-      </button>
-
-      {isOpen ? (
-        <div className="fixed inset-0 z-[70] flex items-end justify-center p-3 sm:items-center sm:justify-end sm:p-5">
-          <button
-            type="button"
-            className="absolute inset-0 bg-neutral-950/25 dark:bg-black/60 backdrop-blur-[2px]"
-            onClick={close}
-            aria-label="Close guestbook"
-          />
-          <dialog
-            open
-            id="visitor-log"
-            aria-modal="true"
-            aria-labelledby="visitor-log-title"
-            className="relative m-0 flex max-h-[min(760px,calc(100vh-1.5rem))] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-0 shadow-2xl shadow-neutral-950/20"
-          >
-            <header className="flex items-start justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 px-5 py-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <MessageSquarePlus size={16} className="text-blue-500" aria-hidden="true" />
-                  <h2
-                    id="visitor-log-title"
-                    className="text-sm font-bold text-neutral-950 dark:text-white"
-                  >
-                    Guestbook
-                  </h2>
-                </div>
-              </div>
-              <button
-                ref={closeButtonRef}
-                type="button"
-                onClick={close}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-white cursor-pointer"
-                aria-label="Close guestbook"
+        <header className="flex items-start justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 px-5 py-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <MessageSquarePlus size={16} className="text-blue-500" aria-hidden="true" />
+              <h2
+                id="visitor-log-title"
+                className="text-sm font-bold text-neutral-950 dark:text-white"
               >
-                <X size={15} />
-              </button>
-            </header>
-
-            <div className="min-h-0 overflow-y-auto px-5 py-4">
-              {isLoading || isEnabled === null ? (
-                <div className="flex items-center justify-center gap-2 py-12 text-xs font-mono text-neutral-600 dark:text-neutral-400">
-                  <LoaderCircle size={14} className="animate-spin" />
-                  Loading comments…
-                </div>
-              ) : !isEnabled ? (
-                <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-800 px-4 py-8 text-center">
-                  <ShieldCheck
-                    size={20}
-                    className="mx-auto text-neutral-600 dark:text-neutral-400"
-                  />
-                  <p className="mt-3 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                    Guestbook is coming online.
-                  </p>
-                  <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
-                    Its protected comment form is being configured. Please check back soon.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <form onSubmit={handleSubmit} className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <label
-                        htmlFor="visitor-log-author"
-                        className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400"
-                      >
-                        Leave a comment
-                      </label>
-                      <span className="text-[10px] font-mono text-neutral-600 dark:text-neutral-400">
-                        {messageWordCount}/{MAX_MESSAGE_WORDS} words
-                      </span>
-                    </div>
-                    <input
-                      id="visitor-log-author"
-                      type="text"
-                      value={form.author}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, author: event.target.value }))
-                      }
-                      maxLength={40}
-                      placeholder="Name (optional)"
-                      className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-xs font-mono text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
-                    />
-                    <div className="relative">
-                      <textarea
-                        id="visitor-log-message"
-                        value={form.message}
-                        onChange={(event) =>
-                          setForm((current) => ({ ...current, message: event.target.value }))
-                        }
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" && !event.shiftKey) {
-                            event.preventDefault();
-                            event.currentTarget.form?.requestSubmit();
-                          }
-                        }}
-                        maxLength={MAX_MESSAGE_CHARACTERS}
-                        required
-                        rows={2}
-                        placeholder="Write a comment for me (Press Enter to send)"
-                        aria-label="Write a comment"
-                        className="w-full resize-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 pr-12 text-xs leading-relaxed text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
-                      />
-                      <button
-                        type="submit"
-                        disabled={
-                          isSubmitting || !turnstileToken || messageWordCount > MAX_MESSAGE_WORDS
-                        }
-                        className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-md bg-neutral-900 text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
-                        aria-label="Post comment"
-                        title="Post comment"
-                      >
-                        {isSubmitting ? (
-                          <LoaderCircle size={13} className="animate-spin" />
-                        ) : (
-                          <Send size={13} />
-                        )}
-                      </button>
-                    </div>
-                    <div
-                      className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
-                      aria-hidden="true"
-                    >
-                      <label htmlFor="visitor-log-website">Website</label>
-                      <input
-                        id="visitor-log-website"
-                        tabIndex={-1}
-                        autoComplete="off"
-                        value={form.website}
-                        onChange={(event) =>
-                          setForm((current) => ({ ...current, website: event.target.value }))
-                        }
-                      />
-                    </div>
-                    <div ref={turnstileMountRef} className="min-h-[65px]" />
-
-                    {error ? (
-                      <p
-                        role="alert"
-                        className="text-[11px] leading-relaxed text-red-600 dark:text-red-400"
-                      >
-                        {error}
-                      </p>
-                    ) : null}
-                    {notice ? (
-                      <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-green-600 dark:text-green-400">
-                        <CheckCircle2 size={13} className="mt-0.5 shrink-0" />
-                        {notice}
-                      </p>
-                    ) : null}
-                  </form>
-
-                  <div className="my-5 border-t border-neutral-100 dark:border-neutral-900" />
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h3 className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                      Recent comments
-                    </h3>
-                  </div>
-                  <GuestbookMessages entries={entries} />
-                </>
-              )}
+                Guestbook
+              </h2>
             </div>
-          </dialog>
+          </div>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={close}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-white cursor-pointer"
+            aria-label="Close guestbook"
+          >
+            <X size={15} />
+          </button>
+        </header>
+
+        <div className="min-h-0 overflow-y-auto px-5 py-4">
+          {isLoading || isEnabled === null ? (
+            <div className="flex items-center justify-center gap-2 py-12 text-xs font-mono text-neutral-600 dark:text-neutral-400">
+              <LoaderCircle size={14} className="animate-spin" />
+              Loading comments…
+            </div>
+          ) : !isEnabled ? (
+            <div className="rounded-xl border border-dashed border-neutral-200 dark:border-neutral-800 px-4 py-8 text-center">
+              <ShieldCheck size={20} className="mx-auto text-neutral-600 dark:text-neutral-400" />
+              <p className="mt-3 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                Guestbook is coming online.
+              </p>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                Its protected comment form is being configured. Please check back soon.
+              </p>
+            </div>
+          ) : (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <label
+                    htmlFor="visitor-log-author"
+                    className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400"
+                  >
+                    Leave a comment
+                  </label>
+                  <span className="text-[10px] font-mono text-neutral-600 dark:text-neutral-400">
+                    {messageWordCount}/{MAX_MESSAGE_WORDS} words
+                  </span>
+                </div>
+                <input
+                  id="visitor-log-author"
+                  type="text"
+                  value={form.author}
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, author: event.target.value }))
+                  }
+                  maxLength={40}
+                  placeholder="Name (optional)"
+                  className="w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-xs font-mono text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
+                />
+                <div className="relative">
+                  <textarea
+                    id="visitor-log-message"
+                    value={form.message}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, message: event.target.value }))
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                    maxLength={MAX_MESSAGE_CHARACTERS}
+                    required
+                    rows={2}
+                    placeholder="Write a comment for me (Press Enter to send)"
+                    aria-label="Write a comment"
+                    className="w-full resize-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 pr-12 text-xs leading-relaxed text-neutral-900 placeholder:text-neutral-400 focus:border-blue-400 focus:outline-none dark:text-white dark:focus:border-blue-700"
+                  />
+                  <button
+                    type="submit"
+                    disabled={
+                      isSubmitting || !turnstileToken || messageWordCount > MAX_MESSAGE_WORDS
+                    }
+                    className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-md bg-neutral-900 text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+                    aria-label="Post comment"
+                    title="Post comment"
+                  >
+                    {isSubmitting ? (
+                      <LoaderCircle size={13} className="animate-spin" />
+                    ) : (
+                      <Send size={13} />
+                    )}
+                  </button>
+                </div>
+                <div
+                  className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden"
+                  aria-hidden="true"
+                >
+                  <label htmlFor="visitor-log-website">Website</label>
+                  <input
+                    id="visitor-log-website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, website: event.target.value }))
+                    }
+                  />
+                </div>
+                <div ref={turnstileMountRef} className="min-h-[65px]" />
+
+                {error ? (
+                  <p
+                    role="alert"
+                    className="text-[11px] leading-relaxed text-red-600 dark:text-red-400"
+                  >
+                    {error}
+                  </p>
+                ) : null}
+                {notice ? (
+                  <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-green-600 dark:text-green-400">
+                    <CheckCircle2 size={13} className="mt-0.5 shrink-0" />
+                    {notice}
+                  </p>
+                ) : null}
+              </form>
+
+              <div className="my-5 border-t border-neutral-100 dark:border-neutral-900" />
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="text-[10px] font-bold font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                  Recent comments
+                </h3>
+              </div>
+              <GuestbookMessages entries={entries} />
+            </>
+          )}
         </div>
-      ) : null}
-    </>
-  );
+      </dialog>
+    </div>
+  ) : null;
 }
