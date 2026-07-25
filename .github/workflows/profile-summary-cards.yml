@@ -30,5 +30,6 @@ jobs:
           target_branch: output
           build_dir: profile-summary-card-output
           target_dest: profile-summary-card-output
+          keep_history: true
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
