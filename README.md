@@ -30,34 +30,34 @@
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
       <picture>
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=ryanlau1220&border_color=0000&bg_color=0000&theme=nord_dark"
+          srcset="./profile-summary-card-output/nord_dark/repos-per-language.svg"
           media="(prefers-color-scheme: dark)" />
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=ryanlau1220&border_color=0000&bg_color=0000&theme=nord_bright"
+          srcset="./profile-summary-card-output/nord_bright/repos-per-language.svg"
           media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=ryanlau1220&border_color=0000&bg_color=0000" height="100%" />
+        <img src="./profile-summary-card-output/nord_bright/repos-per-language.svg" height="100%" />
       </picture>
     </a></td>
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
       <picture>
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=ryanlau1220&border_color=0000&bg_color=0000&theme=nord_dark"
+          srcset="./profile-summary-card-output/nord_dark/most-commit-language.svg"
           media="(prefers-color-scheme: dark)" />
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=ryanlau1220&border_color=0000&bg_color=0000&theme=nord_bright"
+          srcset="./profile-summary-card-output/nord_bright/most-commit-language.svg"
           media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=ryanlau1220&border_color=0000&bg_color=0000" height="100%" />
+        <img src="./profile-summary-card-output/nord_bright/most-commit-language.svg" height="100%" />
       </picture>
     </a></td>
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
       <picture>
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=ryanlau1220&utcOffset=8&border_color=0000&bg_color=0000&theme=nord_dark"
+          srcset="./profile-summary-card-output/nord_dark/productive-time.svg"
           media="(prefers-color-scheme: dark)" />
         <source
-          srcset="https://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=ryanlau1220&utcOffset=8&border_color=0000&bg_color=0000&theme=nord_bright"
+          srcset="./profile-summary-card-output/nord_bright/productive-time.svg"
           media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="https://github-profile-summary-cards.vercel.app/api/cards/productive-time?username=ryanlau1220&utcOffset=8&border_color=0000&bg_color=0000" height="100%" />
+        <img src="./profile-summary-card-output/nord_bright/productive-time.svg" height="100%" />
       </picture>
     </a></td>
   </tr>
