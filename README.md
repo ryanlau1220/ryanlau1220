@@ -27,38 +27,19 @@
     </a></td>
   </tr>
   <tr>
+    <td colspan="6" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
+      <img src="./profile-summary-card-output/2077/0-profile-details.svg" width="100%" />
+    </a></td>
+  </tr>
+  <tr>
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
-      <picture>
-        <source
-          srcset="./profile-summary-card-output/nord_dark/repos-per-language.svg"
-          media="(prefers-color-scheme: dark)" />
-        <source
-          srcset="./profile-summary-card-output/nord_bright/repos-per-language.svg"
-          media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="./profile-summary-card-output/nord_bright/repos-per-language.svg" height="100%" />
-      </picture>
+      <img src="./profile-summary-card-output/2077/1-repos-per-language.svg" width="100%" />
     </a></td>
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
-      <picture>
-        <source
-          srcset="./profile-summary-card-output/nord_dark/most-commit-language.svg"
-          media="(prefers-color-scheme: dark)" />
-        <source
-          srcset="./profile-summary-card-output/nord_bright/most-commit-language.svg"
-          media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="./profile-summary-card-output/nord_bright/most-commit-language.svg" height="100%" />
-      </picture>
+      <img src="./profile-summary-card-output/2077/2-most-commit-language.svg" width="100%" />
     </a></td>
     <td colspan="2" align="center"><a href="https://github.com/vn7n24fzkq/github-profile-summary-cards">
-      <picture>
-        <source
-          srcset="./profile-summary-card-output/nord_dark/productive-time.svg"
-          media="(prefers-color-scheme: dark)" />
-        <source
-          srcset="./profile-summary-card-output/nord_bright/productive-time.svg"
-          media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" />
-        <img src="./profile-summary-card-output/nord_bright/productive-time.svg" height="100%" />
-      </picture>
+      <img src="./profile-summary-card-output/2077/4-productive-time.svg" width="100%" />
     </a></td>
   </tr>
   <tr>
