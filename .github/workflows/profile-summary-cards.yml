@@ -27,9 +27,15 @@ jobs:
       - name: fetch streak stats card
         run: |
           mkdir -p profile-summary-card-output/2077
-          curl -s --retry 3 --retry-delay 5 \
+          curl --fail --silent --show-error \
+            --retry 3 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 60 \
             "https://streak-stats.demolab.com/?user=ryanlau1220&mode=weekly&hide_border=true&background=141321&stroke=ff0055&ring=fcee0c&fire=fcee0c&currStreakNum=03d8f3&sideNums=03d8f3&currStreakLabel=ff0055&sideLabels=03d8f3&dates=03d8f3" \
             -o profile-summary-card-output/2077/streak-stats.svg
+          grep -q '<svg' profile-summary-card-output/2077/streak-stats.svg
           cp profile-summary-card-output/2077/streak-stats.svg profile-summary-card-output/streak-stats.svg
 
       - name: push profile-summary-cards to output branch
