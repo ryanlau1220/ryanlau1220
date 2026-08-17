@@ -1,4 +1,4 @@
-name: GitHub-Profile-Summary-Cards
+name: GitHub Profile Assets
 
 on:
   schedule:
@@ -11,12 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: generate-github-profile-summary-cards
+    name: generate-profile-assets
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: vn7n24fzkq/github-profile-summary-cards@release
+
+      # 1. Generate Profile Summary Cards
+      - name: Generate profile summary cards
+        uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
@@ -24,21 +27,26 @@ jobs:
           AUTO_PUSH: false
           UTC_OFFSET: 8
 
-      - name: fetch streak stats card
+      # 2. Fetch Streak Stats Card
+      - name: Fetch streak stats card
         run: |
           mkdir -p profile-summary-card-output/2077
-          curl --fail --silent --show-error \
-            --retry 3 \
-            --retry-delay 5 \
-            --retry-all-errors \
-            --connect-timeout 10 \
-            --max-time 60 \
+          curl -s --retry 3 --retry-delay 5 \
             "https://streak-stats.demolab.com/?user=ryanlau1220&mode=weekly&hide_border=true&background=141321&stroke=ff0055&ring=fcee0c&fire=fcee0c&currStreakNum=03d8f3&sideNums=03d8f3&currStreakLabel=ff0055&sideLabels=03d8f3&dates=03d8f3" \
             -o profile-summary-card-output/2077/streak-stats.svg
-          grep -q '<svg' profile-summary-card-output/2077/streak-stats.svg
           cp profile-summary-card-output/2077/streak-stats.svg profile-summary-card-output/streak-stats.svg
 
-      - name: push profile-summary-cards to output branch
+      # 3. Generate Snake Animation directly into the same output directory
+      - name: Generate snake animation
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            profile-summary-card-output/github-contribution-grid-snake.svg
+            profile-summary-card-output/github-contribution-grid-snake-dark.svg?palette=github-dark
+
+      # 4. Atomically publish everything together to the output branch
+      - name: Push all assets to output branch
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: output
