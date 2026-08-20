@@ -31,13 +31,17 @@ test("opens and closes the project preview with keyboard support", async ({ page
   await expect(dialog).toHaveCount(0);
 });
 
-test("filters the carousel to pinned open-source projects", async ({ page }) => {
+test("filters the carousel to pinned open-source projects", async ({ page }, testInfo) => {
   await openHome(page);
   await page.locator("#projects").scrollIntoViewIfNeeded();
 
   await page.getByRole("button", { name: "Pinned" }).click();
   await expect(page.getByRole("heading", { level: 3, name: "APU-ASC" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Next project" })).toBeVisible();
+  const nextButton = testInfo.project.name.startsWith("mobile")
+    ? page.getByRole("button", { name: "Next", exact: true })
+    : page.getByRole("button", { name: "Next project" });
+  await nextButton.click();
+  await expect(page.getByRole("heading", { level: 3, name: "OpenChain" })).toBeVisible();
 });
 
 test("opens the guestbook without requiring a submission", async ({ page }) => {
