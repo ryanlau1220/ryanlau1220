@@ -10,7 +10,10 @@ export interface Project {
   domains: string[];
   technologies: Technology[];
   featuredTechnologies: Technology[];
+  pinned?: boolean;
   imageUrl?: string;
+  previewImageUrl?: string;
+  mobilePreviewImageUrl?: string;
   videoUrl?: string;
 }
 
@@ -41,6 +44,83 @@ export interface EventItem {
 }
 
 export const PROJECTS: Project[] = [
+  {
+    id: "apu-asc",
+    category: "open-source",
+    title: "APU-ASC",
+    subtitle: "Automotive Service Centre Platform",
+    description:
+      "A full-stack platform for managing automotive services, appointments, vehicles, and workshop operations.",
+    achievements: [
+      "Built modular web, mobile, and Spring Boot applications around service, appointment, vehicle, and billing workflows.",
+      "Integrated Keycloak, PostgreSQL, Flyway, Valkey, and MinIO for secure identity, data, caching, and storage.",
+      "Added Docker-based deployment and end-to-end observability with OpenTelemetry, Grafana, Prometheus, Loki, and Tempo.",
+    ],
+    githubUrl: "https://github.com/ryanlau1220/APU-ASC",
+    demoUrl: "https://apu-asc.duckdns.org/",
+    domains: ["Backend", "DevOps"],
+    technologies: [
+      "React",
+      "TanStack Start",
+      "Expo",
+      "Spring Boot",
+      "Spring Modulith",
+      "Keycloak",
+      "PostgreSQL",
+      "JPA",
+      "Hibernate",
+      "Flyway",
+      "Valkey",
+      "MinIO",
+      "Traefik",
+      "Docker Compose",
+      "OpenTelemetry",
+      "Grafana",
+      "Prometheus",
+      "Loki",
+      "Tempo",
+      "Playwright",
+    ],
+    featuredTechnologies: ["Spring Boot", "Spring Modulith", "Keycloak", "OpenTelemetry", "Grafana"],
+    pinned: true,
+    imageUrl: "/projects/apu-asc/image.png",
+    previewImageUrl: "/projects/apu-asc/preview.webp",
+    mobilePreviewImageUrl: "/projects/apu-asc/preview-mobile.webp",
+  },
+  {
+    id: "openchain",
+    category: "open-source",
+    title: "OpenChain",
+    subtitle: "Blockchain Investigation Workspace",
+    description:
+      "An evidence-aware workspace for tracing Ethereum address activity and investigating transaction flows.",
+    achievements: [
+      "Built graph-based Ethereum address tracing with scoped transfer data, coverage limits, and confirmation status.",
+      "Modeled evidence-backed entity labels and investigation leads without treating activity as proof of ownership.",
+      "Connected a Cytoscape investigation UI to a Go ConnectRPC API, Protocol Buffers, and PostgreSQL with Apache AGE.",
+    ],
+    githubUrl: "https://github.com/ryanlau1220/OpenChain",
+    domains: ["Backend", "Data & Databases"],
+    technologies: [
+      "React",
+      "TanStack Start",
+      "Cytoscape",
+      "Go",
+      "ConnectRPC",
+      "Protocol Buffers",
+      "PostgreSQL",
+      "Apache AGE",
+      "Docker Compose",
+      "Turborepo",
+      "Biome",
+      "Vitest",
+    ],
+    featuredTechnologies: ["Cytoscape", "ConnectRPC", "Protocol Buffers", "Apache AGE", "Go"],
+    pinned: true,
+    imageUrl: "/projects/openchain/image.png",
+    previewImageUrl: "/projects/openchain/preview.webp",
+    mobilePreviewImageUrl: "/projects/openchain/preview-mobile.webp",
+  },
   {
     id: "llm-wiki",
     category: "open-source",
@@ -618,6 +698,8 @@ export const TECHNOLOGY_CATEGORIES = {
   Move: "Programming Languages",
 
   React: "Frontend Development",
+  Expo: "Frontend Development",
+  Cytoscape: "Frontend Development",
   "Next.js": "Frontend Development",
   "TanStack Start": "Frontend Development",
   "TanStack Query": "Frontend Development",
@@ -639,6 +721,12 @@ export const TECHNOLOGY_CATEGORIES = {
   Elysia: "Backend & APIs",
   ORPC: "Backend & APIs",
   Express: "Backend & APIs",
+  "Spring Boot": "Backend & APIs",
+  "Spring Modulith": "Backend & APIs",
+  "JPA": "Backend & APIs",
+  Hibernate: "Backend & APIs",
+  ConnectRPC: "Backend & APIs",
+  "Protocol Buffers": "Backend & APIs",
   Firebase: "Backend & APIs",
   Genkit: "Backend & APIs",
   Prisma: "Backend & APIs",
@@ -664,6 +752,8 @@ export const TECHNOLOGY_CATEGORIES = {
   Atlas: "Data & Databases",
   GeoLite2: "Data & Databases",
   Blnk: "Data & Databases",
+  Valkey: "Data & Databases",
+  "Apache AGE": "Data & Databases",
 
   Ollama: "AI & Machine Learning",
   Gemini: "AI & Machine Learning",
@@ -696,6 +786,8 @@ export const TECHNOLOGY_CATEGORIES = {
   "AWS App Runner": "Cloud & DevOps",
   Contabo: "Cloud & DevOps",
   Vercel: "Cloud & DevOps",
+  MinIO: "Cloud & DevOps",
+  Traefik: "Cloud & DevOps",
 
   RAG: "Architecture & Concepts",
   "Event-Driven Systems": "Architecture & Concepts",
@@ -717,6 +809,7 @@ export const TECHNOLOGY_CATEGORIES = {
   "Database Management": "Architecture & Concepts",
   IoT: "Architecture & Concepts",
   "Networking Technologies": "Architecture & Concepts",
+  Flyway: "Architecture & Concepts",
 
   Vitest: "Observability & Tools",
   Turborepo: "Observability & Tools",
@@ -730,6 +823,13 @@ export const TECHNOLOGY_CATEGORIES = {
   OpenSanctions: "Observability & Tools",
   TradingView: "Observability & Tools",
   MT5: "Observability & Tools",
+  Biome: "Observability & Tools",
+  Playwright: "Observability & Tools",
+  OpenTelemetry: "Observability & Tools",
+  Grafana: "Observability & Tools",
+  Prometheus: "Observability & Tools",
+  Loki: "Observability & Tools",
+  Tempo: "Observability & Tools",
 } as const satisfies Record<string, SkillCategory>;
 
 export type Technology = keyof typeof TECHNOLOGY_CATEGORIES;

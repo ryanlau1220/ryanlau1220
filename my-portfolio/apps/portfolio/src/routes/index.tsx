@@ -14,6 +14,7 @@ import {
   Mail,
   MapPin,
   Maximize2,
+  Pin,
   Phone,
   Play,
   X,
@@ -27,6 +28,8 @@ const SkillsGraph = lazy(() =>
 );
 
 const PROJECT_IMAGE_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  "apu-asc": { width: 1920, height: 947 },
+  openchain: { width: 1920, height: 947 },
   "llm-wiki": { width: 1920, height: 947 },
   ledgertrace: { width: 1920, height: 947 },
   umhackathon: { width: 1279, height: 1079 },
@@ -37,12 +40,16 @@ const PROJECT_IMAGE_DIMENSIONS: Record<string, { width: number; height: number }
   futurehack: { width: 1920, height: 947 },
 };
 
-function getProjectPreviewUrl(imageUrl: string) {
-  return imageUrl.replace("image.png", "preview.webp");
+function getProjectPreviewUrl(project: (typeof PROJECTS)[number]) {
+  return project.previewImageUrl ?? project.imageUrl?.replace("image.png", "preview.webp");
 }
 
-function getMobileProjectPreviewUrl(imageUrl: string) {
-  return imageUrl.replace("image.png", "preview-mobile.webp");
+function getMobileProjectPreviewUrl(project: (typeof PROJECTS)[number]) {
+  return (
+    project.mobilePreviewImageUrl ??
+    project.previewImageUrl ??
+    project.imageUrl?.replace("image.png", "preview-mobile.webp")
+  );
 }
 
 export const Route = createFileRoute("/")({
@@ -74,7 +81,7 @@ function PortfolioHome() {
   const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
   const [shouldLoadSkills, setShouldLoadSkills] = useState(false);
   const [projectFilter, setProjectFilter] = useState<
-    "all" | "open-source" | "hackathon" | "internship"
+    "all" | "pinned" | "open-source" | "hackathon" | "internship"
   >("all");
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
   const [timelineFocusRequest, setTimelineFocusRequest] = useState<{
@@ -91,7 +98,9 @@ function PortfolioHome() {
   // Dynamic numeric pagination pages list
   const paginationPages = useMemo(() => {
     const total = PROJECTS.filter((p) => {
-      const matchCat = projectFilter === "all" || p.category === projectFilter;
+      const matchCat =
+        projectFilter === "all" ||
+        (projectFilter === "pinned" ? p.pinned : p.category === projectFilter);
       const matchSkill =
         !selectedSkill ||
         p.technologies.some((technology) => technology === selectedSkill) ||
@@ -194,7 +203,9 @@ function PortfolioHome() {
   // Filter projects by selected category and skill (technologies or domains)
   const filteredProjects = useMemo(() => {
     let list = PROJECTS;
-    if (projectFilter !== "all") {
+    if (projectFilter === "pinned") {
+      list = list.filter((project) => project.pinned);
+    } else if (projectFilter !== "all") {
       list = list.filter((p) => p.category === projectFilter);
     }
     if (selectedSkill) {
@@ -393,6 +404,7 @@ function PortfolioHome() {
         {/* Category Filters */}
         <div className="flex flex-wrap items-center gap-2 mb-10">
           {[
+            { id: "pinned", label: "Pinned" },
             { id: "all", label: "All Projects" },
             { id: "internship", label: "Internships" },
             { id: "hackathon", label: "Hackathons" },
@@ -402,14 +414,17 @@ function PortfolioHome() {
               key={filter.id}
               type="button"
               onClick={() =>
-                setProjectFilter(filter.id as "all" | "open-source" | "hackathon" | "internship")
+                setProjectFilter(
+                  filter.id as "all" | "pinned" | "open-source" | "hackathon" | "internship",
+                )
               }
-              className={`text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
                 projectFilter === filter.id
                   ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"
                   : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
               }`}
             >
+              {filter.id === "pinned" && <Pin size={12} aria-hidden="true" />}
               {filter.label}
             </button>
           ))}
@@ -482,10 +497,10 @@ function PortfolioHome() {
                         <picture className="relative z-10 h-full w-full">
                           <source
                             media="(max-width: 639px)"
-                            srcSet={getMobileProjectPreviewUrl(project.imageUrl!)}
+                            srcSet={getMobileProjectPreviewUrl(project)}
                           />
                           <img
-                            src={getProjectPreviewUrl(project.imageUrl!)}
+                            src={getProjectPreviewUrl(project)}
                             alt={`${project.title} product screenshot`}
                             width={imageDimensions?.width}
                             height={imageDimensions?.height}
