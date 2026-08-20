@@ -434,7 +434,7 @@ function RootLayout() {
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
         <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
-          © Ryan Lau Jun Hong · Built with TanStack Start, Cloudflare Workers &amp; Pusher.
+          © Ryan Lau Jun Hong · Built with TanStack Start &amp; Cloudflare Workers.
         </div>
       </footer>
 
