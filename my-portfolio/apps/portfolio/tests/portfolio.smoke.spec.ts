@@ -48,6 +48,7 @@ test("opens the guestbook without requiring a submission", async ({ page }) => {
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Close guestbook" }).click();
   await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Open guestbook" })).toBeVisible();
 });
 
 test("renders a helpful 404 recovery page", async ({ page }) => {

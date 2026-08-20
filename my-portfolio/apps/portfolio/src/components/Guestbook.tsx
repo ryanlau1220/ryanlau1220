@@ -176,7 +176,13 @@ function useRealtimeGuestbook(
   }, [isOpen, onEntry, realtime]);
 }
 
-export function Guestbook({ initiallyOpen = false }: { initiallyOpen?: boolean }) {
+export function Guestbook({
+  initiallyOpen = false,
+  onClose,
+}: {
+  initiallyOpen?: boolean;
+  onClose?: () => void;
+}) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
@@ -296,6 +302,7 @@ export function Guestbook({ initiallyOpen = false }: { initiallyOpen?: boolean }
     setIsOpen(false);
     setNotice(null);
     setError(null);
+    onClose?.();
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

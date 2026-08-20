@@ -87,7 +87,7 @@ export function GuestbookLauncher() {
         />
       }
     >
-      <Guestbook initiallyOpen />
+      <Guestbook initiallyOpen onClose={() => setHasLoadedGuestbook(false)} />
     </Suspense>
   );
 }
