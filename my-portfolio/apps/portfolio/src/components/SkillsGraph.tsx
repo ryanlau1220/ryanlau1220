@@ -132,6 +132,8 @@ export function SkillsGraph({
     // Setup force simulation
     const simulation = d3Force
       .forceSimulation<D3Node>(d3Nodes)
+      .alphaDecay(0.06)
+      .velocityDecay(0.55)
       .force(
         "link",
         d3Force
@@ -150,10 +152,14 @@ export function SkillsGraph({
       .force("y", d3Force.forceY(0).strength(0.06))
       .force(
         "collision",
-        d3Force.forceCollide<D3Node>().radius((d) => {
-          const baseRadius = d.type === "domain" ? 24 : 14;
-          return baseRadius + Math.sqrt(d.linkCount) * 3 + 12;
-        }),
+        d3Force
+          .forceCollide<D3Node>()
+          .radius((d) => {
+            const baseRadius = d.type === "domain" ? 24 : 14;
+            return baseRadius + Math.sqrt(d.linkCount) * 3 + 12;
+          })
+          .strength(1)
+          .iterations(2),
       );
 
     simulationRef.current = simulation;
