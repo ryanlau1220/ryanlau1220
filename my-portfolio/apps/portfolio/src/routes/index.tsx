@@ -14,8 +14,8 @@ import {
   Mail,
   MapPin,
   Maximize2,
-  Pin,
   Phone,
+  Pin,
   Play,
   X,
 } from "lucide-react";
