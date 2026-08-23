@@ -867,6 +867,7 @@ export const PROFILE = {
     socialDescription:
       "Software Engineering student specializing in DevOps, AI automation, and secure Backend architectures.",
     siteUrl: "https://portfolio.ryanlau1220.workers.dev",
+    socialImageUrl: "https://portfolio.ryanlau1220.workers.dev/images/portfolio-preview.png",
   },
 } as const;
 

@@ -23,16 +23,22 @@ export const Route = createRootRoute({
         content: PROFILE.seo.socialDescription,
       },
       { property: "og:url", content: PROFILE.seo.siteUrl },
+      { property: "og:image", content: PROFILE.seo.socialImageUrl },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:type", content: "image/png" },
       // Twitter Card
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: PROFILE.seo.title },
       {
         name: "twitter:description",
         content: PROFILE.seo.socialDescription,
       },
+      { name: "twitter:image", content: PROFILE.seo.socialImageUrl },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "canonical", href: PROFILE.seo.siteUrl },
       {
         rel: "preload",
         href: "/fonts/geist-latin.woff2",
