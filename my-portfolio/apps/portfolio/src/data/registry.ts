@@ -106,6 +106,7 @@ export const PROJECTS: Project[] = [
       "Connected a Cytoscape investigation UI to a Go ConnectRPC API, Protocol Buffers, and PostgreSQL with Apache AGE.",
     ],
     githubUrl: "https://github.com/ryanlau1220/OpenChain",
+    demoUrl: "https://openchain.duckdns.org/",
     domains: ["Backend", "Data & Databases"],
     technologies: [
       "React",
