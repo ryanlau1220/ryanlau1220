@@ -52,3 +52,13 @@
 ```
 
     
+
+---
+
+![](./4-productive-time.svg)
+
+```
+![](https://raw.githubusercontent.com/ryanlau1220/ryanlau1220/main/profile-summary-card-output/codeSTACKr/4-productive-time.svg)
+```
+
+    
