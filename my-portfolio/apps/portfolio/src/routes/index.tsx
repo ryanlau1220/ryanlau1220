@@ -365,13 +365,20 @@ function PortfolioHome() {
                 <p key={paragraph}>{paragraph}</p>
               ))}
 
-              <div className="pt-4">
+              <div className="pt-4 flex flex-wrap gap-2.5">
                 <a
                   href={PROFILE.resumePath}
-                  download
                   target="_blank"
                   className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink size={14} />
+                  <span>View Resume</span>
+                </a>
+                <a
+                  href={PROFILE.resumePath}
+                  download="Ryan Lau_Resume.pdf"
+                  className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-700 dark:text-neutral-300 rounded-lg transition-colors font-semibold shadow-sm"
                 >
                   <Download size={14} />
                   <span>Download Resume</span>

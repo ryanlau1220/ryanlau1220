@@ -5,6 +5,10 @@
   "compatibility_flags": ["nodejs_compat"],
   // Local secrets belong in .dev.vars; production setup is documented in SETUP.md.
   "main": "./src/server.ts",
+  // Lets src/routes/resume.ts read public/ files; the Vite plugin fills in the directory.
+  "assets": {
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "VISITOR_LOG_DB",

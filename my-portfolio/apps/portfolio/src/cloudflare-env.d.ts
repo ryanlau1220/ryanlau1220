@@ -11,6 +11,7 @@ interface GuestbookD1Database {
 
 declare module "cloudflare:workers" {
   export const env: {
+    ASSETS?: { fetch(request: Request | URL | string): Promise<Response> };
     VISITOR_LOG_DB?: GuestbookD1Database;
     TURNSTILE_SITE_KEY?: string;
     TURNSTILE_SECRET_KEY?: string;

@@ -1,0 +1,3 @@
+# Keep the original file name when visitors save the resume served at /resume.
+/resume
+  Content-Disposition: inline; filename="Ryan Lau_Resume.pdf"

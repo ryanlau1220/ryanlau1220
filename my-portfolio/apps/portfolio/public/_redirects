@@ -1,0 +1,2 @@
+# Serve the resume at a clean URL without renaming the file (200 = rewrite, URL stays /resume).
+/resume /Ryan%20Lau_Resume.pdf 200

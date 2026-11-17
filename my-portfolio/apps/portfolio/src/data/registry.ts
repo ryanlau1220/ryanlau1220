@@ -725,7 +725,7 @@ export const PROJECTS: Project[] = [
 export const EXPERIENCES: Experience[] = [
   {
     id: "edu-bsc",
-    role: "BS in Software Engineering",
+    role: "BSc (Hons) Software Engineering",
     company: "Asia Pacific University (APU)",
     period: "Feb 2026 – Present",
     description:
@@ -1296,7 +1296,7 @@ export const PROFILE = {
     "I am a Software Engineering student who enjoys learning new technologies and turning ideas into reliable, practical systems. I focus on clear architecture, thoughtful safeguards, and solving real problems.",
     "My recent work explores AI agents, backend security, blockchain, and human-centered automation, from controlled infrastructure tools to mobile apps and scientific data experiences.",
   ],
-  resumePath: "/Ryan Lau_Resume.pdf",
+  resumePath: "/resume",
   contact: {
     email: "liujunhong20@gmail.com",
     phone: "+601110768752",
