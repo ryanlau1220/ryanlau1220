@@ -20,6 +20,7 @@ test("opens and closes the project preview with keyboard support", async ({ page
   await openHome(page);
   await page.locator("#projects").scrollIntoViewIfNeeded();
 
+  await page.getByRole("button", { name: "Pinned", exact: true }).click();
   await page.getByRole("button", { name: "Expand APU-ASC screenshot" }).click();
   const dialog = page.locator('dialog[aria-labelledby="expanded-screenshot-title"][open]');
   await expect(dialog).toBeVisible();
@@ -31,7 +32,7 @@ test("opens and closes the project preview with keyboard support", async ({ page
   await expect(dialog).toHaveCount(0);
 });
 
-test("filters the carousel to pinned open-source projects", async ({ page }, testInfo) => {
+test("filters the carousel to the selected pinned projects", async ({ page }, testInfo) => {
   await openHome(page);
   await page.locator("#projects").scrollIntoViewIfNeeded();
 
@@ -41,7 +42,27 @@ test("filters the carousel to pinned open-source projects", async ({ page }, tes
     ? page.getByRole("button", { name: "Next", exact: true })
     : page.getByRole("button", { name: "Next project" });
   await nextButton.click();
-  await expect(page.getByRole("heading", { level: 3, name: "OpenChain" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "GammaShield" })).toBeVisible();
+  await nextButton.click();
+  await expect(page.getByRole("heading", { level: 3, name: "Nexus Net" })).toBeVisible();
+  await nextButton.click();
+  await expect(page.getByRole("heading", { level: 3, name: "PromptPlay" })).toBeVisible();
+  await nextButton.click();
+  await expect(page.getByRole("heading", { level: 3, name: "APU-ASC" })).toBeVisible();
+});
+
+test("orders projects by recency and offers the event filter", async ({ page }, testInfo) => {
+  await openHome(page);
+  const projects = page.locator("#projects");
+  await expect(projects.getByRole("heading", { level: 3, name: "Analog Blindspot" })).toBeVisible();
+  const nextButton = testInfo.project.name.startsWith("mobile")
+    ? projects.getByRole("button", { name: "Next", exact: true })
+    : projects.getByRole("button", { name: "Next project" });
+  await nextButton.click();
+  await expect(projects.getByRole("heading", { level: 3, name: "PromptPlay" })).toBeVisible();
+  await projects.getByRole("button", { name: "Events", exact: true }).click();
+  await expect(projects.getByRole("heading", { level: 3, name: "Analog Blindspot" })).toBeVisible();
+  await expect(projects.getByRole("button", { name: "Open Source", exact: true })).toHaveCount(0);
 });
 
 test("opens the guestbook without requiring a submission", async ({ page }) => {

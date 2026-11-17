@@ -30,6 +30,14 @@ const SkillsGraph = lazy(() =>
 const PROJECT_IMAGE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   "apu-asc": { width: 1920, height: 947 },
   openchain: { width: 1920, height: 947 },
+  gammashield: { width: 1440, height: 900 },
+  "nexus-net": { width: 1440, height: 900 },
+  trustrun: { width: 1440, height: 900 },
+  "wake-me-up": { width: 1280, height: 720 },
+  promptplay: { width: 1440, height: 900 },
+  buildforward: { width: 1440, height: 900 },
+  "quora-chat": { width: 1919, height: 948 },
+  "analog-blindspot": { width: 1440, height: 900 },
   "llm-wiki": { width: 1920, height: 947 },
   ledgertrace: { width: 1920, height: 947 },
   umhackathon: { width: 1279, height: 1079 },
@@ -80,9 +88,9 @@ function PortfolioHome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeImage, setActiveImage] = useState<{ src: string; alt: string } | null>(null);
   const [shouldLoadSkills, setShouldLoadSkills] = useState(false);
-  const [projectFilter, setProjectFilter] = useState<
-    "all" | "pinned" | "open-source" | "hackathon" | "internship"
-  >("all");
+  const [projectFilter, setProjectFilter] = useState<"all" | "pinned" | "hackathon" | "internship">(
+    "all",
+  );
   const [currentProjectIdx, setCurrentProjectIdx] = useState(0);
   const [timelineFocusRequest, setTimelineFocusRequest] = useState<{
     id: string;
@@ -204,7 +212,7 @@ function PortfolioHome() {
   const filteredProjects = useMemo(() => {
     let list = PROJECTS;
     if (projectFilter === "pinned") {
-      list = list.filter((project) => project.pinned);
+      list = list.filter((project) => project.pinned).sort((a, b) => a.pinned! - b.pinned!);
     } else if (projectFilter !== "all") {
       list = list.filter((p) => p.category === projectFilter);
     }
@@ -407,16 +415,13 @@ function PortfolioHome() {
             { id: "pinned", label: "Pinned" },
             { id: "all", label: "All Projects" },
             { id: "internship", label: "Internships" },
-            { id: "hackathon", label: "Hackathons" },
-            { id: "open-source", label: "Open Source" },
+            { id: "hackathon", label: "Events" },
           ].map((filter) => (
             <button
               key={filter.id}
               type="button"
               onClick={() =>
-                setProjectFilter(
-                  filter.id as "all" | "pinned" | "open-source" | "hackathon" | "internship",
-                )
+                setProjectFilter(filter.id as "all" | "pinned" | "hackathon" | "internship")
               }
               className={`inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
                 projectFilter === filter.id
@@ -518,7 +523,7 @@ function PortfolioHome() {
                     <div
                       className={`w-full ${hasImage ? "p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
                     >
-                      {!hasImage && (
+                      {!hasImage && project.category === "internship" && (
                         <span className="inline-flex w-fit rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300">
                           Internship work · Product visuals confidential
                         </span>
