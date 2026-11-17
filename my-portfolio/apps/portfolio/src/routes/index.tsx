@@ -316,7 +316,7 @@ function PortfolioHome() {
         className="hero-scene relative min-h-[85vh] flex items-center justify-center py-20 px-6 bg-grid overflow-hidden border-b border-neutral-100 dark:border-neutral-900"
       >
         <div className="max-w-3xl mx-auto text-center space-y-6 relative z-10 select-text">
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
+          <h1 className="whitespace-nowrap text-[clamp(1.5rem,0.5rem+6.7vw,2.25rem)] sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
             <RevealText text={PROFILE.name} startDelay={1100} />
           </h1>
 

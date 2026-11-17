@@ -16,6 +16,30 @@ test("serves the home page with the expected security headers", async ({ page })
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Ryan Lau Jun Hong");
 });
 
+test("hero name stays on one line without clipping at phone widths", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const heading = page.getByRole("heading", { level: 1, name: "Ryan Lau Jun Hong" });
+  for (const width of [320, 375, 425]) {
+    await page.setViewportSize({ width, height: 844 });
+    const result = await heading.evaluate((element) => {
+      const words = Array.from(element.querySelectorAll(".reveal-word"));
+      const boxes = words.map((word) => word.getBoundingClientRect());
+      const bounds = element.getBoundingClientRect();
+      return {
+        lines: new Set(boxes.map((box) => Math.round(box.top))).size,
+        first: boxes[0]?.left ?? 0,
+        last: boxes.at(-1)?.right ?? 0,
+        left: bounds.left,
+        right: bounds.right,
+      };
+    });
+    expect(result.lines).toBe(1);
+    expect(result.first).toBeGreaterThanOrEqual(result.left - 1);
+    expect(result.last).toBeLessThanOrEqual(result.right + 1);
+  }
+});
+
 test("opens and closes the project preview with keyboard support", async ({ page }) => {
   await openHome(page);
   await page.locator("#projects").scrollIntoViewIfNeeded();
