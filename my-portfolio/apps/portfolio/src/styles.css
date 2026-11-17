@@ -173,17 +173,205 @@ html {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
-    animation-duration: 0.01ms !important;
-    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
-    animation-iteration-count: 1 !important;
-    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
-    scroll-behavior: auto !important;
-    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
-    transition-duration: 0.01ms !important;
+/* Fixed liquid field is shared by every section, behind content and controls. */
+.portfolio-scene {
+  position: relative;
+  isolation: isolate;
+}
+.liquid-background {
+  --pointer-x: 50%;
+  --pointer-y: 48%;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+.liquid-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.liquid-field {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.62;
+  filter: url(#liquid-displacement) blur(26px);
+  background:
+    radial-gradient(ellipse at 32% 52%, #60a5fa55, transparent 25%),
+    radial-gradient(ellipse at 67% 44%, #2dd4bf42, transparent 27%),
+    radial-gradient(ellipse at 50% 72%, #818cf83b, transparent 27%);
+  animation: liquid-drift 16s ease-in-out infinite alternate;
+}
+.liquid-pointer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 240px at var(--pointer-x) var(--pointer-y),
+    #3b82f64a,
+    transparent 75%
+  );
+}
+[data-theme="dark"] .liquid-field {
+  opacity: 0.85;
+}
+[data-theme="dark"] .liquid-pointer {
+  background: radial-gradient(
+    circle 260px at var(--pointer-x) var(--pointer-y),
+    #38bdf84d,
+    transparent 75%
+  );
+}
+@keyframes liquid-drift {
+  from {
+    transform: translate3d(-3%, 2%, 0) rotate(-4deg) scale(1);
+  }
+  to {
+    transform: translate3d(3%, -2%, 0) rotate(5deg) scale(1.1);
+  }
+}
+
+/* One project card sits in front of its two angled neighbors. */
+.project-orbit {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  perspective: 1200px;
+  touch-action: pan-y;
+}
+.orbit-active {
+  position: relative;
+  z-index: 2;
+}
+.orbit-neighbor {
+  position: absolute;
+  z-index: 3;
+  top: 15%;
+  width: 5%;
+  min-width: 18px;
+  height: 70%;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  background: var(--bg-secondary);
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s;
+}
+.orbit-neighbor:hover {
+  opacity: 0.85;
+}
+.orbit-neighbor-before {
+  left: -2%;
+  transform: perspective(900px) rotateY(22deg);
+}
+.orbit-neighbor-after {
+  right: -2%;
+  transform: perspective(900px) rotateY(-22deg);
+}
+.orbit-neighbor img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.project-detail-card {
+  animation: project-arrive 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.project-title-reveal {
+  display: inline;
+}
+.project-title-reveal span {
+  display: inline-block;
+  animation: character-arrive 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes project-arrive {
+  from {
+    opacity: 0.45;
+    transform: perspective(1100px) translateX(45px) rotateY(-7deg) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes character-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(0.65em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 47.999rem) {
+  .orbit-neighbor {
+    display: none;
+  }
+}
+
+/* Scene movement follows scrolling when view timelines are supported. */
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  .scene-section {
+    animation: scene-enter auto linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 85%;
+  }
+  #skills.scene-section {
+    animation-name: scene-fade;
+  }
+  .project-scene {
+    animation-name: scene-stack;
+    transform-origin: center top;
+  }
+  .project-detail-stage {
+    animation: stage-expand auto linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 85%;
+  }
+}
+.project-scene {
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+}
+@keyframes scene-fade {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scene-enter {
+  from {
+    opacity: 0.4;
+    transform: translateY(110px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes scene-stack {
+  from {
+    opacity: 0.55;
+    transform: translateY(130px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes stage-expand {
+  from {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
