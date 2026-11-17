@@ -48,6 +48,8 @@ test("filters the carousel to the selected pinned projects", async ({ page }, te
   await nextButton.click();
   await expect(page.getByRole("heading", { level: 3, name: "PromptPlay" })).toBeVisible();
   await nextButton.click();
+  await expect(page.getByRole("heading", { level: 3, name: "Grocerly" })).toBeVisible();
+  await nextButton.click();
   await expect(page.getByRole("heading", { level: 3, name: "APU-ASC" })).toBeVisible();
 });
 

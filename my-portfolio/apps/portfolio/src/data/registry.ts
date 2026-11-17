@@ -1,6 +1,6 @@
 export interface Project {
   id: string;
-  category: "open-source" | "hackathon" | "internship";
+  category: "open-source" | "hackathon" | "internship" | "coursework";
   title: string;
   subtitle: string;
   description: string;
@@ -107,6 +107,42 @@ export const PROJECTS: Project[] = [
     imageUrl: "/projects/promptplay/image.png",
     previewImageUrl: "/projects/promptplay/preview.webp",
     mobilePreviewImageUrl: "/projects/promptplay/preview-mobile.webp",
+  },
+  {
+    id: "grocerly",
+    category: "coursework",
+    title: "Grocerly",
+    subtitle: "Grocerly App",
+    description:
+      "A Flutter and Firebase grocery platform for customers, store staff, and administrators.",
+    achievements: [
+      "Contributed grocery list scanning, order workflows, and backend functions for checkout and stock handling.",
+      "Built simulated wallet, notification, and recipe suggestion features within the shared app.",
+      "Added Firebase emulator and Patrol journey tests, plus CI/CD for the admin web app and Android release.",
+    ],
+    githubUrl: "https://github.com/jasonwong1025/mae_assignment",
+    demoUrl: "https://mae-assignment-grocerly.web.app/",
+    domains: ["Backend", "Mobile Development", "DevOps"],
+    technologies: [
+      "Flutter",
+      "Dart",
+      "Firebase",
+      "Firestore",
+      "Firebase Cloud Functions",
+      "Firebase Hosting",
+      "Riverpod",
+      "Gemini",
+      "ML Kit OCR",
+      "Patrol",
+      "FVM",
+      "Mason",
+      "GitHub Actions",
+    ],
+    featuredTechnologies: ["FVM", "Patrol", "Riverpod", "Mason", "Firebase"],
+    pinned: 5,
+    imageUrl: "/projects/grocerly/image.png",
+    previewImageUrl: "/projects/grocerly/preview.webp",
+    mobilePreviewImageUrl: "/projects/grocerly/preview-mobile.webp",
   },
   {
     id: "nexus-net",
@@ -697,6 +733,8 @@ export const EXPERIENCES: Experience[] = [
     achievements: [
       "Deepening core engineering concepts in distributed ledger databases.",
       "Analyzing network protocols and low-latency system architectures.",
+      "Applied C++ data structures, sorting, and searching to patient records and parcel management assignments.",
+      "Developed mobile and backend workflows with Flutter and Firebase through the Grocerly team assignment.",
     ],
     domains: ["Education"],
     technologies: [
@@ -704,6 +742,13 @@ export const EXPERIENCES: Experience[] = [
       "ERP Systems",
       "System Development Methods",
       "Requirements Engineering",
+      "Data Structures & Algorithms",
+      "Flutter",
+      "Workplace Communication Skills",
+      "Software Architecture",
+      "Software Testing",
+      "Research Methods",
+      "UML Diagrams",
     ],
     sortKey: 202602,
   },
@@ -1052,6 +1097,7 @@ export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
 export const TECHNOLOGY_CATEGORIES = {
   TypeScript: "Programming Languages",
   Go: "Programming Languages",
+  "C++": "Programming Languages",
   Dart: "Programming Languages",
   Python: "Programming Languages",
   Java: "Programming Languages",
@@ -1067,6 +1113,7 @@ export const TECHNOLOGY_CATEGORIES = {
 
   React: "Frontend Development",
   "React Native": "Frontend Development",
+  Riverpod: "Frontend Development",
   Android: "Frontend Development",
   "Three.js": "Frontend Development",
   Zustand: "Frontend Development",
@@ -1103,6 +1150,7 @@ export const TECHNOLOGY_CATEGORIES = {
   ConnectRPC: "Backend & APIs",
   "Protocol Buffers": "Backend & APIs",
   Firebase: "Backend & APIs",
+  "Firebase Cloud Functions": "Backend & APIs",
   Genkit: "Backend & APIs",
   Prisma: "Backend & APIs",
   GORM: "Backend & APIs",
@@ -1159,6 +1207,7 @@ export const TECHNOLOGY_CATEGORIES = {
   Linux: "Cloud & DevOps",
   Bubblewrap: "Cloud & DevOps",
   "Cloudflare Workers": "Cloud & DevOps",
+  "Firebase Hosting": "Cloud & DevOps",
   Replit: "Cloud & DevOps",
   "Docker Compose": "Cloud & DevOps",
   "Google Cloud": "Cloud & DevOps",
@@ -1177,6 +1226,14 @@ export const TECHNOLOGY_CATEGORIES = {
 
   RAG: "Architecture & Concepts",
   "ERC-4337": "Architecture & Concepts",
+  "Data Structures & Algorithms": "Architecture & Concepts",
+  "Workplace Communication Skills": "Architecture & Concepts",
+  "Software Architecture": "Architecture & Concepts",
+  "Software Testing": "Architecture & Concepts",
+  "Research Methods": "Architecture & Concepts",
+  "UML Diagrams": "Architecture & Concepts",
+  "Binary Search Trees": "Architecture & Concepts",
+  "Algorithm Analysis": "Architecture & Concepts",
   "Base Network": "Architecture & Concepts",
   "NEP-413": "Architecture & Concepts",
   Gamification: "Architecture & Concepts",
@@ -1203,6 +1260,8 @@ export const TECHNOLOGY_CATEGORIES = {
   Flyway: "Architecture & Concepts",
 
   Vitest: "Observability & Tools",
+  FVM: "Observability & Tools",
+  Mason: "Observability & Tools",
   Foundry: "Observability & Tools",
   Turborepo: "Observability & Tools",
   Obsidian: "Observability & Tools",
@@ -1217,6 +1276,7 @@ export const TECHNOLOGY_CATEGORIES = {
   MT5: "Observability & Tools",
   Biome: "Observability & Tools",
   Playwright: "Observability & Tools",
+  Patrol: "Observability & Tools",
   OpenTelemetry: "Observability & Tools",
   Grafana: "Observability & Tools",
   Prometheus: "Observability & Tools",

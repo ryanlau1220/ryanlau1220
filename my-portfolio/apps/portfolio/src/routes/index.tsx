@@ -38,6 +38,7 @@ const PROJECT_IMAGE_DIMENSIONS: Record<string, { width: number; height: number }
   buildforward: { width: 1440, height: 900 },
   "quora-chat": { width: 1919, height: 948 },
   "analog-blindspot": { width: 1440, height: 900 },
+  grocerly: { width: 1080, height: 2250 },
   "llm-wiki": { width: 1920, height: 947 },
   ledgertrace: { width: 1920, height: 947 },
   umhackathon: { width: 1279, height: 1079 },
@@ -489,7 +490,7 @@ function PortfolioHome() {
                             alt: `${project.title} product screenshot`,
                           })
                         }
-                        className="relative min-h-[260px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-white to-blue-50/70 p-3 text-left dark:from-black dark:via-neutral-950 dark:to-blue-950/20 sm:min-h-[320px] sm:p-4 md:flex md:min-h-full md:items-center md:justify-center md:p-5"
+                        className="relative h-[260px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-white to-blue-50/70 text-left dark:from-black dark:via-neutral-950 dark:to-blue-950/20 sm:h-[320px] md:h-auto md:min-h-[320px]"
                         aria-label={`Expand ${project.title} screenshot`}
                       >
                         <span
@@ -499,7 +500,7 @@ function PortfolioHome() {
                         <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                           Project preview
                         </span>
-                        <picture className="relative z-10 h-full w-full">
+                        <picture className="absolute inset-0 z-10 h-full w-full p-3 sm:p-4 md:p-5">
                           <source
                             media="(max-width: 639px)"
                             srcSet={getMobileProjectPreviewUrl(project)}
@@ -929,20 +930,20 @@ function PortfolioHome() {
             onClick={() => setActiveImage(null)}
             aria-label="Close expanded screenshot by clicking outside"
           />
-          <div className="relative flex max-h-full w-full max-w-7xl items-center justify-center">
+          <div className="pointer-events-none relative flex max-h-full w-full max-w-7xl items-center justify-center">
             <p id="expanded-screenshot-title" className="sr-only">
               {activeImage.alt}
             </p>
             <img
               src={activeImage.src}
               alt={activeImage.alt}
-              className="max-h-[88vh] w-auto max-w-full rounded-xl border border-white/15 bg-neutral-950 object-contain shadow-2xl"
+              className="pointer-events-auto max-h-[88vh] w-auto max-w-full rounded-xl border border-white/15 bg-neutral-950 object-contain shadow-2xl"
             />
             <button
               ref={imageCloseButtonRef}
               type="button"
               onClick={() => setActiveImage(null)}
-              className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+              className="pointer-events-auto absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
               aria-label="Close expanded screenshot"
             >
               <X size={18} aria-hidden="true" />
