@@ -105,3 +105,25 @@ test("a vertical touch gesture does not change the project", async ({ page }, te
   });
   await expect(page.getByRole("heading", { name: "Analog Blindspot", level: 3 })).toBeVisible();
 });
+
+test("landing matrix clears and heading letters reveal without changing accessible text", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  const reveal = page.locator(".landing-reveal");
+  await expect(reveal).toHaveAttribute("aria-hidden", "true");
+  await expect(page.getByRole("heading", { level: 1, name: "Ryan Lau Jun Hong" })).toBeVisible();
+  await expect(page.locator("h1 .reveal-text")).toHaveAttribute("data-revealed", "true");
+  await expect(reveal).toHaveCSS("visibility", "hidden");
+  if (testInfo.project.name.startsWith("mobile")) {
+    await page.getByRole("button", { name: "Open navigation menu" }).click();
+    await page
+      .locator("#mobile-navigation")
+      .getByRole("link", { name: "Projects", exact: true })
+      .click();
+  } else {
+    await page.locator("header nav").getByRole("link", { name: "Projects", exact: true }).click();
+  }
+  const projectsHeading = page.getByRole("heading", { level: 2, name: "Featured Projects" });
+  await expect(projectsHeading.locator(".reveal-text")).toHaveAttribute("data-revealed", "true");
+});

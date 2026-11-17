@@ -299,7 +299,7 @@ html {
 @keyframes character-arrive {
   from {
     opacity: 0;
-    transform: translateY(0.65em);
+    transform: translateY(-0.65em);
   }
   to {
     opacity: 1;
@@ -373,5 +373,74 @@ html {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* A temporary field of characters dissolves to reveal the landing page. */
+.landing-reveal {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg-primary);
+  pointer-events: none;
+  animation: landing-clear 1.8s ease-in-out both;
+}
+.landing-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(48, minmax(0, 1fr));
+  height: 100%;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: 500 8px / 1.35 var(--font-mono);
+  opacity: 0.75;
+}
+.landing-reveal-grid span {
+  white-space: pre;
+  animation: landing-scatter 1.25s cubic-bezier(0.55, 0, 0.8, 0.5) both;
+}
+@keyframes landing-scatter {
+  0%,
+  25% {
+    opacity: 1;
+    transform: translateY(-4%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30%);
+  }
+}
+@keyframes landing-clear {
+  0%,
+  40% {
+    opacity: 1;
+    visibility: visible;
+  }
+  99% {
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.reveal-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.reveal-glyph {
+  display: inline-block;
+}
+.reveal-text[data-revealed="true"] .reveal-glyph {
+  animation: reveal-character 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes reveal-character {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

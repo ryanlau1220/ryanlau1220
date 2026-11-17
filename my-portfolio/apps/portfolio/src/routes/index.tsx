@@ -20,8 +20,10 @@ import {
   X,
 } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { LandingReveal } from "../components/LandingReveal";
 import { LiquidBackground } from "../components/LiquidBackground";
 import { ProjectOrbit } from "../components/ProjectOrbit";
+import { RevealText } from "../components/RevealText";
 import { Timeline } from "../components/Timeline";
 import { CERTIFICATIONS, EVENTS, EXPERIENCES, PROFILE, PROJECTS } from "../data/registry";
 import { getMobileProjectPreviewUrl, getProjectPreviewUrl } from "../project-images";
@@ -315,6 +317,7 @@ function PortfolioHome() {
   return (
     <div className="portfolio-scene w-full">
       <LiquidBackground />
+      <LandingReveal />
       <DevelopmentErrorBoundaryTrigger />
       {/* 1. HERO SECTION */}
       <section
@@ -323,11 +326,11 @@ function PortfolioHome() {
       >
         <div className="max-w-3xl mx-auto text-center space-y-6 relative z-10 select-text">
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-none">
-            {PROFILE.name}
+            <RevealText text={PROFILE.name} startDelay={1100} />
           </h1>
 
           <p className="text-lg sm:text-xl font-medium text-neutral-600 dark:text-neutral-400 font-mono">
-            {PROFILE.role}
+            <RevealText text={PROFILE.role} startDelay={1300} />
           </p>
 
           <p className="max-w-lg mx-auto text-sm sm:text-base text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans">
@@ -363,7 +366,7 @@ function PortfolioHome() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
             <div>
               <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2 font-sans">
-                Who I Am
+                <RevealText text="Who I Am" />
               </h2>
             </div>
             <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
@@ -397,7 +400,7 @@ function PortfolioHome() {
         <div className="scene-inner">
           <div className="text-center space-y-3 mb-10">
             <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-              Skill Connections
+              <RevealText text="Skill Connections" />
             </h2>
           </div>
 
@@ -439,7 +442,7 @@ function PortfolioHome() {
         <div className="scene-inner">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
-              Featured Projects
+              <RevealText text="Featured Projects" />
             </h2>
           </div>
 
@@ -766,7 +769,7 @@ function PortfolioHome() {
         <div className="scene-inner">
           <div className="text-center space-y-3 mb-12">
             <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-              Education &amp; Experience
+              <RevealText text="Education & Experience" />
             </h2>
           </div>
 
@@ -782,7 +785,7 @@ function PortfolioHome() {
         <div className="scene-inner">
           <div className="text-center space-y-3 mb-12">
             <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-              Credentials &amp; Certifications
+              <RevealText text="Credentials & Certifications" />
             </h2>
           </div>
 
@@ -841,7 +844,7 @@ function PortfolioHome() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div>
               <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
-                Let's Connect
+                <RevealText text="Let's Connect" />
               </h2>
               <p className="text-xs text-neutral-500 mt-2">
                 Have a question or looking to recruit? Drop me an email directly or submit the
