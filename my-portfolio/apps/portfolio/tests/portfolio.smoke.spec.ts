@@ -79,8 +79,9 @@ test("opens the guestbook without requiring a submission", async ({ page }) => {
 });
 
 test("renders a helpful 404 recovery page", async ({ page }) => {
-  await page.goto("/this-page-does-not-exist");
+  const response = await page.goto("/this-page-does-not-exist");
 
+  expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1, name: "Page not found." })).toBeVisible();
   await expect(page.getByAltText("Friendly Ciallo illustration")).toBeVisible();
   await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
@@ -90,8 +91,27 @@ test("renders the error boundary through the development trigger", async ({ page
   await page.goto("/?__errorBoundary=1");
 
   await expect(page.getByRole("heading", { level: 1, name: "A small hiccup." })).toBeVisible();
+  await expect(page.locator("header")).toBeVisible();
+  await expect(page.locator("footer")).toContainText("Ryan Lau Jun Hong");
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/favicon.svg");
+  await expect(page.getByAltText("Friendly Ciallo illustration")).toBeVisible();
   await page.getByRole("button", { name: "Try again" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Ryan Lau Jun Hong" })).toBeVisible();
+});
+
+test("shows recovery artwork at the same size as the 404 page on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/missing-page");
+  const image = page.getByAltText("Friendly Ciallo illustration");
+  const notFoundSize = await image.boundingBox();
+  await page.goto("/?__errorBoundary=1");
+  await expect(page.getByRole("heading", { name: "A small hiccup." })).toBeVisible();
+  await expect(image).toBeVisible();
+  const errorSize = await image.boundingBox();
+  expect(notFoundSize).not.toBeNull();
+  expect(errorSize).not.toBeNull();
+  expect(errorSize?.height).toBeCloseTo(notFoundSize?.height ?? 0, 0);
+  expect(errorSize?.height).toBeGreaterThan(200);
 });
 
 test("opens mobile navigation and exposes navigation links", async ({ page }, testInfo) => {

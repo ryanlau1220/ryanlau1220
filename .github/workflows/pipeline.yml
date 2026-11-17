@@ -5,12 +5,12 @@ on:
     branches: [main]
     paths:
       - "my-portfolio/**"
-      - ".github/workflows/portfolio-deploy.yml"
+      - ".github/workflows/pipeline.yml"
   push:
     branches: [main]
     paths:
       - "my-portfolio/**"
-      - ".github/workflows/portfolio-deploy.yml"
+      - ".github/workflows/pipeline.yml"
   workflow_dispatch:
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint, type-check, and build
+      - name: Lint, type-check, test, and build
         run: pnpm run check
 
       - name: Install Playwright browser
@@ -54,6 +54,7 @@ jobs:
 
       - name: Run browser smoke tests
         run: pnpm --filter portfolio-app exec playwright test
+
       - name: Upload browser test results
         if: failure()
         uses: actions/upload-artifact@v6

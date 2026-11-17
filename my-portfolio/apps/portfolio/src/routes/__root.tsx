@@ -75,7 +75,8 @@ export const Route = createRootRoute({
         : []),
     ],
   }),
-  component: RootComponent,
+  shellComponent: RootShell,
+  component: Outlet,
   errorComponent: RootErrorComponent,
   notFoundComponent: NotFoundComponent,
 });
@@ -129,17 +130,18 @@ function RootErrorComponent({ reset }: { reset: () => void }) {
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       url.searchParams.delete("__errorBoundary");
+      url.searchParams.delete("__routeError");
       window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
     }
     reset();
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-9rem)] max-w-5xl items-center px-6 py-16">
+    <div className="mx-auto flex min-h-[calc(100dvh-9rem)] max-w-4xl items-center px-6 py-4 max-sm:max-[700px]:py-2 sm:py-16">
       <section className="grid w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 md:grid-cols-[1.05fr_0.95fr]">
-        <div className="flex flex-col justify-center p-8 sm:p-12">
+        <div className="flex flex-col justify-center p-6 max-sm:max-[700px]:p-4 sm:p-12">
           <p className="text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
-            System recovery
+            500 ·System recovery
           </p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-neutral-950 dark:text-white sm:text-4xl">
             A small hiccup.
@@ -172,24 +174,21 @@ function RootErrorComponent({ reset }: { reset: () => void }) {
   );
 }
 
-function RootComponent() {
+function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
-        <RootLayout />
-        {/* {process.env.NODE_ENV === 'development' && (
-          <TanStackRouterDevtools position="bottom-right" />
-        )} */}
+        <RootLayout>{children}</RootLayout>
         <Scripts />
       </body>
     </html>
   );
 }
 
-function RootLayout() {
+function RootLayout({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [activeHash, setActiveHash] = useState("#home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -439,7 +438,7 @@ function RootLayout() {
 
       {/* Main Outlet */}
       <main id="main-content" className="flex-1" tabIndex={-1}>
-        <Outlet />
+        {children}
       </main>
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">

@@ -62,6 +62,11 @@ function getMobileProjectPreviewUrl(project: (typeof PROJECTS)[number]) {
 }
 
 export const Route = createFileRoute("/")({
+  beforeLoad: ({ location }) => {
+    if (import.meta.env.DEV && new URLSearchParams(location.searchStr).has("__routeError")) {
+      throw new Error("Simulated route loading failure");
+    }
+  },
   component: PortfolioHome,
 });
 
