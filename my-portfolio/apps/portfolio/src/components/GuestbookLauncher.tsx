@@ -1,5 +1,5 @@
 import { MessageSquarePlus } from "lucide-react";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 const GUESTBOOK_SEEN_STORAGE_KEY = "portfolio:guestbook-seen:v1";
 

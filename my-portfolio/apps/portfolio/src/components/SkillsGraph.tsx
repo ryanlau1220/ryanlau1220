@@ -8,6 +8,7 @@ import {
   SKILL_CATEGORIES,
   TECHNOLOGY_CATEGORIES,
 } from "../data/registry";
+
 interface D3Node extends d3Force.SimulationNodeDatum {
   id: string;
   name: string;
@@ -309,7 +310,7 @@ export function SkillsGraph({
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
-    if (!selectedNode || selectedNode.type !== "domain") return [];
+    if (selectedNode?.type !== "domain") return [];
     return Object.entries(techMap)
       .filter(([, cat]) => cat === selectedNode.id)
       .map(([tech]) => tech)
@@ -487,6 +488,7 @@ export function SkillsGraph({
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Tracks pointer movement for dragging graph nodes.
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
@@ -551,6 +553,7 @@ export function SkillsGraph({
       {/* Main graph viewport / list */}
       <div className="flex-1 min-h-0 relative bg-neutral-50/50 dark:bg-neutral-950/20 rounded-b-xl">
         {viewMode === "graph" ? (
+          // biome-ignore lint/a11y/noStaticElementInteractions: Ends graph dragging when the pointer is released or leaves.
           <div
             className="w-full h-[450px] sm:h-[500px] relative overflow-hidden select-none"
             onMouseUp={handleMouseUpOrLeave}
@@ -595,6 +598,7 @@ export function SkillsGraph({
                         : 10 + Math.sqrt(node.linkCount) * 1.5;
 
                     return (
+                      // biome-ignore lint/a11y/useSemanticElements: SVG nodes cannot be HTML buttons.
                       <g
                         key={node.id}
                         transform={`translate(${node.x}, ${node.y})`}
@@ -615,6 +619,7 @@ export function SkillsGraph({
                         onMouseEnter={() => setHoveredNodeId(node.id)}
                         onMouseLeave={() => setHoveredNodeId(null)}
                         tabIndex={0}
+                        role="button"
                         aria-label={`${node.name}, ${node.type === "domain" ? "skill domain" : "technology"}`}
                         className="cursor-grab active:cursor-grabbing select-none group"
                       >
@@ -760,10 +765,7 @@ export function SkillsGraph({
 
         {/* Stationary Details Card in Graph View — fixed to centre of viewport so it's always readable */}
         {viewMode === "graph" && selectedNode && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-            aria-modal="false"
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
             {/* Translucent backdrop to help the card stand out against any node */}
             <button
               type="button"

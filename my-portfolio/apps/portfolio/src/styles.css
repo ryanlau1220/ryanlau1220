@@ -21,7 +21,7 @@
   --font-mono: "Geist Mono", "Courier New", Courier, monospace;
 }
 
-@variant dark ([data-theme="dark"] &, .dark &);
+@custom-variant dark ([data-theme="dark"] &, .dark &);
 
 /* Base resets & layout variables */
 :root {
@@ -57,7 +57,10 @@ body,
   color: var(--text-primary);
   font-family: var(--font-sans);
   scroll-behavior: smooth;
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 html {
@@ -93,7 +96,8 @@ html {
 
 /* Vercel-like grid background overlay */
 .bg-grid {
-  background-image: linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+  background-image:
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
   background-size: 24px 24px;
 }
@@ -153,7 +157,9 @@ html {
   );
   background-size: 200% 100%;
   animation: shine-bar 2.5s infinite linear;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.7), 0 0 5px rgba(59, 130, 246, 0.4);
+  box-shadow:
+    0 0 10px rgba(59, 130, 246, 0.7),
+    0 0 5px rgba(59, 130, 246, 0.4);
   transition: width 0.05s ease-out;
   will-change: width;
 }
@@ -171,9 +177,13 @@ html {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
     animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
     animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
     scroll-behavior: auto !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Reduced-motion preferences must override component animations. */
     transition-duration: 0.01ms !important;
   }
 }

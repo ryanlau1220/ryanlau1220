@@ -1,5 +1,6 @@
 import { Award, Briefcase, Calendar, ChevronDown, GraduationCap, Laptop } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+
 interface UnifiedTimelineItem {
   id: string;
   title: string;

@@ -19,24 +19,27 @@ permissions:
 jobs:
   validate:
     name: Validate portfolio
-    runs-on: ubuntu-latest
+    concurrency:
+      group: portfolio-validation-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
         working-directory: my-portfolio
     steps:
       - name: Check out source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: 10.32.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           cache-dependency-path: my-portfolio/pnpm-lock.yaml
 
@@ -51,19 +54,27 @@ jobs:
 
       - name: Run browser smoke tests
         run: pnpm --filter portfolio-app exec playwright test
+      - name: Upload browser test results
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: portfolio-playwright-results
+          path: my-portfolio/apps/portfolio/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
   deploy:
     name: Deploy portfolio
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:
       group: portfolio-production
       cancel-in-progress: false
     environment:
       name: production
-      url: https://portfolio.ryanlau1220.workers.dev
+      url: https://ryanlau1220.dev
     defaults:
       run:
         working-directory: my-portfolio/apps/portfolio
@@ -72,17 +83,17 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Check out source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: 10.32.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           cache-dependency-path: my-portfolio/pnpm-lock.yaml
 

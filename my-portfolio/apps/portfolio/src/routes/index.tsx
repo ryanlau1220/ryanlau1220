@@ -19,7 +19,7 @@ import {
   Play,
   X,
 } from "lucide-react";
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Timeline } from "../components/Timeline";
 import { CERTIFICATIONS, EVENTS, EXPERIENCES, PROFILE, PROJECTS } from "../data/registry";
 
