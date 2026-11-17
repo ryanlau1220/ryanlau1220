@@ -64,11 +64,15 @@ export const Route = createRootRoute({
           })();
         `,
       },
-      {
-        src: "https://static.cloudflareinsights.com/beacon.min.js",
-        defer: true,
-        "data-cf-beacon": '{"token": "2694e0f121d542d9baa344c450858c6f"}',
-      },
+      ...(!import.meta.env.DEV
+        ? [
+            {
+              src: "https://static.cloudflareinsights.com/beacon.min.js",
+              defer: true,
+              "data-cf-beacon": '{"token": "2694e0f121d542d9baa344c450858c6f"}',
+            },
+          ]
+        : []),
     ],
   }),
   component: RootComponent,

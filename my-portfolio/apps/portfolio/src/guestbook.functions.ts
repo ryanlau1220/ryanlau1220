@@ -2,6 +2,7 @@ import { createHash, createHmac } from "node:crypto";
 import { env } from "cloudflare:workers";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { isVerifiedGuestbookHostname } from "./guestbook-hostnames";
 import type { GuestbookEntry, GuestbookSnapshot } from "./guestbook.types";
 
 const MAX_AUTHOR_LENGTH = 40;
@@ -70,7 +71,9 @@ function getRuntimeConfig() {
     siteKey,
     secretKey,
     rateLimitSalt,
-    enabled: Boolean(database && siteKey && secretKey && rateLimitSalt),
+    enabled: Boolean(
+      database && siteKey && secretKey && rateLimitSalt && env.VISITOR_LOG_HOSTNAME?.trim(),
+    ),
     realtime:
       env.PUSHER_APP_ID?.trim() &&
       env.PUSHER_KEY?.trim() &&
@@ -147,7 +150,7 @@ async function verifyTurnstile(token: string, secret: string, hostname?: string)
   if (
     !result.success ||
     result.action !== "visitor-log" ||
-    (hostname && result.hostname !== hostname)
+    !isVerifiedGuestbookHostname(hostname, request.url, result.hostname)
   ) {
     throw new Error("Verification failed. Please try again.");
   }

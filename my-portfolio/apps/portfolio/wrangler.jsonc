@@ -14,6 +14,6 @@
   ],
   "vars": {
     "TURNSTILE_SITE_KEY": "0x4AAAAAAD5OBIUxwrQ_UYo-",
-    "VISITOR_LOG_HOSTNAME": "portfolio.ryanlau1220.workers.dev"
+    "VISITOR_LOG_HOSTNAME": "ryanlau1220.dev,portfolio.ryanlau1220.workers.dev"
   }
 }

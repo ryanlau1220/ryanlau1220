@@ -33,13 +33,13 @@ pnpm exec wrangler d1 execute portfolio-visitor-log --remote --file migrations/0
 
 ## 2. Configure Turnstile
 
-Create a Turnstile widget for the production hostname in the Cloudflare dashboard. Add the public site key and hostname under `vars` in `wrangler.jsonc`:
+In the Cloudflare dashboard, add both `ryanlau1220.dev` and `portfolio.ryanlau1220.workers.dev` to the existing Turnstile widget’s hostname list. Keep its existing site key and secret. Configure the public site key and comma-separated allowed production hostnames under `vars` in `wrangler.jsonc`:
 
 ```jsonc
 {
   "vars": {
     "TURNSTILE_SITE_KEY": "your-public-site-key",
-    "VISITOR_LOG_HOSTNAME": "your-domain.example"
+    "VISITOR_LOG_HOSTNAME": "ryanlau1220.dev,portfolio.ryanlau1220.workers.dev"
   }
 }
 ```
@@ -51,7 +51,7 @@ pnpm exec wrangler secret put TURNSTILE_SECRET_KEY
 pnpm exec wrangler secret put VISITOR_LOG_RATE_LIMIT_SALT
 ```
 
-The Worker validates the token server-side, checks the Turnstile action and hostname, stores only a salted visitor fingerprint, and never stores the raw IP address.
+The Worker validates the token server-side, checks the Turnstile action and requires its hostname to match both the current request and the configured allowlist, stores only a salted visitor fingerprint, and never stores the raw IP address.
 
 ## 3. Enable optional Pusher realtime updates
 
