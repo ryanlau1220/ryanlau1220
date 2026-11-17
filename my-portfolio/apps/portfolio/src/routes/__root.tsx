@@ -300,14 +300,19 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     localStorage.setItem("theme", nextTheme);
   };
 
-  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string, closeMenu = false) => {
     const isHashLink = href.includes("#");
     if (isHashLink && location.pathname === "/") {
       e.preventDefault();
       const id = href.split("#")[1];
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        const navigate = () => element.scrollIntoView({ behavior: "smooth" });
+        if (closeMenu) {
+          requestAnimationFrame(() => requestAnimationFrame(navigate));
+        } else {
+          navigate();
+        }
         setActiveHash(`#${id}`);
       }
     }
@@ -417,8 +422,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => {
-                    handleNavClick(e, link.href);
                     setMobileMenuOpen(false);
+                    handleNavClick(e, link.href, true);
                   }}
                   className={`text-sm font-mono transition-colors ${
                     isActive(link.href)

@@ -186,7 +186,10 @@ function PortfolioHome() {
                   { opacity: 0.4, transform: "translateY(80px) scale(.96)" },
                   { opacity: 1, transform: "none" },
                 ];
-          entry.target.animate(frames, { duration: 750, easing: "cubic-bezier(.22,1,.36,1)" });
+          entry.target.querySelector(".scene-inner")?.animate(frames, {
+            duration: 750,
+            easing: "cubic-bezier(.22,1,.36,1)",
+          });
           observer.unobserve(entry.target);
         });
       },
@@ -356,28 +359,30 @@ function PortfolioHome() {
         id="about"
         className="scene-section max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
-          <div>
-            <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2 font-sans">
-              Who I Am
-            </h2>
-          </div>
-          <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
-            {PROFILE.about.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+        <div className="scene-inner">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2 font-sans">
+                Who I Am
+              </h2>
+            </div>
+            <div className="md:col-span-2 space-y-6 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              {PROFILE.about.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
 
-            <div className="pt-4">
-              <a
-                href={PROFILE.resumePath}
-                download
-                target="_blank"
-                className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
-                rel="noreferrer"
-              >
-                <Download size={14} />
-                <span>Download Resume</span>
-              </a>
+              <div className="pt-4">
+                <a
+                  href={PROFILE.resumePath}
+                  download
+                  target="_blank"
+                  className="inline-flex items-center gap-2 text-xs font-mono px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-colors font-semibold shadow-sm"
+                  rel="noreferrer"
+                >
+                  <Download size={14} />
+                  <span>Download Resume</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -389,39 +394,41 @@ function PortfolioHome() {
         ref={skillsSectionRef}
         className="scene-section max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
-        <div className="text-center space-y-3 mb-10">
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-            Skill Connections
-          </h2>
-        </div>
+        <div className="scene-inner">
+          <div className="text-center space-y-3 mb-10">
+            <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+              Skill Connections
+            </h2>
+          </div>
 
-        {shouldLoadSkills ? (
-          <Suspense
-            fallback={
-              <div
-                className="flex min-h-[500px] items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-300"
-                aria-live="polite"
-              >
-                Loading skill connections…
-              </div>
-            }
-          >
-            <SkillsGraph
-              selectedSkill={selectedSkill}
-              onSelectSkill={setSelectedSkill}
-              onRouteToProject={handleRouteToProject}
-              onRouteToTimeline={handleRouteToTimeline}
-              projects={PROJECTS}
-              experiences={EXPERIENCES}
-              events={EVENTS}
+          {shouldLoadSkills ? (
+            <Suspense
+              fallback={
+                <div
+                  className="flex min-h-[500px] items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 text-sm text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-300"
+                  aria-live="polite"
+                >
+                  Loading skill connections…
+                </div>
+              }
+            >
+              <SkillsGraph
+                selectedSkill={selectedSkill}
+                onSelectSkill={setSelectedSkill}
+                onRouteToProject={handleRouteToProject}
+                onRouteToTimeline={handleRouteToTimeline}
+                projects={PROJECTS}
+                experiences={EXPERIENCES}
+                events={EVENTS}
+              />
+            </Suspense>
+          ) : (
+            <div
+              className="min-h-[500px] rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/50"
+              aria-hidden="true"
             />
-          </Suspense>
-        ) : (
-          <div
-            className="min-h-[500px] rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/50"
-            aria-hidden="true"
-          />
-        )}
+          )}
+        </div>
       </section>
 
       {/* 4. PROJECTS SECTION */}
@@ -429,319 +436,325 @@ function PortfolioHome() {
         id="projects"
         className="scene-section project-scene max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
-            Featured Projects
-          </h2>
-        </div>
+        <div className="scene-inner">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
+              Featured Projects
+            </h2>
+          </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center gap-2 mb-10">
-          {[
-            { id: "pinned", label: "Pinned" },
-            { id: "all", label: "All Projects" },
-            { id: "internship", label: "Internships" },
-            { id: "hackathon", label: "Events" },
-          ].map((filter) => (
-            <button
-              key={filter.id}
-              type="button"
-              onClick={() =>
-                setProjectFilter(filter.id as "all" | "pinned" | "hackathon" | "internship")
-              }
-              className={`inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
-                projectFilter === filter.id
-                  ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"
-                  : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-              }`}
-            >
-              {filter.id === "pinned" && <Pin size={12} aria-hidden="true" />}
-              {filter.label}
-            </button>
-          ))}
-          {selectedSkill && (
-            <button
-              type="button"
-              onClick={() => setSelectedSkill(null)}
-              className="text-xs px-4 py-2 rounded-full border border-blue-200 dark:border-blue-900/70 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-mono hover:bg-blue-100 dark:hover:bg-blue-950/60 transition-colors cursor-pointer"
-            >
-              Clear: {selectedSkill}
-            </button>
-          )}
-        </div>
-
-        <div className="relative project-detail-stage">
-          {filteredProjects.length === 0 ? (
-            <p className="text-center font-mono text-xs text-neutral-500 py-12 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
-              No projects found matching the filters.
-            </p>
-          ) : (
-            <div className="flex items-stretch gap-6">
-              {/* Left Arrow Button */}
+          {/* Category Filters */}
+          <div className="flex flex-wrap items-center gap-2 mb-10">
+            {[
+              { id: "pinned", label: "Pinned" },
+              { id: "all", label: "All Projects" },
+              { id: "internship", label: "Internships" },
+              { id: "hackathon", label: "Events" },
+            ].map((filter) => (
               <button
+                key={filter.id}
                 type="button"
                 onClick={() =>
-                  setCurrentProjectIdx(
-                    (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
-                  )
+                  setProjectFilter(filter.id as "all" | "pinned" | "hackathon" | "internship")
                 }
-                className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
-                  filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
+                className={`inline-flex items-center gap-1.5 text-xs px-4 py-2 rounded-full border transition-all font-mono cursor-pointer ${
+                  projectFilter === filter.id
+                    ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-semibold"
+                    : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
                 }`}
-                aria-label="Previous project"
               >
-                <ChevronLeft size={16} />
+                {filter.id === "pinned" && <Pin size={12} aria-hidden="true" />}
+                {filter.label}
               </button>
-
-              {/* The selected project remains the only full-size gallery card. */}
-              <ProjectOrbit
-                projects={filteredProjects}
-                activeIndex={activeProjectIndex}
-                onSelect={setCurrentProjectIdx}
+            ))}
+            {selectedSkill && (
+              <button
+                type="button"
+                onClick={() => setSelectedSkill(null)}
+                className="text-xs px-4 py-2 rounded-full border border-blue-200 dark:border-blue-900/70 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-mono hover:bg-blue-100 dark:hover:bg-blue-950/60 transition-colors cursor-pointer"
               >
-                {(() => {
-                  const project = filteredProjects[activeProjectIndex];
-                  if (!project) return null;
-                  const hasImage = !!project.imageUrl;
-                  const imageDimensions = PROJECT_IMAGE_DIMENSIONS[project.id];
-                  return (
-                    <div
-                      key={project.id}
-                      className={`project-detail-card flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col ${
-                        hasImage ? "md:grid md:grid-cols-[1.15fr_1fr]" : "p-6 sm:p-8 space-y-6"
-                      }`}
-                    >
-                      {hasImage && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setActiveImage({
-                              src: project.imageUrl!,
-                              alt: `${project.title} product screenshot`,
-                            })
-                          }
-                          className="relative h-[260px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-white to-blue-50/70 text-left dark:from-black dark:via-neutral-950 dark:to-blue-950/20 sm:h-[320px] md:h-auto md:min-h-[320px]"
-                          aria-label={`Expand ${project.title} screenshot`}
-                        >
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-0 bg-white/35 dark:bg-neutral-950/20"
-                          />
-                          <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                            Project preview
-                          </span>
-                          <picture className="absolute inset-0 z-10 h-full w-full p-3 sm:p-4 md:p-5">
-                            <source
-                              media="(max-width: 639px)"
-                              srcSet={getMobileProjectPreviewUrl(project)}
-                            />
-                            <img
-                              src={getProjectPreviewUrl(project)}
-                              alt={`${project.title} product screenshot`}
-                              width={imageDimensions?.width}
-                              height={imageDimensions?.height}
-                              className="h-full w-full rounded-lg border border-white/50 object-contain shadow-xl transition-transform duration-500 group-hover:scale-[1.015] dark:border-white/10"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </picture>
-                          <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                            <Maximize2 size={15} aria-hidden="true" />
-                          </span>
-                        </button>
-                      )}
+                Clear: {selectedSkill}
+              </button>
+            )}
+          </div>
 
+          <div className="relative project-detail-stage">
+            {filteredProjects.length === 0 ? (
+              <p className="text-center font-mono text-xs text-neutral-500 py-12 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
+                No projects found matching the filters.
+              </p>
+            ) : (
+              <div className="flex items-stretch gap-6">
+                {/* Left Arrow Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentProjectIdx(
+                      (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
+                    )
+                  }
+                  className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
+                    filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
+                  }`}
+                  aria-label="Previous project"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {/* The selected project remains the only full-size gallery card. */}
+                <ProjectOrbit
+                  projects={filteredProjects}
+                  activeIndex={activeProjectIndex}
+                  onSelect={setCurrentProjectIdx}
+                >
+                  {(() => {
+                    const project = filteredProjects[activeProjectIndex];
+                    if (!project) return null;
+                    const hasImage = !!project.imageUrl;
+                    const imageDimensions = PROJECT_IMAGE_DIMENSIONS[project.id];
+                    return (
                       <div
-                        className={`w-full ${hasImage ? "p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
+                        key={project.id}
+                        className={`project-detail-card flex-1 min-w-0 group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col ${
+                          hasImage ? "md:grid md:grid-cols-[1.15fr_1fr]" : "p-6 sm:p-8 space-y-6"
+                        }`}
                       >
-                        {!hasImage && project.category === "internship" && (
-                          <span className="inline-flex w-fit rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300">
-                            Internship work · Product visuals confidential
-                          </span>
-                        )}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div>
-                            <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                              {project.subtitle}
+                        {hasImage && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setActiveImage({
+                                src: project.imageUrl!,
+                                alt: `${project.title} product screenshot`,
+                              })
+                            }
+                            className="relative h-[260px] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-white to-blue-50/70 text-left dark:from-black dark:via-neutral-950 dark:to-blue-950/20 sm:h-[320px] md:h-auto md:min-h-[320px]"
+                            aria-label={`Expand ${project.title} screenshot`}
+                          >
+                            <span
+                              aria-hidden="true"
+                              className="absolute inset-0 bg-white/35 dark:bg-neutral-950/20"
+                            />
+                            <span className="absolute left-5 top-5 z-10 rounded-md border border-white/20 bg-black/55 px-2.5 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                              Project preview
                             </span>
-                            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
-                              <span className="sr-only">{project.title}</span>
-                              <span className="project-title-reveal" aria-hidden="true">
-                                {Array.from(project.title).map((character, index) => (
-                                  <span
-                                    key={`${index}-${character}`}
-                                    style={{ animationDelay: `${Math.min(index, 24) * 24}ms` }}
-                                  >
-                                    {character === " " ? "\u00a0" : character}
-                                  </span>
-                                ))}
+                            <picture className="absolute inset-0 z-10 h-full w-full p-3 sm:p-4 md:p-5">
+                              <source
+                                media="(max-width: 639px)"
+                                srcSet={getMobileProjectPreviewUrl(project)}
+                              />
+                              <img
+                                src={getProjectPreviewUrl(project)}
+                                alt={`${project.title} product screenshot`}
+                                width={imageDimensions?.width}
+                                height={imageDimensions?.height}
+                                className="h-full w-full rounded-lg border border-white/50 object-contain shadow-xl transition-transform duration-500 group-hover:scale-[1.015] dark:border-white/10"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </picture>
+                            <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white opacity-0 shadow-sm backdrop-blur-sm transition-all duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                              <Maximize2 size={15} aria-hidden="true" />
+                            </span>
+                          </button>
+                        )}
+
+                        <div
+                          className={`w-full ${hasImage ? "p-6 sm:p-8 flex flex-col justify-between space-y-6" : "space-y-6"}`}
+                        >
+                          {!hasImage && project.category === "internship" && (
+                            <span className="inline-flex w-fit rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300">
+                              Internship work · Product visuals confidential
+                            </span>
+                          )}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                                {project.subtitle}
                               </span>
-                            </h3>
+                              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mt-1">
+                                <span className="sr-only">{project.title}</span>
+                                <span className="project-title-reveal" aria-hidden="true">
+                                  {Array.from(project.title).map((character, index) => (
+                                    <span
+                                      key={`${index}-${character}`}
+                                      style={{ animationDelay: `${Math.min(index, 24) * 24}ms` }}
+                                    >
+                                      {character === " " ? "\u00a0" : character}
+                                    </span>
+                                  ))}
+                                </span>
+                              </h3>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              {project.videoUrl && (
+                                <a
+                                  href={project.videoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                                  title="Watch Demo Video"
+                                >
+                                  <Play size={16} className="opacity-80" />
+                                </a>
+                              )}
+                              {project.githubUrl && (
+                                <a
+                                  href={project.githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                                  title="GitHub Repo"
+                                >
+                                  <Github size={16} />
+                                </a>
+                              )}
+                              {project.demoUrl && (
+                                <a
+                                  href={project.demoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
+                                  title="Live Demo"
+                                >
+                                  <ExternalLink size={16} />
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            {project.videoUrl && (
-                              <a
-                                href={project.videoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
-                                title="Watch Demo Video"
-                              >
-                                <Play size={16} className="opacity-80" />
-                              </a>
-                            )}
-                            {project.githubUrl && (
-                              <a
-                                href={project.githubUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
-                                title="GitHub Repo"
-                              >
-                                <Github size={16} />
-                              </a>
-                            )}
-                            {project.demoUrl && (
-                              <a
-                                href={project.demoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors"
-                                title="Live Demo"
-                              >
-                                <ExternalLink size={16} />
-                              </a>
-                            )}
+
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            {project.description}
+                          </p>
+
+                          {/* Achievements List */}
+                          <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-900 pt-4">
+                            <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
+                              Key Outcomes &amp; Technical Achievements
+                            </span>
+                            <ul className="space-y-2">
+                              {project.achievements.map((ach: string, idx: number) => (
+                                <li
+                                  key={idx}
+                                  className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed"
+                                >
+                                  <CheckCircle
+                                    size={14}
+                                    className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5"
+                                  />
+                                  <span>{ach}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                        </div>
 
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                          {project.description}
-                        </p>
-
-                        {/* Achievements List */}
-                        <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-900 pt-4">
-                          <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
-                            Key Outcomes &amp; Technical Achievements
-                          </span>
-                          <ul className="space-y-2">
-                            {project.achievements.map((ach: string, idx: number) => (
-                              <li
-                                key={idx}
-                                className="text-xs text-neutral-600 dark:text-neutral-400 flex items-start gap-2.5 leading-relaxed"
+                          {/* Curated project skills — complete technology relationships stay in the Skills Map. */}
+                          <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
+                            <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                              Top skills
+                            </span>
+                            {project.featuredTechnologies.map((tech: string) => (
+                              <button
+                                key={tech}
+                                type="button"
+                                onClick={() => setSelectedSkill(tech)}
+                                className={`text-[10px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
+                                  selectedSkill === tech
+                                    ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold"
+                                    : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
+                                }`}
                               >
-                                <CheckCircle
-                                  size={14}
-                                  className="text-neutral-400 dark:text-neutral-700 shrink-0 mt-0.5"
-                                />
-                                <span>{ach}</span>
-                              </li>
+                                {tech}
+                              </button>
                             ))}
-                          </ul>
-                        </div>
-
-                        {/* Curated project skills — complete technology relationships stay in the Skills Map. */}
-                        <div className="flex flex-wrap gap-1.5 pt-4 border-t border-neutral-100 dark:border-neutral-900">
-                          <span className="basis-full text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
-                            Top skills
-                          </span>
-                          {project.featuredTechnologies.map((tech: string) => (
-                            <button
-                              key={tech}
-                              type="button"
-                              onClick={() => setSelectedSkill(tech)}
-                              className={`text-[10px] font-mono px-2.5 py-1 rounded transition-all cursor-pointer ${
-                                selectedSkill === tech
-                                  ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-400 text-blue-600 dark:text-blue-400 font-bold"
-                                  : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-700"
-                              }`}
-                            >
-                              {tech}
-                            </button>
-                          ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })()}
-              </ProjectOrbit>
+                    );
+                  })()}
+                </ProjectOrbit>
 
-              {/* Right Arrow Button */}
-              <button
-                type="button"
-                onClick={() => setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)}
-                className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
-                  filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
-                }`}
-                aria-label="Next project"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
+                {/* Right Arrow Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)
+                  }
+                  className={`hidden md:flex self-center p-3.5 rounded-full border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors shadow-sm cursor-pointer shrink-0 ${
+                    filteredProjects.length <= 1 ? "opacity-0 pointer-events-none" : ""
+                  }`}
+                  aria-label="Next project"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
 
-          {filteredProjects.length > 1 && (
-            <div className="mt-4 flex items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-900/50 md:hidden">
-              <button
-                type="button"
-                onClick={() =>
-                  setCurrentProjectIdx(
-                    (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
-                  )
-                }
-                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
-              >
-                <ChevronLeft size={15} aria-hidden="true" />
-                Previous
-              </button>
-              <span className="shrink-0 px-2 text-[10px] font-mono font-semibold tabular-nums text-neutral-500 dark:text-neutral-400">
-                {activeProjectIndex + 1} / {filteredProjects.length}
-              </span>
-              <button
-                type="button"
-                onClick={() => setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)}
-                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
-              >
-                Next
-                <ChevronRight size={15} aria-hidden="true" />
-              </button>
-            </div>
-          )}
+            {filteredProjects.length > 1 && (
+              <div className="mt-4 flex items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-2 dark:border-neutral-800 dark:bg-neutral-900/50 md:hidden">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentProjectIdx(
+                      (prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length,
+                    )
+                  }
+                  className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
+                >
+                  <ChevronLeft size={15} aria-hidden="true" />
+                  Previous
+                </button>
+                <span className="shrink-0 px-2 text-[10px] font-mono font-semibold tabular-nums text-neutral-500 dark:text-neutral-400">
+                  {activeProjectIndex + 1} / {filteredProjects.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentProjectIdx((prev) => (prev + 1) % filteredProjects.length)
+                  }
+                  className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-mono font-semibold text-neutral-700 transition-colors hover:bg-white dark:text-neutral-300 dark:hover:bg-neutral-950"
+                >
+                  Next
+                  <ChevronRight size={15} aria-hidden="true" />
+                </button>
+              </div>
+            )}
 
-          {/* Numeric Pagination Indicator */}
-          {filteredProjects.length > 1 && (
-            <div className="mt-8 hidden select-none items-center justify-center gap-1.5 md:flex">
-              {paginationPages.map((page, idx) => {
-                if (typeof page === "string") {
+            {/* Numeric Pagination Indicator */}
+            {filteredProjects.length > 1 && (
+              <div className="mt-8 hidden select-none items-center justify-center gap-1.5 md:flex">
+                {paginationPages.map((page, idx) => {
+                  if (typeof page === "string") {
+                    return (
+                      <span
+                        key={`ellipsis-${idx}`}
+                        className="text-xs text-neutral-600 dark:text-neutral-400 px-1 font-mono"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+
+                  const isActive = page === activeProjectIndex;
                   return (
-                    <span
-                      key={`ellipsis-${idx}`}
-                      className="text-xs text-neutral-600 dark:text-neutral-400 px-1 font-mono"
+                    <button
+                      key={`page-${page}`}
+                      type="button"
+                      onClick={() => setCurrentProjectIdx(page)}
+                      className={`h-7 w-7 rounded-full border text-[11px] font-mono font-semibold flex items-center justify-center transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-bold scale-105"
+                          : "bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
+                      }`}
+                      aria-label={`Go to slide ${page + 1}`}
                     >
-                      ...
-                    </span>
+                      {page + 1}
+                    </button>
                   );
-                }
-
-                const isActive = page === activeProjectIndex;
-                return (
-                  <button
-                    key={`page-${page}`}
-                    type="button"
-                    onClick={() => setCurrentProjectIdx(page)}
-                    className={`h-7 w-7 rounded-full border text-[11px] font-mono font-semibold flex items-center justify-center transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-950 border-neutral-900 dark:border-white shadow-sm font-bold scale-105"
-                        : "bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-                    }`}
-                    aria-label={`Go to slide ${page + 1}`}
-                  >
-                    {page + 1}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -750,13 +763,15 @@ function PortfolioHome() {
         id="timeline"
         className="scene-section max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900"
       >
-        <div className="text-center space-y-3 mb-12">
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-            Education &amp; Experience
-          </h2>
-        </div>
+        <div className="scene-inner">
+          <div className="text-center space-y-3 mb-12">
+            <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+              Education &amp; Experience
+            </h2>
+          </div>
 
-        <Timeline experiences={EXPERIENCES} events={EVENTS} focusRequest={timelineFocusRequest} />
+          <Timeline experiences={EXPERIENCES} events={EVENTS} focusRequest={timelineFocusRequest} />
+        </div>
       </section>
 
       {/* 6. CERTIFICATIONS & CREDENTIALS SECTION */}
@@ -764,190 +779,194 @@ function PortfolioHome() {
         id="certifications"
         className="scene-section max-w-6xl mx-auto py-24 px-6 border-b border-neutral-100 dark:border-neutral-900 select-text"
       >
-        <div className="text-center space-y-3 mb-12">
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
-            Credentials &amp; Certifications
-          </h2>
-        </div>
+        <div className="scene-inner">
+          <div className="text-center space-y-3 mb-12">
+            <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white">
+              Credentials &amp; Certifications
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {CERTIFICATIONS.map((certification) => {
-            const Icon =
-              certification.icon === "award"
-                ? Award
-                : certification.icon === "code"
-                  ? Code2
-                  : Cloud;
-            const iconClassName =
-              certification.icon === "award"
-                ? "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40 text-blue-600 dark:text-blue-400"
-                : certification.icon === "code"
-                  ? "bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300"
-                  : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400";
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {CERTIFICATIONS.map((certification) => {
+              const Icon =
+                certification.icon === "award"
+                  ? Award
+                  : certification.icon === "code"
+                    ? Code2
+                    : Cloud;
+              const iconClassName =
+                certification.icon === "award"
+                  ? "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40 text-blue-600 dark:text-blue-400"
+                  : certification.icon === "code"
+                    ? "bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300"
+                    : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400";
 
-            return (
-              <a
-                key={certification.title}
-                href={certification.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div
-                    className={`h-10 w-10 border rounded-lg flex items-center justify-center ${iconClassName}`}
-                  >
-                    <Icon size={22} />
+              return (
+                <a
+                  key={certification.title}
+                  href={certification.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div
+                      className={`h-10 w-10 border rounded-lg flex items-center justify-center ${iconClassName}`}
+                    >
+                      <Icon size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                        {certification.title}
+                      </h3>
+                      <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+                        {certification.description}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-                      {certification.title}
-                    </h3>
-                    <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                      {certification.description}
-                    </p>
+                  <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
+                    <span>{certification.cta}</span>
+                    <ExternalLink size={10} />
                   </div>
-                </div>
-                <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
-                  <span>{certification.cta}</span>
-                  <ExternalLink size={10} />
-                </div>
-              </a>
-            );
-          })}
+                </a>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* 7. CONTACT SECTION */}
       <section id="contact" className="scene-section max-w-6xl mx-auto py-24 px-6 select-text">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div>
-            <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
-              Let's Connect
-            </h2>
-            <p className="text-xs text-neutral-500 mt-2">
-              Have a question or looking to recruit? Drop me an email directly or submit the contact
-              form.
-            </p>
+        <div className="scene-inner">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+              <h2 className="text-2xl font-bold text-neutral-950 dark:text-white mt-2">
+                Let's Connect
+              </h2>
+              <p className="text-xs text-neutral-500 mt-2">
+                Have a question or looking to recruit? Drop me an email directly or submit the
+                contact form.
+              </p>
 
-            <div className="mt-8 space-y-4 font-mono text-xs text-neutral-600 dark:text-neutral-400">
-              <div className="flex items-center gap-3">
-                <Mail size={14} className="text-neutral-400" />
-                <a href={`mailto:${PROFILE.contact.email}`} className="hover:text-blue-500">
-                  {PROFILE.contact.email}
-                </a>
+              <div className="mt-8 space-y-4 font-mono text-xs text-neutral-600 dark:text-neutral-400">
+                <div className="flex items-center gap-3">
+                  <Mail size={14} className="text-neutral-400" />
+                  <a href={`mailto:${PROFILE.contact.email}`} className="hover:text-blue-500">
+                    {PROFILE.contact.email}
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone size={14} className="text-neutral-400" />
+                  <a href={`tel:${PROFILE.contact.phone}`} className="hover:text-blue-500">
+                    {PROFILE.contact.phone}
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin size={14} className="text-neutral-400" />
+                  <span>{PROFILE.contact.location}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Phone size={14} className="text-neutral-400" />
-                <a href={`tel:${PROFILE.contact.phone}`} className="hover:text-blue-500">
-                  {PROFILE.contact.phone}
+
+              {/* Resume & Social Links */}
+              <div className="flex flex-wrap gap-2.5 mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-900">
+                <a
+                  href={PROFILE.contact.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"
+                  title="GitHub"
+                >
+                  <Github size={12} />
+                  <span>GitHub</span>
                 </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin size={14} className="text-neutral-400" />
-                <span>{PROFILE.contact.location}</span>
+                <a
+                  href={PROFILE.contact.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"
+                  title="LinkedIn"
+                >
+                  <Linkedin size={12} />
+                  <span>LinkedIn</span>
+                </a>
               </div>
             </div>
 
-            {/* Resume & Social Links */}
-            <div className="flex flex-wrap gap-2.5 mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-900">
-              <a
-                href={PROFILE.contact.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"
-                title="GitHub"
-              >
-                <Github size={12} />
-                <span>GitHub</span>
-              </a>
-              <a
-                href={PROFILE.contact.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-[10px] font-semibold font-mono text-neutral-700 dark:text-neutral-300 transition-colors shadow-sm"
-                title="LinkedIn"
-              >
-                <Linkedin size={12} />
-                <span>LinkedIn</span>
-              </a>
+            <div className="md:col-span-2">
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label
+                      className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
+                      htmlFor="form-name"
+                    >
+                      Name
+                    </label>
+                    <input
+                      id="form-name"
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      required
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label
+                      className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
+                      htmlFor="form-email"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="form-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                      className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
+                    htmlFor="form-msg"
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="form-msg"
+                    name="message"
+                    required
+                    rows={7}
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                    className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white resize-none"
+                  />
+                </div>
+
+                {formSubmitted ? (
+                  <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/40 rounded-lg text-xs text-green-600 dark:text-green-400 font-mono">
+                    <CheckCircle size={14} />
+                    <span>Thank you! Your message has been sent successfully.</span>
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="text-xs font-mono px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-all font-semibold shadow-sm cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Sending..." : "Send Message"}
+                  </button>
+                )}
+              </form>
             </div>
-          </div>
-
-          <div className="md:col-span-2">
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label
-                    className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
-                    htmlFor="form-name"
-                  >
-                    Name
-                  </label>
-                  <input
-                    id="form-name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label
-                    className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
-                    htmlFor="form-email"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="form-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label
-                  className="text-[10px] font-bold font-mono text-neutral-600 dark:text-neutral-400 uppercase"
-                  htmlFor="form-msg"
-                >
-                  Message
-                </label>
-                <textarea
-                  id="form-msg"
-                  name="message"
-                  required
-                  rows={7}
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full text-xs font-mono px-3.5 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 text-neutral-900 dark:text-white resize-none"
-                />
-              </div>
-
-              {formSubmitted ? (
-                <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/40 rounded-lg text-xs text-green-600 dark:text-green-400 font-mono">
-                  <CheckCircle size={14} />
-                  <span>Thank you! Your message has been sent successfully.</span>
-                </div>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="text-xs font-mono px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 rounded-lg transition-all font-semibold shadow-sm cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmitting ? "Sending..." : "Send Message"}
-                </button>
-              )}
-            </form>
           </div>
         </div>
       </section>

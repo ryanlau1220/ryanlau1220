@@ -314,17 +314,17 @@ html {
 
 /* Scene movement follows scrolling when view timelines are supported. */
 @supports ((animation-timeline: view()) and (animation-range: entry)) {
-  .scene-section {
+  .scene-section > .scene-inner {
     animation: scene-enter auto linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 85%;
   }
-  #skills.scene-section {
-    animation-name: scene-fade;
-  }
-  .project-scene {
+  .project-scene > .scene-inner {
     animation-name: scene-stack;
     transform-origin: center top;
+  }
+  #skills.scene-section > .scene-inner {
+    animation-name: scene-fade;
   }
   .project-detail-stage {
     animation: stage-expand auto linear both;
