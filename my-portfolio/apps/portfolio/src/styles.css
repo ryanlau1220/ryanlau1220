@@ -444,3 +444,13 @@ html {
     transform: translateY(0);
   }
 }
+
+/* Keep the preview in the browser top layer and contain scrolling while open. */
+.image-lightbox:modal {
+  overscroll-behavior: contain;
+}
+.image-lightbox::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: transparent;
+}

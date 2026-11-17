@@ -24,11 +24,24 @@ test("opens and closes the project preview with keyboard support", async ({ page
   await page.getByRole("button", { name: "Expand APU-ASC screenshot" }).click();
   const dialog = page.locator('dialog[aria-labelledby="expanded-screenshot-title"][open]');
   await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveJSProperty("open", true);
+  expect(await dialog.evaluate((element) => element.matches(":modal"))).toBe(true);
   await expect(
     dialog.getByRole("button", { name: "Close expanded screenshot", exact: true }),
   ).toBeFocused();
+  expect(
+    await page.evaluate(
+      () => document.elementFromPoint(innerWidth / 2, 20)?.closest("dialog") !== null,
+    ),
+  ).toBe(true);
 
   await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Expand APU-ASC screenshot" })).toBeFocused();
+  await page.getByRole("button", { name: "Expand APU-ASC screenshot" }).click();
+  await dialog
+    .getByRole("button", { name: "Close expanded screenshot by clicking outside" })
+    .click({ position: { x: 5, y: 5 } });
   await expect(dialog).toHaveCount(0);
 });
 

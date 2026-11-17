@@ -101,6 +101,7 @@ function PortfolioHome() {
   const timelineRequestIdRef = useRef(0);
   const skillsSectionRef = useRef<HTMLElement | null>(null);
 
+  const imageDialogRef = useRef<HTMLDialogElement | null>(null);
   const imageCloseButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Dynamic numeric pagination pages list
@@ -223,21 +224,11 @@ function PortfolioHome() {
   }, []);
 
   useEffect(() => {
-    if (!activeImage) return;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const focusFrame = window.requestAnimationFrame(() => imageCloseButtonRef.current?.focus());
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setActiveImage(null);
-    };
-
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      document.removeEventListener("keydown", closeOnEscape);
-      previouslyFocused?.focus();
-    };
+    const dialog = imageDialogRef.current;
+    if (activeImage && dialog && !dialog.open) {
+      dialog.showModal();
+      imageCloseButtonRef.current?.focus();
+    }
   }, [activeImage]);
 
   // Filter projects by selected category and skill (technologies or domains)
@@ -976,21 +967,15 @@ function PortfolioHome() {
 
       {activeImage && (
         <dialog
-          open
-          className="fixed inset-0 z-[100] m-0 flex h-screen w-screen max-w-none items-center justify-center border-0 bg-transparent p-4 sm:p-8"
-          aria-modal="true"
+          ref={imageDialogRef}
+          className="image-lightbox fixed inset-0 m-0 h-dvh w-screen max-h-none max-w-none items-center justify-center border-0 bg-transparent p-4 open:flex sm:p-8"
           aria-labelledby="expanded-screenshot-title"
-          onKeyDown={(event) => {
-            if (event.key === "Tab") {
-              event.preventDefault();
-              imageCloseButtonRef.current?.focus();
-            }
-          }}
+          onClose={() => setActiveImage(null)}
         >
           <button
             type="button"
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setActiveImage(null)}
+            onClick={() => imageDialogRef.current?.close()}
             aria-label="Close expanded screenshot by clicking outside"
           />
           <div className="pointer-events-none relative flex max-h-full w-full max-w-7xl items-center justify-center">
@@ -1005,7 +990,7 @@ function PortfolioHome() {
             <button
               ref={imageCloseButtonRef}
               type="button"
-              onClick={() => setActiveImage(null)}
+              onClick={() => imageDialogRef.current?.close()}
               className="pointer-events-auto absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
               aria-label="Close expanded screenshot"
             >
