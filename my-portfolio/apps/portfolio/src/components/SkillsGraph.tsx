@@ -1,6 +1,5 @@
-import * as d3Force from "d3-force";
-import { List, Maximize, Network, RefreshCw, ZoomIn, ZoomOut } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { List, Network } from "lucide-react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import {
   type EventItem,
   type Experience,
@@ -9,17 +8,7 @@ import {
   TECHNOLOGY_CATEGORIES,
 } from "../data/registry";
 
-interface D3Node extends d3Force.SimulationNodeDatum {
-  id: string;
-  name: string;
-  type: "domain" | "technology";
-  linkCount: number;
-}
-
-interface D3Link extends d3Force.SimulationLinkDatum<D3Node> {
-  source: string | D3Node;
-  target: string | D3Node;
-}
+const SkillsGlobe = lazy(() => import("./SkillsGlobe"));
 
 interface SkillsGraphProps {
   selectedSkill: string | null;
@@ -42,215 +31,20 @@ export function SkillsGraph({
 }: SkillsGraphProps) {
   // The complete connected inventory is intentionally dense; begin with the scannable view.
   const [viewMode, setViewMode] = useState<"graph" | "list">("list");
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-
-  // Pan & Zoom state
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const svgRef = useRef<SVGSVGElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [_simKey, setSimKey] = useState(0);
-
-  // Dragging state for node
-  const draggedNodeRef = useRef<D3Node | null>(null);
-  const hasMovedRef = useRef(false);
-
-  // 1. Build the graph from skills that are actually connected to public work.
-  const { nodes, links, domains, technologies, techMap } = useMemo(() => {
-    const connectedTechnologies = new Set(
-      [...PROJECTS, ...EXPERIENCES, ...EVENTS].flatMap((item) => item.technologies),
-    );
-    const uniqueTech = new Set(
-      Object.keys(TECHNOLOGY_CATEGORIES).filter((technology) =>
-        connectedTechnologies.has(technology as keyof typeof TECHNOLOGY_CATEGORIES),
-      ),
-    );
-    const uniqueDomains = new Set<string>();
-    uniqueTech.forEach((technology) => {
-      uniqueDomains.add(TECHNOLOGY_CATEGORIES[technology as keyof typeof TECHNOLOGY_CATEGORIES]);
-    });
-    const connections = new Set<string>(); // "source-target" string set
-
-    Object.entries(TECHNOLOGY_CATEGORIES).forEach(([tech, cat]) => {
-      if (uniqueTech.has(tech)) connections.add(`${tech}::${cat}`);
-    });
-
-    // Count links for scaling node sizes
-    const linkCounts = new Map<string, number>();
-    connections.forEach((conn) => {
-      const [tech, domain] = conn.split("::");
-      linkCounts.set(tech, (linkCounts.get(tech) || 0) + 1);
-      linkCounts.set(domain, (linkCounts.get(domain) || 0) + 1);
-    });
-
-    // Construct nodes
-    const nodeList: D3Node[] = [
-      ...Array.from(uniqueDomains).map((d) => ({
-        id: d,
-        name: d,
-        type: "domain" as const,
-        linkCount: linkCounts.get(d) || 0,
-      })),
-      ...Array.from(uniqueTech).map((t) => ({
-        id: t,
-        name: t,
+  const techMap = TECHNOLOGY_CATEGORIES;
+  const technologies = Object.keys(techMap).sort();
+  const domains = SKILL_CATEGORIES;
+  const nodes = useMemo(
+    () => [
+      ...SKILL_CATEGORIES.map((name) => ({ id: name, name, type: "domain" as const })),
+      ...Object.keys(TECHNOLOGY_CATEGORIES).map((name) => ({
+        id: name,
+        name,
         type: "technology" as const,
-        linkCount: linkCounts.get(t) || 0,
       })),
-    ];
-
-    // Construct links
-    const linkList: D3Link[] = Array.from(connections).map((conn) => {
-      const [tech, domain] = conn.split("::");
-      return {
-        source: tech,
-        target: domain,
-      };
-    });
-
-    return {
-      nodes: nodeList,
-      links: linkList,
-      domains: Array.from(uniqueDomains).sort(),
-      technologies: Array.from(uniqueTech).sort(),
-      techMap: TECHNOLOGY_CATEGORIES,
-    };
-  }, [PROJECTS, EXPERIENCES, EVENTS]);
-
-  // 2. D3 force simulation layout
-  const [simulationNodes, setSimulationNodes] = useState<D3Node[]>([]);
-  const [simulationLinks, setSimulationLinks] = useState<D3Link[]>([]);
-  const simulationRef = useRef<d3Force.Simulation<D3Node, D3Link> | null>(null);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: _simKey intentionally used as restart trigger
-  useEffect(() => {
-    if (nodes.length === 0 || viewMode !== "graph") return;
-
-    // Create fresh copies of nodes and links
-    const d3Nodes: D3Node[] = nodes.map((n) => ({ ...n }));
-    const d3Links: D3Link[] = links.map((l) => ({ ...l }));
-
-    // Setup force simulation
-    const simulation = d3Force
-      .forceSimulation<D3Node>(d3Nodes)
-      .alphaDecay(0.06)
-      .velocityDecay(0.55)
-      .force(
-        "link",
-        d3Force
-          .forceLink<D3Node, D3Link>(d3Links)
-          .id((d) => d.id)
-          .distance((d) => {
-            const s = d.source as D3Node;
-            const t = d.target as D3Node;
-            const sourceCount = s?.linkCount || 1;
-            const targetCount = t?.linkCount || 1;
-            return 80 + Math.min(sourceCount, targetCount) * 10;
-          }),
-      )
-      .force("charge", d3Force.forceManyBody().strength(-220))
-      .force("x", d3Force.forceX(0).strength(0.06))
-      .force("y", d3Force.forceY(0).strength(0.06))
-      .force(
-        "collision",
-        d3Force
-          .forceCollide<D3Node>()
-          .radius((d) => {
-            const baseRadius = d.type === "domain" ? 24 : 14;
-            return baseRadius + Math.sqrt(d.linkCount) * 3 + 12;
-          })
-          .strength(1)
-          .iterations(2),
-      );
-
-    simulationRef.current = simulation;
-
-    // Run active updates on tick
-    simulation.on("tick", () => {
-      if (svgRef.current) {
-        const rect = svgRef.current.getBoundingClientRect();
-        const w = rect.width;
-        const h = rect.height;
-
-        d3Nodes.forEach((node) => {
-          const radius = node.type === "domain" ? 30 : 18;
-          const padX = w / 2 - radius;
-          const padY = h / 2 - radius;
-
-          if (node.x !== undefined && node.y !== undefined) {
-            // Clamp X and bounce
-            if (node.x < -padX) {
-              node.x = -padX;
-              if (node.vx !== undefined) node.vx = Math.abs(node.vx) * 0.5;
-            } else if (node.x > padX) {
-              node.x = padX;
-              if (node.vx !== undefined) node.vx = -Math.abs(node.vx) * 0.5;
-            }
-
-            // Clamp Y and bounce
-            if (node.y < -padY) {
-              node.y = -padY;
-              if (node.vy !== undefined) node.vy = Math.abs(node.vy) * 0.5;
-            } else if (node.y > padY) {
-              node.y = padY;
-              if (node.vy !== undefined) node.vy = -Math.abs(node.vy) * 0.5;
-            }
-          }
-        });
-      }
-      setSimulationNodes([...d3Nodes]);
-      setSimulationLinks([...d3Links]);
-    });
-
-    return () => {
-      simulation.stop();
-    };
-  }, [nodes, links, _simKey, viewMode]);
-
-  // Center the view on load and resize
-  useEffect(() => {
-    if (viewMode !== "graph" || !svgRef.current) return;
-
-    const handleResize = () => {
-      if (svgRef.current) {
-        const rect = svgRef.current.getBoundingClientRect();
-        setPan({ x: rect.width / 2, y: rect.height / 2 });
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Center initially
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [viewMode]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (draggedNodeRef.current && svgRef.current && simulationRef.current) {
-      const rect = svgRef.current.getBoundingClientRect();
-      const localX = (e.clientX - rect.left - pan.x) / zoom;
-      const localY = (e.clientY - rect.top - pan.y) / zoom;
-
-      const node = draggedNodeRef.current;
-      node.fx = localX;
-      node.fy = localY;
-      hasMovedRef.current = true;
-
-      // Keep the simulation warm and active
-      simulationRef.current.alpha(0.3).restart();
-    }
-  };
-
-  const handleMouseUpOrLeave = () => {
-    if (draggedNodeRef.current) {
-      draggedNodeRef.current.fx = null;
-      draggedNodeRef.current.fy = null;
-      draggedNodeRef.current = null;
-
-      if (simulationRef.current) {
-        simulationRef.current.alphaTarget(0).restart();
-      }
-    }
-  };
+    ],
+    [],
+  );
 
   // Helper to find the currently selected node object
   const selectedNode = useMemo(() => {
@@ -260,7 +54,6 @@ export function SkillsGraph({
         id: selectedSkill,
         name: selectedSkill,
         type: "technology" as const,
-        linkCount: 0,
       }
     );
   }, [selectedSkill, nodes]);
@@ -282,7 +75,7 @@ export function SkillsGraph({
     return PROJECTS.filter((p) =>
       p.technologies.some((technology) => technology === selectedNode.id),
     );
-  }, [selectedNode, techMap, PROJECTS]);
+  }, [selectedNode, PROJECTS]);
 
   const activeTimelineItems = useMemo(() => {
     if (!selectedNode) return [];
@@ -306,7 +99,7 @@ export function SkillsGraph({
         title:
           "company" in item ? `${item.role} · ${item.company}` : `${item.title} · ${item.event}`,
       }));
-  }, [selectedNode, techMap, EXPERIENCES, EVENTS]);
+  }, [selectedNode, EXPERIENCES, EVENTS]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
@@ -315,70 +108,7 @@ export function SkillsGraph({
       .filter(([, cat]) => cat === selectedNode.id)
       .map(([tech]) => tech)
       .sort();
-  }, [selectedNode, techMap]);
-
-  const handleNodeDragStart = (e: React.MouseEvent, node: D3Node) => {
-    e.stopPropagation();
-    if (e.button !== 0) return;
-
-    draggedNodeRef.current = node;
-    node.fx = node.x;
-    node.fy = node.y;
-    hasMovedRef.current = false;
-
-    if (simulationRef.current) {
-      simulationRef.current.alphaTarget(0.3).restart();
-    }
-  };
-
-  const handleZoomIn = () => setZoom((z) => Math.min(3, z * 1.15));
-  const handleZoomOut = () => setZoom((z) => Math.max(0.4, z / 1.15));
-  const handleReset = () => {
-    setZoom(1);
-    if (svgRef.current) {
-      const rect = svgRef.current.getBoundingClientRect();
-      setPan({ x: rect.width / 2, y: rect.height / 2 });
-    }
-    onSelectSkill(null);
-  };
-
-  // Node highlighting and dimming logic
-  const isNodeDimmed = (nodeId: string) => {
-    const activeSkill = selectedSkill;
-    const hoverSkill = hoveredNodeId;
-
-    if (activeSkill && activeSkill !== nodeId) {
-      // Check if they are connected
-      const isConnected = links.some((l) => {
-        const sId = typeof l.source === "string" ? l.source : l.source.id;
-        const tId = typeof l.target === "string" ? l.target : l.target.id;
-        return (sId === activeSkill && tId === nodeId) || (tId === activeSkill && sId === nodeId);
-      });
-      if (!isConnected) return true;
-    }
-
-    if (hoverSkill && hoverSkill !== nodeId) {
-      const isConnected = links.some((l) => {
-        const sId = typeof l.source === "string" ? l.source : l.source.id;
-        const tId = typeof l.target === "string" ? l.target : l.target.id;
-        return (sId === hoverSkill && tId === nodeId) || (tId === hoverSkill && sId === nodeId);
-      });
-      if (!isConnected) return true;
-    }
-
-    return false;
-  };
-
-  const isLinkActive = (link: D3Link) => {
-    const sId = typeof link.source === "string" ? link.source : link.source.id;
-    const tId = typeof link.target === "string" ? link.target : link.target.id;
-
-    const highlightId = hoveredNodeId || selectedSkill;
-    if (highlightId) {
-      return sId === highlightId || tId === highlightId;
-    }
-    return false;
-  };
+  }, [selectedNode]);
 
   // Categorize technologies for the traditional list view — derived dynamically from techMap so it's always in sync
   const categorizedSkills = useMemo(() => {
@@ -394,7 +124,7 @@ export function SkillsGraph({
       name: catName,
       items: buckets[catName].sort(),
     }));
-  }, [techMap]);
+  }, []);
 
   const renderDetailsCard = () => {
     if (!selectedNode) return null;
@@ -488,14 +218,13 @@ export function SkillsGraph({
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Tracks pointer movement for dragging graph nodes.
     <div
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      className="w-full relative border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl shadow-sm flex flex-col min-h-[500px]"
+      className={`w-full relative flex flex-col min-h-[500px] ${viewMode === "list" ? "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl shadow-sm" : ""}`}
     >
       {/* Control bar */}
-      <header className="px-5 py-4 border-b border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-3 justify-between items-center bg-neutral-50 dark:bg-neutral-900/50 rounded-t-xl">
+      <header
+        className={`px-5 py-4 flex flex-col sm:flex-row gap-3 justify-between items-center ${viewMode === "list" ? "border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 rounded-t-xl" : ""}`}
+      >
         <div className="flex items-center gap-2.5">
           <Network className="text-neutral-700 dark:text-neutral-300 animate-pulse" size={20} />
           <div>
@@ -536,183 +265,27 @@ export function SkillsGraph({
               List View
             </button>
           </div>
-
-          {viewMode === "graph" && (
-            <button
-              type="button"
-              onClick={() => setSimKey((k) => k + 1)}
-              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 hover:bg-neutral-50 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-400 transition-colors cursor-pointer"
-              aria-label="Recalculate skill graph"
-            >
-              <RefreshCw size={14} />
-            </button>
-          )}
         </div>
       </header>
 
       {/* Main graph viewport / list */}
-      <div className="flex-1 min-h-0 relative bg-neutral-50/50 dark:bg-neutral-950/20 rounded-b-xl">
+      <div
+        className={`flex-1 min-h-0 relative ${viewMode === "list" ? "bg-neutral-50/50 dark:bg-neutral-950/20 rounded-b-xl" : ""}`}
+      >
         {viewMode === "graph" ? (
-          // biome-ignore lint/a11y/noStaticElementInteractions: Ends graph dragging when the pointer is released or leaves.
-          <div
-            className="w-full h-[450px] sm:h-[500px] relative overflow-hidden select-none"
-            onMouseUp={handleMouseUpOrLeave}
-            onMouseLeave={handleMouseUpOrLeave}
+          <Suspense
+            fallback={
+              <div className="h-[500px] flex items-center justify-center text-sm text-neutral-500">
+                Loading skills globe…
+              </div>
+            }
           >
-            <svg ref={svgRef} className="w-full h-full">
-              <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-                {/* Connection lines */}
-                <g>
-                  {simulationLinks.map((link, idx) => {
-                    const s = link.source as D3Node;
-                    const t = link.target as D3Node;
-                    if (!s || !t || s.x === undefined || t.x === undefined) return null;
-                    const isActive = isLinkActive(link);
-                    const isDimmed = isNodeDimmed(s.id) || isNodeDimmed(t.id);
-
-                    return (
-                      <line
-                        key={`link-${s.id}-${t.id}-${idx}`}
-                        x1={s.x}
-                        y1={s.y}
-                        x2={t.x}
-                        y2={t.y}
-                        stroke={isActive ? "#3b82f6" : "#d4d4d8"}
-                        strokeWidth={isActive ? 2 : 1}
-                        strokeOpacity={isDimmed && !isActive ? 0.08 : isActive ? 0.8 : 0.25}
-                        className="transition-all duration-300 dark:stroke-neutral-800"
-                      />
-                    );
-                  })}
-                </g>
-
-                {/* Nodes */}
-                <g>
-                  {simulationNodes.map((node) => {
-                    if (node.x === undefined || node.y === undefined) return null;
-                    const isSelected = node.id === selectedSkill;
-                    const isDimmed = isNodeDimmed(node.id);
-                    const radius =
-                      node.type === "domain"
-                        ? 22 + Math.sqrt(node.linkCount) * 2
-                        : 10 + Math.sqrt(node.linkCount) * 1.5;
-
-                    return (
-                      // biome-ignore lint/a11y/useSemanticElements: SVG nodes cannot be HTML buttons.
-                      <g
-                        key={node.id}
-                        transform={`translate(${node.x}, ${node.y})`}
-                        onMouseDown={(e) => handleNodeDragStart(e, node)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (hasMovedRef.current) return;
-                          onSelectSkill(isSelected ? null : node.id);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (hasMovedRef.current) return;
-                            onSelectSkill(isSelected ? null : node.id);
-                          }
-                        }}
-                        onMouseEnter={() => setHoveredNodeId(node.id)}
-                        onMouseLeave={() => setHoveredNodeId(null)}
-                        tabIndex={0}
-                        role="button"
-                        aria-label={`${node.name}, ${node.type === "domain" ? "skill domain" : "technology"}`}
-                        className="cursor-grab active:cursor-grabbing select-none group"
-                      >
-                        {/* Selected halo */}
-                        {isSelected && (
-                          <circle
-                            r={radius + 6}
-                            fill="none"
-                            stroke="#3b82f6"
-                            strokeWidth={1.5}
-                            strokeDasharray="3 2"
-                            className="animate-[spin_20s_linear_infinite]"
-                          />
-                        )}
-
-                        {/* Outer interactive circle */}
-                        <circle
-                          r={radius + 3}
-                          fill="transparent"
-                          className="group-hover:stroke-neutral-200 dark:group-hover:stroke-neutral-800 transition-colors duration-200"
-                          strokeWidth={1}
-                        />
-
-                        {/* Core circle */}
-                        <circle
-                          r={radius}
-                          fill={node.type === "domain" ? "#3b82f6" : "#22c55e"}
-                          fillOpacity={isDimmed ? 0.15 : isSelected ? 0.95 : 0.75}
-                          className="transition-all duration-300"
-                        />
-
-                        {/* Core text label */}
-                        <text
-                          dy=".31em"
-                          textAnchor="middle"
-                          fontSize={node.type === "domain" ? "10px" : "8px"}
-                          fontWeight={node.type === "domain" ? "bold" : "normal"}
-                          fill={isDimmed ? "#a3a3a3" : "#171717"}
-                          fillOpacity={isDimmed ? 0.25 : 0.9}
-                          className="select-none pointer-events-none dark:fill-white font-sans transition-all duration-300"
-                        >
-                          {node.name}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </g>
-              </g>
-            </svg>
-
-            {/* Float controls */}
-            <div className="absolute bottom-4 right-4 flex flex-col gap-1.5 z-10">
-              <button
-                type="button"
-                onClick={handleZoomIn}
-                className="h-8 w-8 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 text-neutral-700 dark:text-neutral-300 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-900 cursor-pointer"
-                aria-label="Zoom in skill graph"
-              >
-                <ZoomIn size={14} />
-              </button>
-              <button
-                type="button"
-                onClick={handleZoomOut}
-                className="h-8 w-8 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 text-neutral-700 dark:text-neutral-300 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-900 cursor-pointer"
-                aria-label="Zoom out skill graph"
-              >
-                <ZoomOut size={14} />
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className="h-8 w-8 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 text-neutral-700 dark:text-neutral-300 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-900 cursor-pointer"
-                aria-label="Reset skill graph zoom"
-              >
-                <Maximize size={13} />
-              </button>
-            </div>
-
-            {/* Legend (Bottom-Left) */}
-            <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-neutral-950/95 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 shadow-md text-[10px] space-y-2 z-10 select-none font-mono">
-              <span className="font-bold text-neutral-800 dark:text-neutral-200 block border-b border-neutral-200 dark:border-neutral-800 pb-1 uppercase tracking-wider">
-                Graph Legend
-              </span>
-              <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]" />
-                <span>Domain</span>
-              </div>
-              <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
-                <span>Technology</span>
-              </div>
-            </div>
-          </div>
+            <SkillsGlobe
+              selectedSkill={selectedSkill}
+              onSelectSkill={onSelectSkill}
+              onShowList={() => setViewMode("list")}
+            />
+          </Suspense>
         ) : (
           // List view: full scroll within a bounded container
           <div className="max-h-[540px] overflow-y-auto">
@@ -736,8 +309,6 @@ export function SkillsGraph({
                           <button
                             key={item}
                             type="button"
-                            onMouseEnter={() => setHoveredNodeId(item)}
-                            onMouseLeave={() => setHoveredNodeId(null)}
                             onClick={() => onSelectSkill(isSelected ? null : item)}
                             className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all cursor-pointer ${
                               isSelected
