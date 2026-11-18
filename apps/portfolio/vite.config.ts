@@ -7,6 +7,19 @@ import { defineConfig } from "vite";
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  environments: {
+    client: {
+      build: {
+        rolldownOptions: {
+          output: {
+            codeSplitting: {
+              groups: [{ name: "three-core", test: /three[\\/]build[\\/]three\.core\.js$/ }],
+            },
+          },
+        },
+      },
+    },
+  },
 
   plugins: [
     devtools(),

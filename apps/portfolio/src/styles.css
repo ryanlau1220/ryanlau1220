@@ -67,6 +67,41 @@ html {
   scroll-padding-top: 5rem;
 }
 
+/* Keep native mobile pickers; enhance the desktop menu where supported. */
+@media (hover: hover) and (pointer: fine) {
+  @supports (appearance: base-select) {
+    .skill-domain-select,
+    .skill-domain-select::picker(select) {
+      appearance: base-select;
+    }
+    .skill-domain-select::picker-icon {
+      display: none;
+    }
+    .skill-domain-select::picker(select) {
+      margin-top: 0.5rem;
+      padding: 0.4rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      box-shadow: 0 12px 36px rgb(0 0 0 / 0.16);
+    }
+    .skill-domain-select option {
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .skill-domain-select option:hover,
+    .skill-domain-select option:focus-visible {
+      background: var(--bg-secondary);
+    }
+    .skill-domain-select option::checkmark {
+      color: var(--accent-color);
+    }
+  }
+}
+
 /* Keep the sections' normal padding while landing closer to their headings. */
 #skills,
 #projects,

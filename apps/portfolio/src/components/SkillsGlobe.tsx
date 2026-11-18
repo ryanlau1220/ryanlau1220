@@ -1,3 +1,4 @@
+import { ChevronDown, Globe2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { SKILL_CATEGORIES, TECHNOLOGY_CATEGORIES } from "../data/registry";
@@ -31,6 +32,26 @@ const points = skills.map((skill, index) => {
   };
 });
 
+// Find a view that brings the largest concentration of this domain toward the camera.
+function domainView(category: string) {
+  const domainPoints = points.filter((point) => point.category === category);
+  let best = { x: -0.12, y: 0, score: -1 };
+  for (let pitch = -7; pitch <= 7; pitch++) {
+    const x = pitch * 0.2;
+    for (let longitude = 0; longitude < 48; longitude++) {
+      const y = (longitude * Math.PI * 2) / 48;
+      const score = domainPoints.reduce((total, point) => {
+        const depth =
+          Math.sin(x) * point.position.y +
+          Math.cos(x) * (-Math.sin(y) * point.position.x + Math.cos(y) * point.position.z);
+        return total + Math.max(0, depth - 0.4);
+      }, 0);
+      if (score > best.score) best = { x, y, score };
+    }
+  }
+  return { x: best.x, y: best.y };
+}
+
 type Props = {
   selectedSkill: string | null;
   onSelectSkill: (skill: string | null) => void;
@@ -43,6 +64,9 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
   const selectedRef = useRef(selectedSkill);
   const categoryRef = useRef("All domains");
   const rotationRef = useRef({ x: -0.12, y: 0 });
+  const targetRef = useRef<{ x: number; y: number } | null>(null);
+  const focusRef = useRef<{ x: number; y: number } | null>(null);
+  const swayRef = useRef(0);
   const zoomRef = useRef(3.3);
   const pausedUntilRef = useRef(0);
   const draggedRef = useRef(false);
@@ -152,8 +176,26 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
       }
       const delta = Math.min((time - (last || time)) / 1000, 0.05);
       last = time;
-      if (!selectedRef.current && !dragRef.current && time > pausedUntilRef.current)
-        rotationRef.current.y += delta * 0.12;
+      if (!selectedRef.current && !dragRef.current && targetRef.current) {
+        const target = targetRef.current;
+        const progress = 1 - Math.exp(-delta * 6);
+        rotationRef.current.x += (target.x - rotationRef.current.x) * progress;
+        rotationRef.current.y += (target.y - rotationRef.current.y) * progress;
+        if (
+          Math.abs(target.x - rotationRef.current.x) + Math.abs(target.y - rotationRef.current.y) <
+          0.002
+        ) {
+          rotationRef.current = { ...target };
+          targetRef.current = null;
+        }
+      } else if (!selectedRef.current && !dragRef.current && time > pausedUntilRef.current) {
+        if (focusRef.current) {
+          swayRef.current += delta * 0.22;
+          rotationRef.current.y = focusRef.current.y + Math.sin(swayRef.current) * 0.25;
+        } else {
+          rotationRef.current.y += delta * 0.12;
+        }
+      }
       globe.rotation.set(rotationRef.current.x, rotationRef.current.y, 0);
       const width = mount.clientWidth,
         height = mount.clientHeight;
@@ -255,6 +297,24 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
   const pause = () => {
     pausedUntilRef.current = performance.now() + 4000;
   };
+  const focusDomain = (domain: string) => {
+    const destination = domain === "All domains" ? { x: -0.12, y: 0 } : domainView(domain);
+    const currentY = rotationRef.current.y;
+    const y =
+      currentY + Math.atan2(Math.sin(destination.y - currentY), Math.cos(destination.y - currentY));
+    targetRef.current = { x: destination.x, y };
+    focusRef.current = domain === "All domains" ? null : { x: destination.x, y };
+    swayRef.current = 0;
+    pause();
+  };
+  const finishDrag = () => {
+    if (dragRef.current?.moved && categoryRef.current !== "All domains") {
+      focusRef.current = { ...rotationRef.current };
+      swayRef.current = 0;
+    }
+    dragRef.current = null;
+    pause();
+  };
   if (failed)
     return (
       <div className="flex h-[400px] flex-col items-center justify-center gap-3 text-sm text-neutral-500">
@@ -270,22 +330,41 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
     );
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-neutral-500">
-        <label htmlFor="globe-domain">Explore a domain</label>
-        <select
-          id="globe-domain"
-          value={category}
-          onChange={(event) => {
-            setCategory(event.target.value);
-            pause();
-          }}
-          className="rounded-lg border border-neutral-200 bg-white/70 px-3 py-2 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200"
-        >
-          <option>All domains</option>
-          {SKILL_CATEGORIES.map((domain) => (
-            <option key={domain}>{domain}</option>
-          ))}
-        </select>
+      <div className="mx-auto w-full max-w-[320px] px-3 sm:px-0">
+        <label htmlFor="globe-domain" className="sr-only">
+          Explore a domain
+        </label>
+        <div className="relative">
+          <Globe2
+            aria-hidden="true"
+            size={17}
+            className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-blue-600 dark:text-blue-400"
+          />
+          <select
+            id="globe-domain"
+            name="domain"
+            value={category}
+            onChange={(event) => {
+              const domain = event.target.value;
+              categoryRef.current = domain;
+              setCategory(domain);
+              focusDomain(domain);
+            }}
+            className="skill-domain-select w-full cursor-pointer appearance-none rounded-xl border border-neutral-200 bg-white/80 py-3 pl-11 pr-10 text-sm font-medium text-neutral-800 shadow-sm transition-colors hover:border-blue-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 dark:border-neutral-700 dark:bg-neutral-950/80 dark:text-neutral-100 dark:hover:border-blue-500"
+          >
+            <option value="All domains">All domains</option>
+            {SKILL_CATEGORIES.map((domain) => (
+              <option key={domain} value={domain}>
+                {domain}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            aria-hidden="true"
+            size={16}
+            className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
+          />
+        </div>
       </div>
       <div
         ref={mountRef}
@@ -294,6 +373,7 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
         style={{ touchAction: "pan-y" }}
         onPointerDown={(event) => {
           if (event.button !== 0) return;
+          targetRef.current = null;
           draggedRef.current = false;
           dragRef.current = { x: event.clientX, y: event.clientY, moved: false };
           pause();
@@ -317,22 +397,14 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
           drag.y = event.clientY;
           pause();
         }}
-        onPointerUp={() => {
-          dragRef.current = null;
-          pause();
-        }}
-        onPointerCancel={() => {
-          dragRef.current = null;
-          pause();
-        }}
-        onPointerLeave={() => {
-          dragRef.current = null;
-          pause();
-        }}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
+        onPointerLeave={finishDrag}
       >
         {points.map((point, index) => (
           <button
             key={point.name}
+            data-domain={point.category}
             ref={(element) => {
               labelRefs.current[index] = element;
             }}
@@ -380,9 +452,8 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
         <button
           type="button"
           onClick={() => {
-            rotationRef.current = { x: -0.12, y: 0 };
             zoomRef.current = 3.3;
-            pause();
+            focusDomain(categoryRef.current);
           }}
           className="rounded border border-neutral-200 px-2 py-1 dark:border-neutral-700"
         >

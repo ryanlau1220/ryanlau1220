@@ -29,8 +29,7 @@ export function SkillsGraph({
   experiences: EXPERIENCES,
   events: EVENTS,
 }: SkillsGraphProps) {
-  // The complete connected inventory is intentionally dense; begin with the scannable view.
-  const [viewMode, setViewMode] = useState<"graph" | "list">("list");
+  const [viewMode, setViewMode] = useState<"graph" | "list">("graph");
   const techMap = TECHNOLOGY_CATEGORIES;
   const technologies = Object.keys(techMap).sort();
   const domains = SKILL_CATEGORIES;
@@ -242,6 +241,7 @@ export function SkillsGraph({
           <div className="flex bg-neutral-200/60 dark:bg-neutral-800/70 p-0.5 rounded-lg text-xs">
             <button
               type="button"
+              aria-pressed={viewMode === "graph"}
               onClick={() => setViewMode("graph")}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === "graph"
@@ -254,6 +254,7 @@ export function SkillsGraph({
             </button>
             <button
               type="button"
+              aria-pressed={viewMode === "list"}
               onClick={() => setViewMode("list")}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === "list"
