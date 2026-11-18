@@ -47,14 +47,50 @@ test("globe loads on demand, rotates and preserves linked skill details", async 
   await expect(skill).toBeVisible();
   const skillName = ((await skill.textContent()) ?? "").trim();
   await globe.getByRole("button", { name: skillName, exact: true }).click();
-  const details = page.locator(".fixed.inset-0").filter({ hasText: "Linked Projects" });
+  const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
   await expect(details.getByRole("heading", { name: skillName, exact: true })).toBeVisible();
-  await expect(details.getByText(/Linked Timeline/)).toBeVisible();
+  await expect(details.getByText(/Linked Projects|Linked Timeline/).first()).toBeVisible();
   await details.getByRole("button", { name: "[Clear]" }).click();
   await section.getByRole("button", { name: "List View" }).click();
   await expect(globe).toHaveCount(0);
   await expect(section.getByRole("button", { name: "TypeScript", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("linked project navigation closes the globe card and keeps the skill filter", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.locator("#skills");
+  await section.scrollIntoViewIfNeeded();
+  await section.getByLabel("Explore a domain").selectOption("Programming Languages");
+  const globe = page.getByTestId("skills-globe");
+  await expect(globe.locator("button:visible").first()).toBeVisible();
+  // TypeScript is present in multiple projects; the list lets us set that filter
+  // before reopening the matching globe skill.
+  await section.getByRole("button", { name: "List View" }).click();
+  await section.getByRole("button", { name: "TypeScript", exact: true }).click();
+  await section.getByRole("button", { name: "Graph View" }).click();
+  await expect(
+    page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" }),
+  ).toHaveCount(0);
+  await section.getByLabel("Explore a domain").selectOption("Programming Languages");
+  const skill = globe.getByRole("button", { name: "TypeScript", exact: true });
+  await expect(skill).toBeVisible({ timeout: 10000 });
+  await skill.click();
+  const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
+  const projectLink = details
+    .locator("button")
+    .filter({ hasText: "" })
+    .filter({ has: page.locator("span.truncate") })
+    .first();
+  const title = (await projectLink.locator("span.truncate").textContent())?.trim();
+  await projectLink.click();
+  await expect(details).toHaveCount(0);
+  await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeVisible();
+  await expect(
+    page.locator("#projects").getByRole("heading", { name: title, exact: true }),
+  ).toBeVisible();
 });
 
 test("domain selector supports keyboard selection", async ({ page }, testInfo) => {
@@ -67,6 +103,52 @@ test("domain selector supports keyboard selection", async ({ page }, testInfo) =
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(selector).toHaveValue("Programming Languages");
+});
+
+test("scrolling the page dismisses the globe card without clearing its filter", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.locator("#skills");
+  await section.scrollIntoViewIfNeeded();
+  await section.getByRole("button", { name: "List View" }).click();
+  await section.getByRole("button", { name: "TypeScript", exact: true }).click();
+  await section.getByRole("button", { name: "Graph View" }).click();
+  await section.getByLabel("Explore a domain").selectOption("Programming Languages");
+  await page
+    .getByTestId("skills-globe")
+    .getByRole("button", { name: "TypeScript", exact: true })
+    .click();
+  const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
+  await expect(details).toBeVisible();
+  await page.evaluate(() => window.scrollBy({ top: 180, behavior: "instant" }));
+  await expect(details).toHaveCount(0);
+  await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeAttached();
+});
+
+test("timeline navigation dismisses globe details without clearing the project filter", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.locator("#skills");
+  await section.scrollIntoViewIfNeeded();
+  await section.getByRole("button", { name: "List View" }).click();
+  await section.getByRole("button", { name: "TypeScript", exact: true }).click();
+  await section.getByRole("button", { name: "Graph View" }).click();
+  await section.getByLabel("Explore a domain").selectOption("Programming Languages");
+  await page
+    .getByTestId("skills-globe")
+    .getByRole("button", { name: "TypeScript", exact: true })
+    .click();
+  const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
+  await details
+    .getByText(/Linked Timeline/)
+    .locator("..")
+    .getByRole("button")
+    .first()
+    .click();
+  await expect(details).toHaveCount(0);
+  await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeAttached();
 });
 
 test("desktop picker opens around the selected option", async ({ page }, testInfo) => {

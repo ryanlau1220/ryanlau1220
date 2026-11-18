@@ -1097,7 +1097,6 @@ export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
 export const TECHNOLOGY_CATEGORIES = {
   TypeScript: "Programming Languages",
   Go: "Programming Languages",
-  "C++": "Programming Languages",
   Dart: "Programming Languages",
   Python: "Programming Languages",
   Java: "Programming Languages",
@@ -1232,8 +1231,6 @@ export const TECHNOLOGY_CATEGORIES = {
   "Software Testing": "Architecture & Concepts",
   "Research Methods": "Architecture & Concepts",
   "UML Diagrams": "Architecture & Concepts",
-  "Binary Search Trees": "Architecture & Concepts",
-  "Algorithm Analysis": "Architecture & Concepts",
   "Base Network": "Architecture & Concepts",
   "NEP-413": "Architecture & Concepts",
   Gamification: "Architecture & Concepts",

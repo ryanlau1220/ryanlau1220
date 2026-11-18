@@ -137,10 +137,14 @@ function PortfolioHome() {
 
   const handleRouteToProject = (projectId: string) => {
     // Mark that we are intentionally setting the index; skip the auto-reset effect.
-    skipResetRef.current = true;
+    skipResetRef.current = projectFilter !== "all";
     setProjectFilter("all");
-    setSelectedSkill(null);
-    const idx = PROJECTS.findIndex((p) => p.id === projectId);
+    const idx = PROJECTS.filter(
+      (p) =>
+        !selectedSkill ||
+        p.technologies.some((technology) => technology === selectedSkill) ||
+        p.domains.includes(selectedSkill),
+    ).findIndex((p) => p.id === projectId);
     if (idx !== -1) {
       setCurrentProjectIdx(idx);
     }

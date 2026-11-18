@@ -1,5 +1,5 @@
 import { List, Network } from "lucide-react";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   type EventItem,
   type Experience,
@@ -30,6 +30,16 @@ export function SkillsGraph({
   events: EVENTS,
 }: SkillsGraphProps) {
   const [viewMode, setViewMode] = useState<"graph" | "list">("graph");
+  const [graphDetailsOpen, setGraphDetailsOpen] = useState(false);
+  useEffect(() => {
+    if (!graphDetailsOpen) return;
+    const initialScrollY = window.scrollY;
+    const dismissOnPageScroll = () => {
+      if (Math.abs(window.scrollY - initialScrollY) > 24) setGraphDetailsOpen(false);
+    };
+    window.addEventListener("scroll", dismissOnPageScroll, { passive: true });
+    return () => window.removeEventListener("scroll", dismissOnPageScroll);
+  }, [graphDetailsOpen]);
   const techMap = TECHNOLOGY_CATEGORIES;
   const technologies = Object.keys(techMap).sort();
   const domains = SKILL_CATEGORIES;
@@ -137,7 +147,10 @@ export function SkillsGraph({
             </h4>
             <button
               type="button"
-              onClick={() => onSelectSkill(null)}
+              onClick={() => {
+                setGraphDetailsOpen(false);
+                onSelectSkill(null);
+              }}
               className="text-[10px] font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:underline cursor-pointer"
             >
               [Clear]
@@ -155,15 +168,11 @@ export function SkillsGraph({
           </div>
         )}
 
-        <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3 flex-1 flex flex-col min-h-0">
-          <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
-            Linked Projects ({activeProjects.length})
-          </span>
-          {activeProjects.length === 0 ? (
-            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 italic">
-              No projects listed for this skill.
-            </p>
-          ) : (
+        {activeProjects.length > 0 && (
+          <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3 flex-1 flex flex-col min-h-0">
+            <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
+              Linked Projects ({activeProjects.length})
+            </span>
             <div className="space-y-1.5 overflow-y-auto max-h-[160px] pr-1">
               {activeProjects.map((proj) => (
                 <button
@@ -171,6 +180,7 @@ export function SkillsGraph({
                   type="button"
                   onClick={() => {
                     if (onRouteToProject) {
+                      setGraphDetailsOpen(false);
                       onRouteToProject(proj.id);
                     }
                   }}
@@ -183,24 +193,23 @@ export function SkillsGraph({
                 </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3">
-          <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
-            Linked Timeline ({activeTimelineItems.length})
-          </span>
-          {activeTimelineItems.length === 0 ? (
-            <p className="text-[11px] text-neutral-600 dark:text-neutral-400 italic">
-              No timeline entries listed for this skill.
-            </p>
-          ) : (
+        {activeTimelineItems.length > 0 && (
+          <div className="border-t border-neutral-100 dark:border-neutral-900/60 pt-3">
+            <span className="text-[10px] font-mono font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider block mb-2">
+              Linked Timeline ({activeTimelineItems.length})
+            </span>
             <div className="space-y-1.5 max-h-[120px] overflow-y-auto pr-1">
               {activeTimelineItems.map((item) => (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => onRouteToTimeline?.(item.id)}
+                  onClick={() => {
+                    setGraphDetailsOpen(false);
+                    onRouteToTimeline?.(item.id);
+                  }}
                   className="w-full text-left text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-between gap-2 cursor-pointer py-1 group"
                 >
                   <span className="truncate">{item.title}</span>
@@ -210,8 +219,8 @@ export function SkillsGraph({
                 </button>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -255,7 +264,10 @@ export function SkillsGraph({
             <button
               type="button"
               aria-pressed={viewMode === "list"}
-              onClick={() => setViewMode("list")}
+              onClick={() => {
+                setGraphDetailsOpen(false);
+                setViewMode("list");
+              }}
               className={`px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === "list"
                   ? "bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 shadow-sm"
@@ -282,9 +294,15 @@ export function SkillsGraph({
             }
           >
             <SkillsGlobe
-              selectedSkill={selectedSkill}
-              onSelectSkill={onSelectSkill}
-              onShowList={() => setViewMode("list")}
+              selectedSkill={graphDetailsOpen ? selectedSkill : null}
+              onSelectSkill={(skill) => {
+                setGraphDetailsOpen(skill !== null);
+                onSelectSkill(skill);
+              }}
+              onShowList={() => {
+                setGraphDetailsOpen(false);
+                setViewMode("list");
+              }}
             />
           </Suspense>
         ) : (
@@ -336,13 +354,16 @@ export function SkillsGraph({
         )}
 
         {/* Stationary Details Card in Graph View — fixed to centre of viewport so it's always readable */}
-        {viewMode === "graph" && selectedNode && (
+        {viewMode === "graph" && selectedNode && graphDetailsOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
             {/* Translucent backdrop to help the card stand out against any node */}
             <button
               type="button"
               className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto cursor-default"
-              onClick={() => onSelectSkill(null)}
+              onClick={() => {
+                setGraphDetailsOpen(false);
+                onSelectSkill(null);
+              }}
               aria-label="Close details"
             />
             <div className="relative w-80 max-w-[92vw] pointer-events-auto bg-white/98 dark:bg-neutral-950/98 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-5 backdrop-blur-md border-t-2 border-t-blue-500">
