@@ -33,11 +33,27 @@ test("header links leave every section heading below the sticky header", async (
     // Allow smooth scrolling and scroll-linked entrance motion to settle before measuring.
     await page.waitForTimeout(1200);
     await expectHeadingClearOfHeader(page, section);
+    if (["skills", "projects", "timeline"].includes(section)) {
+      const [heading, header] = await Promise.all([
+        page.locator(`#${section} h2`).first().boundingBox(),
+        page.getByRole("banner").boundingBox(),
+      ]);
+      expect(heading && header ? heading.y - (header.y + header.height) : Infinity).toBeLessThan(
+        75,
+      );
+    }
   }
 });
 
 test("direct section links leave the heading visible", async ({ page }) => {
-  await page.goto("/#projects");
-  await page.waitForTimeout(1800);
-  await expectHeadingClearOfHeader(page, "projects");
+  for (const section of ["skills", "projects", "timeline"]) {
+    await page.goto(`/#${section}`);
+    await page.waitForTimeout(1800);
+    await expectHeadingClearOfHeader(page, section);
+    const [heading, header] = await Promise.all([
+      page.locator(`#${section} h2`).first().boundingBox(),
+      page.getByRole("banner").boundingBox(),
+    ]);
+    expect(heading && header ? heading.y - (header.y + header.height) : Infinity).toBeLessThan(75);
+  }
 });

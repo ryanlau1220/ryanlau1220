@@ -67,6 +67,13 @@ html {
   scroll-padding-top: 5rem;
 }
 
+/* Keep the sections' normal padding while landing closer to their headings. */
+#skills,
+#projects,
+#timeline {
+  scroll-margin-top: -4rem;
+}
+
 :is(a, button, input, textarea, [tabindex]):focus-visible {
   outline: 2px solid #60a5fa;
   outline-offset: 3px;
