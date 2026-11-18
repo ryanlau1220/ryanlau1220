@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { Project } from "../data/registry";
 import { getProjectPreviewUrl } from "../project-images";
 
@@ -14,7 +14,53 @@ export function ProjectOrbit({ projects, activeIndex, onSelect, children }: Proj
   const orbitRef = useRef<HTMLElement>(null);
   const activeRef = useRef(activeIndex);
   const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const previousRef = useRef<{ index: number; snapshot: HTMLElement; height: number } | null>(null);
   activeRef.current = activeIndex;
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    const card = stage?.firstElementChild as HTMLElement | null;
+    if (!stage || !card) return;
+    const previous = previousRef.current;
+    const height = card.offsetHeight;
+    if (previous && previous.index !== activeIndex) {
+      const direction = (previous.index + 1) % projects.length === activeIndex ? 1 : -1;
+      const old = previous.snapshot;
+      old.setAttribute("aria-hidden", "true");
+      old.setAttribute("inert", "");
+      Object.assign(old.style, {
+        position: "absolute",
+        inset: "0",
+        width: "100%",
+        pointerEvents: "none",
+      });
+      stage.appendChild(old);
+      const options = { duration: 300, easing: "cubic-bezier(0.22, 1, 0.36, 1)" };
+      const outgoing = old.animate(
+        [
+          { transform: "translateX(0)", opacity: 1 },
+          { transform: `translateX(${-direction * 28}%)`, opacity: 0 },
+        ],
+        options,
+      );
+      card.animate(
+        [
+          { transform: `translateX(${direction * 28}%)`, opacity: 0 },
+          { transform: "translateX(0)", opacity: 1 },
+        ],
+        options,
+      );
+      if (height !== previous.height)
+        stage.animate([{ height: `${previous.height}px` }, { height: `${height}px` }], options);
+      void outgoing.finished.catch(() => {}).finally(() => old.remove());
+    }
+    previousRef.current = {
+      index: activeIndex,
+      snapshot: card.cloneNode(true) as HTMLElement,
+      height,
+    };
+  }, [activeIndex, projects.length]);
 
   useEffect(() => {
     const orbit = orbitRef.current;
@@ -91,7 +137,9 @@ export function ProjectOrbit({ projects, activeIndex, onSelect, children }: Proj
           </button>
         </>
       )}
-      <div className="orbit-active">{children}</div>
+      <div ref={stageRef} className="orbit-active">
+        {children}
+      </div>
     </section>
   );
 }

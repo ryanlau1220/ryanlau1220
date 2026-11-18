@@ -69,6 +69,63 @@ test("domain selector supports keyboard selection", async ({ page }, testInfo) =
   await expect(selector).toHaveValue("Programming Languages");
 });
 
+test("desktop picker opens around the selected option", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name.startsWith("mobile"), "Mobile devices use their native picker.");
+  await page.goto("/");
+  test.skip(
+    !(await page.evaluate(() => CSS.supports("appearance", "base-select"))),
+    "Browser uses its native picker.",
+  );
+  await page.locator("#skills").scrollIntoViewIfNeeded();
+  const selector = page.getByLabel("Explore a domain");
+  await selector.selectOption("Programming Languages");
+  await selector.click();
+  await page.waitForTimeout(300);
+  const [trigger, selected, first] = await Promise.all([
+    selector.boundingBox(),
+    page.getByRole("option", { name: "Programming Languages" }).boundingBox(),
+    page.getByRole("option", { name: "All domains" }).boundingBox(),
+  ]);
+  expect(trigger && selected && first).toBeTruthy();
+  if (!trigger || !selected || !first) return;
+  expect(
+    Math.abs(trigger.y + trigger.height / 2 - (selected.y + selected.height / 2)),
+  ).toBeLessThan(5);
+  expect(first.y).toBeLessThan(trigger.y);
+});
+
+test("desktop picker distinguishes the hovered option from the current selection", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name.startsWith("mobile"), "Mobile devices use their native picker.");
+  await page.goto("/");
+  test.skip(
+    !(await page.evaluate(() => CSS.supports("appearance", "base-select"))),
+    "Browser uses its native picker.",
+  );
+  await page.locator("#skills").scrollIntoViewIfNeeded();
+  const selector = page.getByLabel("Explore a domain");
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(
+      (value) => document.documentElement.setAttribute("data-theme", value),
+      theme,
+    );
+    await selector.click();
+    await page.waitForTimeout(250);
+    const hovered = page.getByRole("option", { name: "Frontend Development" });
+    await hovered.hover();
+    await expect.poll(() => hovered.evaluate((element) => element.matches(":hover"))).toBe(true);
+    const hoveredBackground = await hovered.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    const selectedBackground = await page
+      .getByRole("option", { name: "All domains" })
+      .evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(hoveredBackground).not.toBe(selectedBackground);
+    await page.keyboard.press("Escape");
+  }
+});
+
 test("each domain turns the globe toward its skills", async ({ page }) => {
   await page.goto("/");
   await page.locator("#skills").scrollIntoViewIfNeeded();

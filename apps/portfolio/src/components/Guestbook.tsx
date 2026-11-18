@@ -184,6 +184,7 @@ export function Guestbook({
   onClose?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const [isClosing, setIsClosing] = useState(false);
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [realtime, setRealtime] = useState<GuestbookRealtimeConfig | null>(null);
@@ -220,11 +221,20 @@ export function Guestbook({
 
     closeButtonRef.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "Escape") setIsClosing(true);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isClosing) return;
+    const timer = window.setTimeout(() => {
+      setIsOpen(false);
+      onClose?.();
+    }, 360);
+    return () => window.clearTimeout(timer);
+  }, [isClosing, onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -299,10 +309,9 @@ export function Guestbook({
   useRealtimeGuestbook(isOpen, realtime, handleRealtimeEntry);
 
   const close = () => {
-    setIsOpen(false);
+    setIsClosing(true);
     setNotice(null);
     setError(null);
-    onClose?.();
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -352,7 +361,9 @@ export function Guestbook({
   };
 
   return isOpen ? (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center p-3 sm:items-center sm:justify-end sm:p-5">
+    <div
+      className={`guestbook-overlay fixed inset-0 z-[70] flex items-end justify-center p-3 sm:items-center sm:justify-end sm:p-5 ${isClosing ? "guestbook-closing pointer-events-none" : ""}`}
+    >
       <button
         type="button"
         className="absolute inset-0 bg-neutral-950/25 dark:bg-black/60 backdrop-blur-[2px]"
@@ -364,7 +375,7 @@ export function Guestbook({
         id="visitor-log"
         aria-modal="true"
         aria-labelledby="visitor-log-title"
-        className="relative m-0 flex max-h-[min(760px,calc(100vh-1.5rem))] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-0 shadow-2xl shadow-neutral-950/20"
+        className="guestbook-panel relative m-0 flex max-h-[min(760px,calc(100vh-1.5rem))] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-0 shadow-2xl shadow-neutral-950/20"
       >
         <header className="flex items-start justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 px-5 py-4">
           <div>

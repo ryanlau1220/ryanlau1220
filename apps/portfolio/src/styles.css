@@ -67,6 +67,105 @@ html {
   scroll-padding-top: 5rem;
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-reveal-contract::view-transition-old(root) {
+  z-index: 2;
+}
+
+.guestbook-overlay {
+  animation: guestbook-backdrop-in 400ms ease both;
+}
+.guestbook-overlay.guestbook-closing {
+  animation: guestbook-backdrop-in 360ms ease reverse both;
+}
+.guestbook-panel {
+  animation: guestbook-wave 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: bottom right;
+}
+.guestbook-closing .guestbook-panel {
+  animation: guestbook-wave 360ms ease-in reverse both;
+}
+.guestbook-ripple {
+  position: fixed;
+  z-index: 80;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: guestbook-ripple-lifetime 1000ms both;
+}
+.guestbook-ripple-ring,
+.guestbook-ripple-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.guestbook-ripple-ring {
+  border: 1px solid rgb(96 165 250 / 0.95);
+  box-shadow:
+    0 0 18px rgb(59 130 246 / 0.55),
+    inset 0 0 12px rgb(147 197 253 / 0.35);
+  animation: guestbook-ripple-expand 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.guestbook-ripple-ring-delayed {
+  animation-delay: 120ms;
+}
+.guestbook-ripple-core {
+  background: radial-gradient(
+    circle,
+    rgb(191 219 254 / 0.85),
+    rgb(59 130 246 / 0.2) 55%,
+    transparent 72%
+  );
+  animation: guestbook-ripple-expand 650ms ease-out both;
+}
+@keyframes guestbook-ripple-expand {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.25);
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(7.5);
+  }
+}
+@keyframes guestbook-ripple-lifetime {
+  0%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes guestbook-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes guestbook-wave {
+  from {
+    opacity: 0;
+    transform: translate(16px, 20px) scale(0.82);
+    clip-path: circle(0% at 100% 100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: circle(150% at 100% 100%);
+  }
+}
+
 /* Keep native mobile pickers; enhance the desktop menu where supported. */
 @media (hover: hover) and (pointer: fine) {
   @supports (appearance: base-select) {
@@ -78,13 +177,39 @@ html {
       display: none;
     }
     .skill-domain-select::picker(select) {
-      margin-top: 0.5rem;
+      position: fixed;
+      position-area: none;
+      inset: auto;
+      top: var(--domain-picker-top, 0px);
+      left: var(--domain-picker-left, 0px);
+      width: var(--domain-picker-width, 320px);
+      max-height: calc(100dvh - 16px);
+      margin: 0;
       padding: 0.4rem;
       border: 1px solid var(--border-color);
       border-radius: 0.75rem;
       background: var(--bg-primary);
       color: var(--text-primary);
       box-shadow: 0 12px 36px rgb(0 0 0 / 0.16);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+      transform-origin: top center;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease,
+        display 180ms,
+        overlay 180ms;
+      transition-behavior: allow-discrete;
+    }
+    .skill-domain-select:open::picker(select) {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    @starting-style {
+      .skill-domain-select:open::picker(select) {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+      }
     }
     .skill-domain-select option {
       padding: 0.65rem 0.75rem;
@@ -92,9 +217,26 @@ html {
       font-size: 0.8125rem;
       cursor: pointer;
     }
+    .skill-domain-select option:checked {
+      background: #eff6ff;
+      color: #1e3a5f;
+      font-weight: 700;
+    }
     .skill-domain-select option:hover,
-    .skill-domain-select option:focus-visible {
-      background: var(--bg-secondary);
+    .skill-domain-select option:not(:checked):focus,
+    .skill-domain-select option:not(:checked):focus-visible {
+      background: #dbeafe;
+      color: #172554;
+    }
+    [data-theme="dark"] .skill-domain-select option:checked {
+      background: #142d4d;
+      color: #eff6ff;
+    }
+    [data-theme="dark"] .skill-domain-select option:hover,
+    [data-theme="dark"] .skill-domain-select option:not(:checked):focus,
+    [data-theme="dark"] .skill-domain-select option:not(:checked):focus-visible {
+      background: #274d7a;
+      color: #fff;
     }
     .skill-domain-select option::checkmark {
       color: var(--accent-color);
@@ -284,6 +426,8 @@ html {
 .orbit-active {
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  border-radius: 0.75rem;
 }
 .orbit-neighbor {
   position: absolute;
@@ -317,9 +461,6 @@ html {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-.project-detail-card {
-  animation: project-arrive 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .project-title-reveal {
   display: inline;

@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts, useLocation } from "@tanstack/react-router";
 import { House, Menu, Moon, RefreshCw, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { GuestbookLauncher } from "../components/GuestbookLauncher";
 import { PROFILE } from "../data/registry";
 import appCss from "../styles.css?url";
@@ -293,11 +294,48 @@ function RootLayout({ children }: { children: React.ReactNode }) {
     };
   }, [location.pathname]);
 
-  const toggleTheme = () => {
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
     const nextTheme = theme === "light" ? "dark" : "light";
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    localStorage.setItem("theme", nextTheme);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const update = () => {
+      flushSync(() => setTheme(nextTheme));
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      try {
+        localStorage.setItem("theme", nextTheme);
+      } catch {
+        /* Theme still works without storage. */
+      }
+    };
+    if (!document.startViewTransition) {
+      update();
+      return;
+    }
+    const root = document.documentElement;
+    root.classList.toggle("theme-reveal-contract", nextTheme === "light");
+    const transition = document.startViewTransition(update);
+    void transition.ready
+      .then(() => {
+        const small = `circle(0px at ${x}px ${y}px)`;
+        const large = `circle(${radius}px at ${x}px ${y}px)`;
+        root.animate(
+          { clipPath: nextTheme === "dark" ? [small, large] : [large, small] },
+          {
+            duration: 275,
+            easing: "ease-in-out",
+            fill: "forwards",
+            pseudoElement:
+              nextTheme === "dark" ? "::view-transition-new(root)" : "::view-transition-old(root)",
+          },
+        );
+      })
+      .catch(() => {});
+    void transition.finished.then(
+      () => root.classList.remove("theme-reveal-contract"),
+      () => root.classList.remove("theme-reveal-contract"),
+    );
   };
 
   const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string, closeMenu = false) => {

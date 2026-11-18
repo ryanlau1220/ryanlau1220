@@ -1,5 +1,5 @@
 import { MessageSquarePlus } from "lucide-react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 const GUESTBOOK_SEEN_STORAGE_KEY = "portfolio:guestbook-seen:v1";
 
@@ -11,12 +11,19 @@ interface GuestbookButtonProps {
   hasUnseenGuestbook: boolean;
   onOpen: () => void;
   onPreload: () => void;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
-function GuestbookButton({ hasUnseenGuestbook, onOpen, onPreload }: GuestbookButtonProps) {
+function GuestbookButton({
+  hasUnseenGuestbook,
+  onOpen,
+  onPreload,
+  buttonRef,
+}: GuestbookButtonProps) {
   return (
     <button
       type="button"
+      ref={buttonRef}
       onClick={onOpen}
       onMouseEnter={onPreload}
       onFocus={onPreload}
@@ -43,6 +50,9 @@ function GuestbookButton({ hasUnseenGuestbook, onOpen, onPreload }: GuestbookBut
 export function GuestbookLauncher() {
   const [hasLoadedGuestbook, setHasLoadedGuestbook] = useState(false);
   const [hasUnseenGuestbook, setHasUnseenGuestbook] = useState(false);
+  const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const openedRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -53,12 +63,25 @@ export function GuestbookLauncher() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!hasLoadedGuestbook && openedRef.current) buttonRef.current?.focus({ preventScroll: true });
+  }, [hasLoadedGuestbook]);
+
   const preloadGuestbook = () => {
     void loadGuestbook();
   };
 
   const openGuestbook = () => {
+    const bounds = buttonRef.current?.getBoundingClientRect();
+    if (bounds) {
+      setRipple({
+        x: bounds.left + bounds.width / 2,
+        y: bounds.top + bounds.height / 2,
+        id: performance.now(),
+      });
+    }
     setHasUnseenGuestbook(false);
+    openedRef.current = true;
     setHasLoadedGuestbook(true);
     try {
       localStorage.setItem(GUESTBOOK_SEEN_STORAGE_KEY, "1");
@@ -67,27 +90,44 @@ export function GuestbookLauncher() {
     }
   };
 
-  if (!hasLoadedGuestbook) {
-    return (
-      <GuestbookButton
-        hasUnseenGuestbook={hasUnseenGuestbook}
-        onOpen={openGuestbook}
-        onPreload={preloadGuestbook}
-      />
-    );
-  }
-
   return (
-    <Suspense
-      fallback={
+    <>
+      {ripple && (
+        <div
+          key={ripple.id}
+          aria-hidden="true"
+          className="guestbook-ripple"
+          style={{ left: ripple.x, top: ripple.y }}
+          onAnimationEnd={(event) => {
+            if (event.target === event.currentTarget) setRipple(null);
+          }}
+        >
+          <span className="guestbook-ripple-ring" />
+          <span className="guestbook-ripple-ring guestbook-ripple-ring-delayed" />
+          <span className="guestbook-ripple-core" />
+        </div>
+      )}
+      {!hasLoadedGuestbook ? (
         <GuestbookButton
-          hasUnseenGuestbook={false}
+          hasUnseenGuestbook={hasUnseenGuestbook}
           onOpen={openGuestbook}
           onPreload={preloadGuestbook}
+          buttonRef={buttonRef}
         />
-      }
-    >
-      <Guestbook initiallyOpen onClose={() => setHasLoadedGuestbook(false)} />
-    </Suspense>
+      ) : (
+        <Suspense
+          fallback={
+            <GuestbookButton
+              hasUnseenGuestbook={false}
+              onOpen={openGuestbook}
+              onPreload={preloadGuestbook}
+              buttonRef={buttonRef}
+            />
+          }
+        >
+          <Guestbook initiallyOpen onClose={() => setHasLoadedGuestbook(false)} />
+        </Suspense>
+      )}
+    </>
   );
 }

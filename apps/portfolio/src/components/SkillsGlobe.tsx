@@ -297,6 +297,15 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
   const pause = () => {
     pausedUntilRef.current = performance.now() + 4000;
   };
+  const positionPicker = (select: HTMLSelectElement) => {
+    const bounds = select.getBoundingClientRect();
+    const pickerHeight = Math.min(380, window.innerHeight - 16);
+    const desiredTop = bounds.top + bounds.height / 2 - 26 - select.selectedIndex * 40;
+    const top = Math.max(8, Math.min(desiredTop, window.innerHeight - pickerHeight - 8));
+    select.style.setProperty("--domain-picker-top", `${top}px`);
+    select.style.setProperty("--domain-picker-left", `${bounds.left}px`);
+    select.style.setProperty("--domain-picker-width", `${bounds.width}px`);
+  };
   const focusDomain = (domain: string) => {
     const destination = domain === "All domains" ? { x: -0.12, y: 0 } : domainView(domain);
     const currentY = rotationRef.current.y;
@@ -344,6 +353,13 @@ export default function SkillsGlobe({ selectedSkill, onSelectSkill, onShowList }
             id="globe-domain"
             name="domain"
             value={category}
+            onPointerDown={(event) => positionPicker(event.currentTarget)}
+            onKeyDown={(event) => {
+              const pickerOpen =
+                CSS.supports("selector(:open)") && event.currentTarget.matches(":open");
+              if (!pickerOpen && [" ", "Enter", "ArrowDown", "ArrowUp"].includes(event.key))
+                positionPicker(event.currentTarget);
+            }}
             onChange={(event) => {
               const domain = event.target.value;
               categoryRef.current = domain;
