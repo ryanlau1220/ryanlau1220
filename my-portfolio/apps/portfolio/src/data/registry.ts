@@ -1318,24 +1318,54 @@ export const PROFILE = {
 
 export const CERTIFICATIONS = [
   {
-    title: "Certificates",
-    description: "A compilation of my learning journey and development roadmap.",
-    href: "https://drive.google.com/drive/folders/1yL_hl6eykQmJX-as3KJKMA0w7seN5c_L?usp=sharing",
-    cta: "View certifications",
+    title: "All Credentials",
+    description: "Centralized collection of certificates, awards, and participation records.",
     icon: "award",
+    links: [
+      {
+        label: "View all credentials",
+        href: "https://drive.google.com/drive/folders/1yL_hl6eykQmJX-as3KJKMA0w7seN5c_L?usp=sharing",
+        logo: "/images/credential-providers/google-drive.png",
+      },
+    ],
   },
   {
-    title: "Google Developer",
-    description: "Developer profile showcasing my Google Cloud pathways and developer milestones.",
-    href: "https://g.dev/ryanlau1220",
-    cta: "View developer profile",
+    title: "Platform Profiles",
+    description: "Provider-specific learning profiles and achievements.",
     icon: "code",
+    links: [
+      {
+        label: "Google Developer",
+        href: "https://g.dev/ryanlau1220",
+        logo: "/images/credential-providers/google-developers.png",
+      },
+      {
+        label: "AWS Skill Builder",
+        href: "https://skillsprofile.skillbuilder.aws/user/ryanlau1220",
+        logo: "/images/credential-providers/aws-skill-builder.svg",
+      },
+      {
+        label: "Devfolio",
+        href: "https://devfolio.co/@ryanlau1220",
+        logo: "/images/credential-providers/devfolio.png",
+      },
+    ],
   },
   {
-    title: "AWS Skill Builder",
-    description: "AWS cloud training logs, simulation scores, and platform learning tracks.",
-    href: "https://skillsprofile.skillbuilder.aws/user/ryanlau1220",
-    cta: "Verify AWS profile",
-    icon: "cloud",
+    title: "Verifiable Credentials",
+    description: "Issuer-backed digital badges and certificates with public verification.",
+    icon: "badge",
+    links: [
+      {
+        label: "Credly",
+        href: "https://www.credly.com/users/ryanlau1220",
+        logo: "/images/credential-providers/credly.png",
+      },
+      {
+        label: "Credential.net",
+        href: "https://www.credential.net/profile/ryanlau1220/wallet",
+        logo: "/images/credential-providers/accredible.png",
+      },
+    ],
   },
 ] as const;

@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
   Award,
+  BadgeCheck,
   CheckCircle,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Cloud,
   Code2,
   Download,
   ExternalLink,
@@ -787,14 +788,14 @@ function PortfolioHome() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 items-start gap-6">
             {CERTIFICATIONS.map((certification) => {
               const Icon =
                 certification.icon === "award"
                   ? Award
                   : certification.icon === "code"
                     ? Code2
-                    : Cloud;
+                    : BadgeCheck;
               const iconClassName =
                 certification.icon === "award"
                   ? "bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/40 text-blue-600 dark:text-blue-400"
@@ -802,34 +803,96 @@ function PortfolioHome() {
                     ? "bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300"
                     : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400";
 
+              const isDirectLink = certification.links.length === 1;
+              const cardContent = (
+                <>
+                  <div
+                    className={`h-10 w-10 border rounded-lg flex items-center justify-center ${iconClassName}`}
+                  >
+                    <Icon size={22} aria-hidden="true" />
+                  </div>
+                  <div className="mt-4">
+                    <span className="block text-sm font-bold text-neutral-900 dark:text-white">
+                      {certification.title}
+                    </span>
+                    <span className="block text-xs text-neutral-500 mt-2 leading-relaxed">
+                      {certification.description}
+                    </span>
+                  </div>
+                  <div className="mt-auto pt-5 flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2" aria-hidden="true">
+                      {certification.links.map((link) => (
+                        <img
+                          key={link.href}
+                          src={link.logo}
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 object-contain"
+                        />
+                      ))}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono text-blue-600 dark:text-blue-400">
+                      {isDirectLink
+                        ? "Open collection"
+                        : `${certification.links.length} ${certification.icon === "code" ? "profiles" : "platforms"}`}
+                      {isDirectLink ? (
+                        <ExternalLink size={12} aria-hidden="true" />
+                      ) : (
+                        <ChevronDown
+                          size={14}
+                          aria-hidden="true"
+                          className="transition-transform duration-300 group-open:rotate-180"
+                        />
+                      )}
+                    </span>
+                  </div>
+                </>
+              );
+              const triggerClassName =
+                "flex w-full min-h-[220px] flex-col p-6 text-left cursor-pointer rounded-xl transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50 focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-blue-500";
               return (
-                <a
+                <article
                   key={certification.title}
-                  href={certification.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 rounded-xl hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 shadow-sm flex flex-col justify-between"
+                  className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl shadow-sm"
                 >
-                  <div className="space-y-4">
-                    <div
-                      className={`h-10 w-10 border rounded-lg flex items-center justify-center ${iconClassName}`}
+                  {isDirectLink ? (
+                    <a
+                      href={certification.links[0].href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={triggerClassName}
                     >
-                      <Icon size={22} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
-                        {certification.title}
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                        {certification.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 dark:text-blue-400 group-hover:underline pt-4">
-                    <span>{certification.cta}</span>
-                    <ExternalLink size={10} />
-                  </div>
-                </a>
+                      {cardContent}
+                    </a>
+                  ) : (
+                    <details className="credential-disclosure group">
+                      <summary className={triggerClassName}>{cardContent}</summary>
+                      <ul className="border-t border-neutral-100 dark:border-neutral-800 px-6 py-4 space-y-3">
+                        {certification.links.map((link) => (
+                          <li key={link.href}>
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-[11px] font-mono text-blue-600 dark:text-blue-400 hover:underline focus-visible:outline-2 focus-visible:outline-blue-500"
+                            >
+                              <img
+                                src={link.logo}
+                                alt=""
+                                width={20}
+                                height={20}
+                                className="h-5 w-5 object-contain"
+                              />
+                              {link.label}
+                              <ExternalLink size={10} aria-hidden="true" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                </article>
               );
             })}
           </div>

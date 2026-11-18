@@ -454,3 +454,22 @@ html {
   overscroll-behavior: contain;
   background: transparent;
 }
+
+/* Native disclosure remains usable where intrinsic-size animation is unsupported. */
+.credential-disclosure > summary {
+  list-style: none;
+}
+.credential-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.credential-disclosure::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+  transition:
+    block-size 300ms ease,
+    content-visibility 300ms allow-discrete;
+}
+.credential-disclosure:not([open])::details-content {
+  block-size: 0;
+}
