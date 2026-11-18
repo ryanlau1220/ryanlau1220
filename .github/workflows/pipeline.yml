@@ -4,13 +4,33 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "my-portfolio/**"
+      - "apps/portfolio/**"
+      - "apps/packages/**"
+      - "apps/package.json"
+      - "apps/pnpm-lock.yaml"
+      - "apps/pnpm-workspace.yaml"
+      - "apps/turbo.json"
+      - "apps/biome.json"
       - ".github/workflows/pipeline.yml"
+      - "!**/README.md"
+      - "!**/readme.md"
+      - "!apps/portfolio/SETUP.md"
+      - "!apps/portfolio/src/data/credential-logo-sources.md"
   push:
     branches: [main]
     paths:
-      - "my-portfolio/**"
+      - "apps/portfolio/**"
+      - "apps/packages/**"
+      - "apps/package.json"
+      - "apps/pnpm-lock.yaml"
+      - "apps/pnpm-workspace.yaml"
+      - "apps/turbo.json"
+      - "apps/biome.json"
       - ".github/workflows/pipeline.yml"
+      - "!**/README.md"
+      - "!**/readme.md"
+      - "!apps/portfolio/SETUP.md"
+      - "!apps/portfolio/src/data/credential-logo-sources.md"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +46,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: my-portfolio
+        working-directory: apps
     steps:
       - name: Check out source
         uses: actions/checkout@v7
@@ -41,7 +61,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: my-portfolio/pnpm-lock.yaml
+          cache-dependency-path: apps/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -60,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: portfolio-playwright-results
-          path: my-portfolio/apps/portfolio/test-results/
+          path: apps/portfolio/test-results/
           if-no-files-found: ignore
           retention-days: 7
 
@@ -78,7 +98,7 @@ jobs:
       url: https://ryanlau1220.dev
     defaults:
       run:
-        working-directory: my-portfolio/apps/portfolio
+        working-directory: apps/portfolio
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -96,10 +116,10 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: my-portfolio/pnpm-lock.yaml
+          cache-dependency-path: apps/pnpm-lock.yaml
 
       - name: Install dependencies
-        working-directory: my-portfolio
+        working-directory: apps
         run: pnpm install --frozen-lockfile
 
       - name: Build production assets

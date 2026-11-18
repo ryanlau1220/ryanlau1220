@@ -1,0 +1,4 @@
+packages:
+  - "portfolio"
+  - "diary"
+  - "packages/*"
