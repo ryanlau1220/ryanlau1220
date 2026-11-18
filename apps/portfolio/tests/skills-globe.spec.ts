@@ -1,5 +1,37 @@
 import { expect, test } from "@playwright/test";
 
+test("event skills link to the project and its filtered project view", async ({ page }) => {
+  await page.goto("/");
+  const skills = page.locator("#skills");
+  await skills.scrollIntoViewIfNeeded();
+  await skills.getByRole("button", { name: "List View" }).click();
+  await skills.getByRole("button", { name: "Pino", exact: true }).click();
+  const card = skills.locator("div.border-t-2:visible").filter({
+    has: page.getByRole("heading", { name: "Pino", exact: true }),
+  });
+  await expect(card.getByRole("button", { name: /AEGIS · MyAI Future/ })).toBeVisible();
+  await card.getByRole("button", { name: "AEGIS →", exact: true }).click();
+  await expect(page.locator("#projects").getByText("Clear: Pino")).toBeVisible();
+  await expect(
+    page.locator("#projects").getByRole("heading", { name: "AEGIS", exact: true }),
+  ).toBeVisible();
+});
+
+test("coursework project skills link to the degree timeline", async ({ page }) => {
+  await page.goto("/");
+  const skills = page.locator("#skills");
+  await skills.scrollIntoViewIfNeeded();
+  await skills.getByRole("button", { name: "List View" }).click();
+  await skills.getByRole("button", { name: "Patrol", exact: true }).click();
+  const card = skills.locator("div.border-t-2:visible").filter({
+    has: page.getByRole("heading", { name: "Patrol", exact: true }),
+  });
+  await expect(card.getByRole("button", { name: /Grocerly/ })).toBeVisible();
+  await expect(
+    card.getByRole("button", { name: /BSc \(Hons\) Software Engineering/ }),
+  ).toBeVisible();
+});
+
 test("globe loads on demand, rotates and preserves linked skill details", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#skills");

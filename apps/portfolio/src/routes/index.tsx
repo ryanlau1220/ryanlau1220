@@ -27,6 +27,7 @@ import { ProjectOrbit } from "../components/ProjectOrbit";
 import { RevealText } from "../components/RevealText";
 import { Timeline } from "../components/Timeline";
 import { CERTIFICATIONS, EVENTS, EXPERIENCES, PROFILE, PROJECTS } from "../data/registry";
+import { projectMatchesSkill } from "../data/skill-connections";
 import { getMobileProjectPreviewUrl, getProjectPreviewUrl } from "../project-images";
 
 const SkillsGraph = lazy(() =>
@@ -111,10 +112,7 @@ function PortfolioHome() {
       const matchCat =
         projectFilter === "all" ||
         (projectFilter === "pinned" ? p.pinned : p.category === projectFilter);
-      const matchSkill =
-        !selectedSkill ||
-        p.technologies.some((technology) => technology === selectedSkill) ||
-        p.domains.includes(selectedSkill);
+      const matchSkill = !selectedSkill || projectMatchesSkill(p, selectedSkill);
       return matchCat && matchSkill;
     }).length; // Match the dynamic filteredProjects length computation below
 
@@ -140,10 +138,7 @@ function PortfolioHome() {
     skipResetRef.current = projectFilter !== "all";
     setProjectFilter("all");
     const idx = PROJECTS.filter(
-      (p) =>
-        !selectedSkill ||
-        p.technologies.some((technology) => technology === selectedSkill) ||
-        p.domains.includes(selectedSkill),
+      (p) => !selectedSkill || projectMatchesSkill(p, selectedSkill),
     ).findIndex((p) => p.id === projectId);
     if (idx !== -1) {
       setCurrentProjectIdx(idx);
@@ -245,11 +240,7 @@ function PortfolioHome() {
       list = list.filter((p) => p.category === projectFilter);
     }
     if (selectedSkill) {
-      list = list.filter(
-        (p) =>
-          p.technologies.some((technology) => technology === selectedSkill) ||
-          p.domains.includes(selectedSkill),
-      );
+      list = list.filter((p) => projectMatchesSkill(p, selectedSkill));
     }
     return list;
   }, [projectFilter, selectedSkill]);

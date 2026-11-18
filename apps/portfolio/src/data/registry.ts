@@ -1,6 +1,7 @@
 export interface Project {
   id: string;
   category: "open-source" | "hackathon" | "internship" | "coursework";
+  timelineId?: string;
   title: string;
   subtitle: string;
   description: string;
@@ -46,6 +47,7 @@ export interface EventItem {
 export const PROJECTS: Project[] = [
   {
     id: "analog-blindspot",
+    timelineId: "event-analog-blindspot",
     category: "hackathon",
     title: "Analog Blindspot",
     subtitle: "NASA Space Apps Challenge 2026",
@@ -75,6 +77,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "promptplay",
+    timelineId: "event-promptplay",
     category: "hackathon",
     title: "PromptPlay",
     subtitle: "NEAR Hackathon 2026",
@@ -110,6 +113,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "grocerly",
+    timelineId: "edu-bsc",
     category: "coursework",
     title: "Grocerly",
     subtitle: "Grocerly App",
@@ -146,6 +150,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "nexus-net",
+    timelineId: "event-nexus-net",
     category: "hackathon",
     title: "Nexus Net",
     subtitle: "Hacktoberfest Hack Day KL 2026 · 2nd Place · Best Use of Gemma 4",
@@ -178,6 +183,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "quora-chat",
+    timelineId: "event-quora-chat",
     category: "hackathon",
     title: "Quora Chat",
     subtitle: "SDC Hackathon 2026",
@@ -209,6 +215,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "buildforward",
+    timelineId: "event-buildforward",
     category: "hackathon",
     title: "BuildForward",
     subtitle: "Dormathon 2026",
@@ -241,6 +248,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "wake-me-up",
+    timelineId: "event-wake-me-up",
     category: "hackathon",
     title: "Wake Me Up",
     subtitle: "Agents, Everywhere 2026",
@@ -272,6 +280,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "trustrun",
+    timelineId: "event-trustrun",
     category: "hackathon",
     title: "TrustRun",
     subtitle: "Terminal 3 Hackathon 2026",
@@ -302,6 +311,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "gammashield",
+    timelineId: "event-gammashield",
     category: "hackathon",
     title: "GammaShield",
     subtitle: "MUBA Hackathon 2026 · 3rd Place, AI × Options",
@@ -371,6 +381,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "ledgertrace",
+    timelineId: "event-ledgertrace",
     category: "hackathon",
     title: "LedgerTrace",
     subtitle: "AI Marathon 2026",
@@ -433,6 +444,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "umhackathon",
+    timelineId: "event-warung",
     category: "hackathon",
     title: "WarungAI",
     subtitle: "UMHackathon 2026",
@@ -467,6 +479,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "myai-future",
+    timelineId: "event-aegis",
     category: "hackathon",
     title: "AEGIS",
     subtitle: "MyAI Future Hackathon 2026",
@@ -559,6 +572,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "kitahack",
+    timelineId: "event-kitahack",
     category: "hackathon",
     title: "Shelf OS",
     subtitle: "KitaHack 2026",
@@ -589,6 +603,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "greatmalaysiaai",
+    timelineId: "event-greatmalaysia",
     category: "hackathon",
     title: "AI Powered Learning Companion",
     subtitle: "Great Malaysia AI Hackathon 2025",
@@ -627,6 +642,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "devmatch",
+    timelineId: "event-devmatch",
     category: "hackathon",
     title: "EcoChain",
     subtitle: "DevMatch Hackathon 2025",
@@ -658,6 +674,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "futurehack",
+    timelineId: "event-futurehack",
     category: "hackathon",
     title: "Fake Review and Fraud Detection",
     subtitle: "FutureHack 2025",
@@ -686,6 +703,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: "krypitalx",
+    timelineId: "internship-fp",
     category: "internship",
     title: "KrypitalX",
     subtitle: "Centralized Trading Platform",
@@ -1025,7 +1043,6 @@ export const EVENTS: EventItem[] = [
       "Smart Contracts",
       "Move",
       "Solidity",
-      "Next.js",
       "Sui SDK",
       "zkLogin",
       "Hardhat",

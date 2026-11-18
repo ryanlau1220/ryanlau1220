@@ -7,6 +7,7 @@ import {
   SKILL_CATEGORIES,
   TECHNOLOGY_CATEGORIES,
 } from "../data/registry";
+import { projectSkills, timelineSkills } from "../data/skill-connections";
 
 const SkillsGlobe = lazy(() => import("./SkillsGlobe"));
 
@@ -78,13 +79,11 @@ export function SkillsGraph({
           .map(([tech]) => tech),
       );
       return PROJECTS.filter((project) =>
-        project.technologies.some((tech) => domainTechs.has(tech)),
+        projectSkills(project, EVENTS).some((tech) => domainTechs.has(tech)),
       );
     }
-    return PROJECTS.filter((p) =>
-      p.technologies.some((technology) => technology === selectedNode.id),
-    );
-  }, [selectedNode, PROJECTS]);
+    return PROJECTS.filter((p) => projectSkills(p, EVENTS).includes(selectedNode.id));
+  }, [selectedNode, PROJECTS, EVENTS]);
 
   const activeTimelineItems = useMemo(() => {
     if (!selectedNode) return [];
@@ -102,13 +101,13 @@ export function SkillsGraph({
         : technologies.includes(selectedNode.id);
 
     return [...EXPERIENCES, ...EVENTS]
-      .filter((item) => matches(item.technologies))
+      .filter((item) => matches(timelineSkills(item, PROJECTS, EVENTS)))
       .map((item) => ({
         id: item.id,
         title:
           "company" in item ? `${item.role} · ${item.company}` : `${item.title} · ${item.event}`,
       }));
-  }, [selectedNode, EXPERIENCES, EVENTS]);
+  }, [selectedNode, EXPERIENCES, EVENTS, PROJECTS]);
 
   // Helper to retrieve technologies under the selected domain — derive dynamically from techMap
   const selectedDomainTechs = useMemo(() => {
