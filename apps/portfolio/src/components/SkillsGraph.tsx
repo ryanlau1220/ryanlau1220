@@ -1,5 +1,6 @@
 import { List, Network } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   type EventItem,
   type Experience,
@@ -35,11 +36,35 @@ export function SkillsGraph({
   useEffect(() => {
     if (!graphDetailsOpen) return;
     const initialScrollY = window.scrollY;
-    const dismissOnPageScroll = () => {
-      if (Math.abs(window.scrollY - initialScrollY) > 24) setGraphDetailsOpen(false);
+    let userScrollUntil = 0;
+    const markUserScroll = () => {
+      userScrollUntil = performance.now() + 1000;
     };
+    const markKeyboardScroll = (event: KeyboardEvent) => {
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+        markUserScroll();
+      }
+    };
+    const dismissOnPageScroll = () => {
+      const section = document.getElementById("skills")?.getBoundingClientRect();
+      const leftSkills = section && (section.bottom <= 0 || section.top >= window.innerHeight);
+      if (
+        leftSkills ||
+        (performance.now() <= userScrollUntil && Math.abs(window.scrollY - initialScrollY) > 24)
+      ) {
+        setGraphDetailsOpen(false);
+      }
+    };
+    window.addEventListener("wheel", markUserScroll, { passive: true });
+    window.addEventListener("touchmove", markUserScroll, { passive: true });
+    window.addEventListener("keydown", markKeyboardScroll);
     window.addEventListener("scroll", dismissOnPageScroll, { passive: true });
-    return () => window.removeEventListener("scroll", dismissOnPageScroll);
+    return () => {
+      window.removeEventListener("wheel", markUserScroll);
+      window.removeEventListener("touchmove", markUserScroll);
+      window.removeEventListener("keydown", markKeyboardScroll);
+      window.removeEventListener("scroll", dismissOnPageScroll);
+    };
   }, [graphDetailsOpen]);
   const techMap = TECHNOLOGY_CATEGORIES;
   const technologies = Object.keys(techMap).sort();
@@ -353,23 +378,28 @@ export function SkillsGraph({
         )}
 
         {/* Stationary Details Card in Graph View — fixed to centre of viewport so it's always readable */}
-        {viewMode === "graph" && selectedNode && graphDetailsOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            {/* Translucent backdrop to help the card stand out against any node */}
-            <button
-              type="button"
-              className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto cursor-default"
-              onClick={() => {
-                setGraphDetailsOpen(false);
-                onSelectSkill(null);
-              }}
-              aria-label="Close details"
-            />
-            <div className="relative w-80 max-w-[92vw] pointer-events-auto bg-white/98 dark:bg-neutral-950/98 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-5 backdrop-blur-md border-t-2 border-t-blue-500">
-              {renderDetailsCard()}
-            </div>
-          </div>
-        )}
+        {viewMode === "graph" &&
+          selectedNode &&
+          graphDetailsOpen &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+              {/* Translucent backdrop to help the card stand out against any node */}
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/10 dark:bg-black/30 pointer-events-auto cursor-default"
+                onClick={() => {
+                  setGraphDetailsOpen(false);
+                  onSelectSkill(null);
+                }}
+                aria-label="Close details"
+              />
+              <div className="relative w-80 max-w-[92vw] max-h-[90dvh] overflow-y-auto pointer-events-auto bg-white/98 dark:bg-neutral-950/98 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-5 backdrop-blur-md border-t-2 border-t-blue-500">
+                {renderDetailsCard()}
+              </div>
+            </div>,
+            document.body,
+          )}
       </div>
     </div>
   );

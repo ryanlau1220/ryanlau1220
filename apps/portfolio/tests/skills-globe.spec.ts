@@ -95,6 +95,10 @@ test("linked project navigation closes the globe card and keeps the skill filter
   await page.goto("/");
   const section = page.locator("#skills");
   await section.scrollIntoViewIfNeeded();
+  // A transformed ancestor must not turn the viewport overlay into a section-relative one.
+  await section.locator(".scene-inner").evaluate((element) => {
+    (element as HTMLElement).style.transform = "translateZ(0)";
+  });
   await section.getByLabel("Explore a domain").selectOption("Programming Languages");
   const globe = page.getByTestId("skills-globe");
   await expect(globe.locator("button:visible").first()).toBeVisible();
@@ -111,6 +115,21 @@ test("linked project navigation closes the globe card and keeps the skill filter
   await expect(skill).toBeVisible({ timeout: 10000 });
   await skill.click();
   const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
+  await expect(details).toBeVisible();
+  expect(
+    await details.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top === 0 &&
+        rect.left === 0 &&
+        rect.width === innerWidth &&
+        rect.height === innerHeight
+      );
+    }),
+  ).toBe(true);
+  // Automatic page adjustments within the Skills section must not dismiss the card.
+  await page.evaluate(() => window.scrollBy({ top: 30, behavior: "instant" }));
+  await expect(details).toBeVisible();
   const projectLink = details
     .locator("button")
     .filter({ hasText: "" })
@@ -153,7 +172,8 @@ test("scrolling the page dismisses the globe card without clearing its filter", 
     .click();
   const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
   await expect(details).toBeVisible();
-  await page.evaluate(() => window.scrollBy({ top: 180, behavior: "instant" }));
+  await page.mouse.move(10, 200);
+  await page.mouse.wheel(0, 180);
   await expect(details).toHaveCount(0);
   await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeAttached();
 });
@@ -181,6 +201,30 @@ test("timeline navigation dismisses globe details without clearing the project f
     .click();
   await expect(details).toHaveCount(0);
   await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeAttached();
+});
+
+test("header navigation remains usable while globe details are open", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  const skills = page.locator("#skills");
+  await skills.scrollIntoViewIfNeeded();
+  await skills.getByRole("button", { name: "List View" }).click();
+  await skills.getByRole("button", { name: "TypeScript", exact: true }).click();
+  await skills.getByRole("button", { name: "Graph View" }).click();
+  await skills.getByLabel("Explore a domain").selectOption("Programming Languages");
+  await page
+    .getByTestId("skills-globe")
+    .getByRole("button", { name: "TypeScript", exact: true })
+    .click();
+  const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
+  await expect(details).toBeVisible();
+  if (testInfo.project.name.startsWith("mobile")) {
+    await page.getByRole("button", { name: "Open navigation menu" }).click();
+  }
+  await page.getByRole("link", { name: "Timeline", exact: true }).filter({ visible: true }).click();
+  await expect(details).toHaveCount(0);
+  await expect(page.locator("#timeline")).toBeInViewport();
 });
 
 test("desktop picker opens around the selected option", async ({ page }, testInfo) => {

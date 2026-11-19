@@ -72,6 +72,7 @@ test("guestbook opens, closes with Escape, and can reopen", async ({ page }) => 
   ).toBeLessThan(2);
   const dialog = page.getByRole("dialog", { name: "Guestbook" });
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: /close/i })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Open guestbook/ })).toBeFocused();
