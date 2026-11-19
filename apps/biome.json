@@ -11,7 +11,9 @@
       "!**/test-results",
       "!**/playwright-report",
       "!**/blob-report",
-      "!**/routeTree.gen.ts"
+      "!**/routeTree.gen.ts",
+      "!**/worker-configuration.d.ts",
+      "!**/migrations/meta"
     ]
   },
   "assist": {

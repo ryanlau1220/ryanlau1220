@@ -486,7 +486,15 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
         <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
-          © Ryan Lau Jun Hong · 2026
+          © Ryan Lau Jun Hong · 2026 ·{" "}
+          <a
+            href="https://diary.ryanlau1220.dev"
+            target="_blank"
+            rel="noopener"
+            className="underline-offset-2 transition-colors hover:text-neutral-900 hover:underline dark:hover:text-white"
+          >
+            My Diary
+          </a>
         </div>
       </footer>
 

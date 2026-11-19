@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "diary",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  // Local secrets belong in .dev.vars; see .dev.vars.example and SETUP.md.
+  "main": "./src/server.ts",
+  "d1_databases": [
+    {
+      "binding": "DIARY_DB",
+      "database_name": "diary",
+      "database_id": "90d53c65-166c-4c08-84d9-252aa53f3bac",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "diary-photos"
+    }
+  ],
+  "vars": {
+    "SITE_URL": "https://diary.ryanlau1220.dev"
+  }
+}

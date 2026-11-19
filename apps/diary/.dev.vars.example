@@ -1,0 +1,17 @@
+# Local-only diary settings. Copy to .dev.vars and replace every value.
+# Never commit apps/diary/.dev.vars.
+
+# Public origin used for links, RSS, and social previews.
+SITE_URL="http://localhost:3001"
+
+# Better Auth. Generate the secret with: openssl rand -hex 32
+BETTER_AUTH_URL="http://localhost:3001"
+BETTER_AUTH_SECRET="replace-with-a-random-32-byte-hex-string"
+
+# GitHub OAuth app (Settings > Developer settings > OAuth Apps).
+# Authorization callback URL: http://localhost:3001/api/auth/callback/github
+GITHUB_CLIENT_ID="your-github-oauth-client-id"
+GITHUB_CLIENT_SECRET="your-github-oauth-client-secret"
+
+# Numeric GitHub user ID of the only account allowed to write (gh api user --jq .id).
+OWNER_GITHUB_ID="0"
