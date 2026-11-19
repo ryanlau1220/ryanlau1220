@@ -50,7 +50,7 @@ export const loadDiary = createServerFn({ method: "GET" }).handler(
 );
 
 export const loadEntryMeta = createServerFn({ method: "GET" })
-  .inputValidator((slug: string) => String(slug).slice(0, LIMITS.slug))
+  .validator((slug: string) => String(slug).slice(0, LIMITS.slug))
   .handler(async ({ data: slug }) => {
     const entry = await readEntryBySlug(slug);
     if (!entry) return null;
@@ -75,7 +75,7 @@ export const loadLoginState = createServerFn({ method: "GET" }).handler(async ()
 // ---------------------------------------------------------------------------
 
 export const createEntry = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => data)
+  .validator((data: unknown) => data)
   .handler(async ({ data }) => {
     await requireOwner();
     try {
@@ -99,7 +99,7 @@ export const createEntry = createServerFn({ method: "POST" })
   });
 
 export const updateEntry = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => data as { id?: unknown } & Record<string, unknown>)
+  .validator((data: unknown) => data as { id?: unknown } & Record<string, unknown>)
   .handler(async ({ data }) => {
     await requireOwner();
     const id = typeof data.id === "string" ? data.id : "";
@@ -126,7 +126,7 @@ export const updateEntry = createServerFn({ method: "POST" })
   });
 
 export const deleteEntry = createServerFn({ method: "POST" })
-  .inputValidator((id: unknown) => String(id))
+  .validator((id: unknown) => String(id))
   .handler(async ({ data: id }) => {
     await requireOwner();
     const db = getDb();
@@ -141,7 +141,7 @@ export const deleteEntry = createServerFn({ method: "POST" })
   });
 
 export const uploadPhoto = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => {
+  .validator((data: unknown) => {
     if (!(data instanceof FormData)) throw new Error("Expected form data.");
     return data;
   })
@@ -197,7 +197,7 @@ export const uploadPhoto = createServerFn({ method: "POST" })
   });
 
 export const deletePhoto = createServerFn({ method: "POST" })
-  .inputValidator((id: unknown) => String(id))
+  .validator((id: unknown) => String(id))
   .handler(async ({ data: id }) => {
     await requireOwner();
     const db = getDb();
