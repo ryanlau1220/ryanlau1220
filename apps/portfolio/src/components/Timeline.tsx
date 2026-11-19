@@ -1,5 +1,6 @@
 import { Award, Briefcase, Calendar, ChevronDown, GraduationCap, Laptop } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { EventItem, Experience } from "../data/registry";
 
 interface UnifiedTimelineItem {
   id: string;
@@ -14,35 +15,9 @@ interface UnifiedTimelineItem {
   sortKey: number;
 }
 
-interface Experience {
-  id: string;
-  role: string;
-  company: string;
-  period: string;
-  description: string;
-  achievements: string[];
-  domains: string[];
-  technologies: string[];
-  sortKey: number;
-}
-
-interface TimelineEvent {
-  id: string;
-  title: string;
-  event: string;
-  date: string;
-  role: string;
-  outcome?: string;
-  description: string;
-  category: "hackathon" | "other";
-  featured: boolean;
-  technologies: string[];
-  sortKey: number;
-}
-
 interface TimelineProps {
   experiences: Experience[];
-  events: TimelineEvent[];
+  events: EventItem[];
   focusRequest?: { id: string; requestId: number } | null;
 }
 
