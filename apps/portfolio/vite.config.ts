@@ -23,7 +23,8 @@ const config = defineConfig({
 
   plugins: [
     devtools(),
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    // Each app gets its own debugger port so both can run together under `pnpm dev`.
+    cloudflare({ viteEnvironment: { name: "ssr" }, inspectorPort: 9229 }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),

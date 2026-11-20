@@ -8,8 +8,10 @@ interface EntryEditorProps {
   /** Omit to write a new page. */
   entry?: DiaryEntry;
   onClose: () => void;
-  /** Called after any saved change with the entry's (possibly new) link name. */
+  /** Called after the page is saved, with its (possibly new) link name. */
   onSaved: (slug: string) => void | Promise<void>;
+  /** Called when photos change without saving the form; refreshes data only. */
+  onPhotosChanged: () => void | Promise<void>;
 }
 
 function linesToLinks(value: string): DiaryLink[] {
@@ -24,7 +26,12 @@ function linesToLinks(value: string): DiaryLink[] {
 }
 
 /** Owner-only page editor. Loaded on demand, so visitors never download it. */
-export default function EntryEditor({ entry, onClose, onSaved }: EntryEditorProps) {
+export default function EntryEditor({
+  entry,
+  onClose,
+  onSaved,
+  onPhotosChanged,
+}: EntryEditorProps) {
   const [form, setForm] = useState({
     title: entry?.title ?? "",
     slug: entry?.slug ?? "",
@@ -60,7 +67,8 @@ export default function EntryEditor({ entry, onClose, onSaved }: EntryEditorProp
     try {
       await deletePhoto({ data: id });
       setPhotos((current) => current.filter((photo) => photo.id !== id));
-      if (entry) await onSaved(form.slug);
+      // Keep the editor (and any unsaved edits) open; just refresh what the scene shows.
+      await onPhotosChanged();
     } catch (removeError) {
       setError(
         removeError instanceof Error ? removeError.message : "The photo could not be removed.",

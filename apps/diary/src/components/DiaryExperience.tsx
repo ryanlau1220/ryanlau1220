@@ -404,6 +404,7 @@ export function DiaryExperience({ entries, isOwner, activeSlug }: DiaryExperienc
             entry={editor.mode === "edit" ? editor.entry : undefined}
             onClose={() => setEditor(null)}
             onSaved={(slug) => refresh(slug)}
+            onPhotosChanged={() => router.invalidate()}
           />
         </Suspense>
       ) : null}

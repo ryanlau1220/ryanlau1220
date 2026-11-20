@@ -8,7 +8,8 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   server: { port: 3001, strictPort: true },
   plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    // Each app gets its own debugger port so both can run together under `pnpm dev`.
+    cloudflare({ viteEnvironment: { name: "ssr" }, inspectorPort: 9230 }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
