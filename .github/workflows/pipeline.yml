@@ -1,10 +1,11 @@
-name: Portfolio CI and production deploy
+name: Apps CI and production deploy
 
 on:
   pull_request:
     branches: [main]
     paths:
       - "apps/portfolio/**"
+      - "apps/diary/**"
       - "apps/packages/**"
       - "apps/package.json"
       - "apps/pnpm-lock.yaml"
@@ -16,10 +17,12 @@ on:
       - "!**/readme.md"
       - "!apps/portfolio/SETUP.md"
       - "!apps/portfolio/src/data/credential-logo-sources.md"
+      - "!apps/diary/SETUP.md"
   push:
     branches: [main]
     paths:
       - "apps/portfolio/**"
+      - "apps/diary/**"
       - "apps/packages/**"
       - "apps/package.json"
       - "apps/pnpm-lock.yaml"
@@ -31,16 +34,54 @@ on:
       - "!**/readme.md"
       - "!apps/portfolio/SETUP.md"
       - "!apps/portfolio/src/data/credential-logo-sources.md"
+      - "!apps/diary/SETUP.md"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect changed apps
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      # A manual run validates and deploys both apps.
+      portfolio: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.portfolio == 'true' }}
+      diary: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.diary == 'true' }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Match changed paths
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            shared: &shared
+              - "apps/packages/**"
+              - "apps/package.json"
+              - "apps/pnpm-lock.yaml"
+              - "apps/pnpm-workspace.yaml"
+              - "apps/turbo.json"
+              - "apps/biome.json"
+              - ".github/workflows/pipeline.yml"
+            portfolio:
+              - *shared
+              - "apps/portfolio/**"
+            diary:
+              - *shared
+              - "apps/diary/**"
+
   validate:
-    name: Validate portfolio
+    name: Validate apps
+    needs: changes
+    if: needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true'
     concurrency:
-      group: portfolio-validation-${{ github.event.pull_request.number || github.ref }}
+      group: apps-validation-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -66,17 +107,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Lints the whole workspace, then type-checks, unit-tests and builds every app.
       - name: Lint, type-check, test, and build
         run: pnpm run check
 
       - name: Install Playwright browser
+        if: needs.changes.outputs.portfolio == 'true'
         run: pnpm --filter portfolio-app exec playwright install --with-deps chromium
 
-      - name: Run browser smoke tests
+      - name: Run portfolio browser smoke tests
+        if: needs.changes.outputs.portfolio == 'true'
         run: pnpm --filter portfolio-app exec playwright test
 
       - name: Upload browser test results
-        if: failure()
+        if: failure() && needs.changes.outputs.portfolio == 'true'
         uses: actions/upload-artifact@v6
         with:
           name: portfolio-playwright-results
@@ -84,10 +128,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  deploy:
+  deploy-portfolio:
     name: Deploy portfolio
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: validate
+    needs: [changes, validate]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.changes.outputs.portfolio == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:
@@ -127,6 +171,53 @@ jobs:
 
       - name: Apply pending D1 migrations
         run: pnpm exec wrangler d1 migrations apply VISITOR_LOG_DB --remote
+
+      - name: Deploy Worker
+        run: pnpm exec wrangler deploy
+
+  deploy-diary:
+    name: Deploy diary
+    needs: [changes, validate]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.changes.outputs.diary == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: diary-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://diary.ryanlau1220.dev
+    defaults:
+      run:
+        working-directory: apps/diary
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.32.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: apps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build production assets
+        run: pnpm run build
+
+      - name: Apply pending D1 migrations
+        run: pnpm exec wrangler d1 migrations apply DIARY_DB --remote
 
       - name: Deploy Worker
         run: pnpm exec wrangler deploy
