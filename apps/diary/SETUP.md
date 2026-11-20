@@ -52,8 +52,9 @@ pnpm exec wrangler secret put GITHUB_CLIENT_SECRET
 pnpm exec wrangler secret put OWNER_GITHUB_ID
 ```
 
-`SITE_URL` and `BETTER_AUTH_URL` are public values and already live under `vars` in
-`wrangler.jsonc`. Local `.dev.vars` overrides both during `pnpm dev`.
+`SITE_URL`, `BETTER_AUTH_URL` and `CF_ANALYTICS_TOKEN` are public values under `vars` in
+`wrangler.jsonc`. Local `.dev.vars` overrides the two URLs during `pnpm dev`. The analytics
+beacon is never loaded by `pnpm dev`, so the token needs no local value.
 
 ## Schema changes
 

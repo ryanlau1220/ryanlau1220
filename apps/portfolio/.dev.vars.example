@@ -4,8 +4,6 @@
 # Public origins. Production values live under "vars" in wrangler.jsonc.
 SITE_URL="http://localhost:3000"
 DIARY_URL="http://localhost:3001"
-# Leave empty to skip Cloudflare Web Analytics locally.
-CF_ANALYTICS_TOKEN=""
 
 TURNSTILE_SITE_KEY="your-local-turnstile-site-key"
 TURNSTILE_SECRET_KEY="your-local-turnstile-secret-key"

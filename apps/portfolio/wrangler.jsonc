@@ -20,7 +20,7 @@
   "vars": {
     "SITE_URL": "https://ryanlau1220.dev",
     "DIARY_URL": "https://diary.ryanlau1220.dev",
-    "CF_ANALYTICS_TOKEN": "2694e0f121d542d9baa344c450858c6f",
+    "CF_ANALYTICS_TOKEN": "97289c376353402a80a5366c9ece5508",
     "TURNSTILE_SITE_KEY": "0x4AAAAAAD5OBIUxwrQ_UYo-",
     "VISITOR_LOG_HOSTNAME": "ryanlau1220.dev,portfolio.ryanlau1220.workers.dev"
   }

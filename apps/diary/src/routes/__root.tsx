@@ -1,9 +1,11 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { loadAnalyticsToken } from "../diary.functions";
 import { SITE_NAME } from "../lib/seo";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
-  head: () => ({
+  loader: () => loadAnalyticsToken(),
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
@@ -14,6 +16,16 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "alternate", type: "application/rss+xml", title: SITE_NAME, href: "/rss.xml" },
     ],
+    scripts:
+      !import.meta.env.DEV && loaderData
+        ? [
+            {
+              src: "https://static.cloudflareinsights.com/beacon.min.js",
+              defer: true,
+              "data-cf-beacon": JSON.stringify({ token: loaderData }),
+            },
+          ]
+        : [],
   }),
   shellComponent: RootShell,
   component: Outlet,

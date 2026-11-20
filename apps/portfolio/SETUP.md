@@ -81,6 +81,7 @@ Direct publishing still needs occasional owner attention. If a comment must be r
 ## Site URLs
 
 `SITE_URL` (this site), `DIARY_URL` (the footer link) and `CF_ANALYTICS_TOKEN` are public values
-under `vars` in `wrangler.jsonc`. `.dev.vars` overrides them locally, so canonical links, the
-sitemap, robots.txt and the footer point at `localhost` during `pnpm dev`. Leave
-`CF_ANALYTICS_TOKEN` empty to skip the analytics beacon; leave `DIARY_URL` empty to hide the link.
+under `vars` in `wrangler.jsonc`. `.dev.vars` overrides the two URLs locally, so canonical links,
+the sitemap, robots.txt and the footer point at `localhost` during `pnpm dev`. The analytics
+beacon is never loaded by `pnpm dev`, so the token needs no local value. Set `DIARY_URL` to an
+empty string to hide the footer link.

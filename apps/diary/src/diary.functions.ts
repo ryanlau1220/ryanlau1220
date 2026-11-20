@@ -50,6 +50,10 @@ export const loadDiary = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export const loadAnalyticsToken = createServerFn({ method: "GET" }).handler(
+  () => env.CF_ANALYTICS_TOKEN?.trim() || null,
+);
+
 export const loadSiteUrl = createServerFn({ method: "GET" }).handler(() =>
   siteOrigin(env.SITE_URL, getRequest().url),
 );

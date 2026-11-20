@@ -22,6 +22,7 @@
   // Public, non-secret values. Local .dev.vars overrides them during `pnpm dev`.
   "vars": {
     "SITE_URL": "https://diary.ryanlau1220.dev",
-    "BETTER_AUTH_URL": "https://diary.ryanlau1220.dev"
+    "BETTER_AUTH_URL": "https://diary.ryanlau1220.dev",
+    "CF_ANALYTICS_TOKEN": "0ab5adeef84e4988be00f174b9797ec6"
   }
 }
