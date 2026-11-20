@@ -52,7 +52,8 @@ pnpm exec wrangler secret put GITHUB_CLIENT_SECRET
 pnpm exec wrangler secret put OWNER_GITHUB_ID
 ```
 
-and add `BETTER_AUTH_URL = "https://diary.ryanlau1220.dev"` under `vars` in `wrangler.jsonc`.
+`SITE_URL` and `BETTER_AUTH_URL` are public values and already live under `vars` in
+`wrangler.jsonc`. Local `.dev.vars` overrides both during `pnpm dev`.
 
 ## Schema changes
 
