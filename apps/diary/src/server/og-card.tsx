@@ -15,13 +15,22 @@ export interface DiaryCardProps {
   note?: string | null;
   /** Data URL of the entry's first photo. Without one, a wax seal is drawn instead. */
   photoDataUrl?: string | null;
+  /** Host shown in the footer, such as diary.ryanlau1220.dev. */
+  siteHost: string;
 }
 
 const INK = "#3b2414";
 const PAPER = "#f3e6c8";
 const GOLD = "#d9a441";
 
-export function DiaryCard({ kicker, title, subtitle, note, photoDataUrl }: DiaryCardProps) {
+export function DiaryCard({
+  kicker,
+  title,
+  subtitle,
+  note,
+  photoDataUrl,
+  siteHost,
+}: DiaryCardProps) {
   const titleSize = title.length > 48 ? 54 : title.length > 28 ? 64 : 76;
   return (
     <div
@@ -89,7 +98,7 @@ export function DiaryCard({ kicker, title, subtitle, note, photoDataUrl }: Diary
               letterSpacing: 2,
             }}
           >
-            Ryan's Diary · diary.ryanlau1220.dev
+            Ryan's Diary · {siteHost}
           </div>
         </div>
 

@@ -77,3 +77,10 @@ Only the public key and cluster are sent to the browser. The application ID and 
 - Duplicate-comment prevention for one day.
 
 Direct publishing still needs occasional owner attention. If a comment must be removed before an owner-only moderation view is added, delete it directly from `visitor_log_entries` with the Cloudflare D1 dashboard or Wrangler.
+
+## Site URLs
+
+`SITE_URL` (this site), `DIARY_URL` (the footer link) and `CF_ANALYTICS_TOKEN` are public values
+under `vars` in `wrangler.jsonc`. `.dev.vars` overrides them locally, so canonical links, the
+sitemap, robots.txt and the footer point at `localhost` during `pnpm dev`. Leave
+`CF_ANALYTICS_TOKEN` empty to skip the analytics beacon; leave `DIARY_URL` empty to hide the link.

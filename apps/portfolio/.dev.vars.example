@@ -1,5 +1,12 @@
-# Local-only Guestbook settings. Copy to .dev.vars and replace every value.
+# Local-only settings. Copy to .dev.vars and replace every value.
 # Never commit apps/portfolio/.dev.vars.
+
+# Public origins. Production values live under "vars" in wrangler.jsonc.
+SITE_URL="http://localhost:3000"
+DIARY_URL="http://localhost:3001"
+# Leave empty to skip Cloudflare Web Analytics locally.
+CF_ANALYTICS_TOKEN=""
+
 TURNSTILE_SITE_KEY="your-local-turnstile-site-key"
 TURNSTILE_SECRET_KEY="your-local-turnstile-secret-key"
 VISITOR_LOG_RATE_LIMIT_SALT="a-unique-random-local-salt"

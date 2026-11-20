@@ -1325,8 +1325,8 @@ export const PROFILE = {
       "Ryan Lau Jun Hong is a Software Engineering student at Asia Pacific University (APU) building AI systems, middleware, and full-stack solutions.",
     socialDescription:
       "Software engineering student building reliable AI-enabled products, backend systems, and human-centered automation.",
-    siteUrl: "https://ryanlau1220.dev",
-    socialImageUrl: "https://ryanlau1220.dev/images/portfolio-preview.png",
+    // Joined with SITE_URL at request time so each environment links to itself.
+    socialImagePath: "/images/portfolio-preview.png",
   },
 } as const;
 

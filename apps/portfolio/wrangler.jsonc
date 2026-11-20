@@ -16,7 +16,11 @@
       "database_id": "9f5d850e-4b4c-4ce7-ba99-29450d22f933"
     }
   ],
+  // Public, non-secret values. Local .dev.vars overrides them during `pnpm dev`.
   "vars": {
+    "SITE_URL": "https://ryanlau1220.dev",
+    "DIARY_URL": "https://diary.ryanlau1220.dev",
+    "CF_ANALYTICS_TOKEN": "2694e0f121d542d9baa344c450858c6f",
     "TURNSTILE_SITE_KEY": "0x4AAAAAAD5OBIUxwrQ_UYo-",
     "VISITOR_LOG_HOSTNAME": "ryanlau1220.dev,portfolio.ryanlau1220.workers.dev"
   }

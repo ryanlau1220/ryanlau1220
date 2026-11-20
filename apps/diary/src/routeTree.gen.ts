@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as OgRouteImport } from './routes/og'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as BookRouteImport } from './routes/_book'
@@ -21,6 +22,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
   id: '/rss.xml',
   path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OgRoute = OgRouteImport.update({
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof BookIndexRoute
   '/login': typeof LoginRoute
   '/og': typeof OgRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/$slug': typeof BookSlugRoute
   '/photos/$': typeof PhotosSplatRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/og': typeof OgRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/$slug': typeof BookSlugRoute
   '/photos/$': typeof PhotosSplatRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   '/_book': typeof BookRouteWithChildren
   '/login': typeof LoginRoute
   '/og': typeof OgRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/_book/$slug': typeof BookSlugRoute
   '/photos/$': typeof PhotosSplatRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/og'
+    | '/robots.txt'
     | '/rss.xml'
     | '/$slug'
     | '/photos/$'
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/og'
+    | '/robots.txt'
     | '/rss.xml'
     | '/$slug'
     | '/photos/$'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/_book'
     | '/login'
     | '/og'
+    | '/robots.txt'
     | '/rss.xml'
     | '/_book/$slug'
     | '/photos/$'
@@ -122,6 +134,7 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRouteWithChildren
   LoginRoute: typeof LoginRoute
   OgRoute: typeof OgRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   PhotosSplatRoute: typeof PhotosSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -134,6 +147,13 @@ declare module '@tanstack/react-router' {
       path: '/rss.xml'
       fullPath: '/rss.xml'
       preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/og': {
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRouteWithChildren,
   LoginRoute: LoginRoute,
   OgRoute: OgRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   PhotosSplatRoute: PhotosSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

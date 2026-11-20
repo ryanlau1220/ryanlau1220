@@ -4,6 +4,7 @@ import { getRequest, getRequestHeaders } from "@tanstack/react-start/server";
 import { and, eq, max, ne } from "drizzle-orm";
 import { type DiaryEntry, EntryValidationError, LIMITS, parseEntryInput } from "./lib/diary";
 import { detectPhotoFormat, hasEmbeddedMetadata } from "./lib/image-safety";
+import { siteOrigin } from "./lib/seo";
 import { getAuth, isAuthConfigured, isOwnerRequest } from "./server/auth";
 import { getDb } from "./server/db";
 import { readAllEntries, readEntryBySlug } from "./server/entries";
@@ -49,12 +50,17 @@ export const loadDiary = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export const loadSiteUrl = createServerFn({ method: "GET" }).handler(() =>
+  siteOrigin(env.SITE_URL, getRequest().url),
+);
+
 export const loadEntryMeta = createServerFn({ method: "GET" })
   .validator((slug: string) => String(slug).slice(0, LIMITS.slug))
   .handler(async ({ data: slug }) => {
     const entry = await readEntryBySlug(slug);
     if (!entry) return null;
     return {
+      siteUrl: siteOrigin(env.SITE_URL, getRequest().url),
       slug: entry.slug,
       title: entry.title,
       eventName: entry.eventName,

@@ -4,78 +4,85 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { GuestbookLauncher } from "../components/GuestbookLauncher";
 import { PROFILE } from "../data/registry";
+import { loadSiteConfig } from "../site-config";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: PROFILE.seo.title },
-      {
-        name: "description",
-        content: PROFILE.seo.description,
-      },
-      // Open Graph (Social Previews)
-      { property: "og:type", content: "website" },
-      { property: "og:title", content: PROFILE.seo.title },
-      {
-        property: "og:description",
-        content: PROFILE.seo.socialDescription,
-      },
-      { property: "og:url", content: PROFILE.seo.siteUrl },
-      { property: "og:image", content: PROFILE.seo.socialImageUrl },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:type", content: "image/png" },
-      // Twitter Card
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: PROFILE.seo.title },
-      {
-        name: "twitter:description",
-        content: PROFILE.seo.socialDescription,
-      },
-      { name: "twitter:image", content: PROFILE.seo.socialImageUrl },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "canonical", href: PROFILE.seo.siteUrl },
-      {
-        rel: "preload",
-        href: "/fonts/geist-latin.woff2",
-        as: "font",
-        type: "font/woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        href: "/fonts/geist-mono-latin.woff2",
-        as: "font",
-        type: "font/woff2",
-        crossOrigin: "anonymous",
-      },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-    ],
-    scripts: [
-      {
-        children: `
+  loader: () => loadSiteConfig(),
+  head: ({ loaderData }) => {
+    const siteUrl = loaderData?.siteUrl ?? "";
+    const socialImageUrl = `${siteUrl}${PROFILE.seo.socialImagePath}`;
+    const analyticsToken = loaderData?.analyticsToken;
+    return {
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { title: PROFILE.seo.title },
+        {
+          name: "description",
+          content: PROFILE.seo.description,
+        },
+        // Open Graph (Social Previews)
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: PROFILE.seo.title },
+        {
+          property: "og:description",
+          content: PROFILE.seo.socialDescription,
+        },
+        { property: "og:url", content: `${siteUrl}/` },
+        { property: "og:image", content: socialImageUrl },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:type", content: "image/png" },
+        // Twitter Card
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: PROFILE.seo.title },
+        {
+          name: "twitter:description",
+          content: PROFILE.seo.socialDescription,
+        },
+        { name: "twitter:image", content: socialImageUrl },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "canonical", href: `${siteUrl}/` },
+        {
+          rel: "preload",
+          href: "/fonts/geist-latin.woff2",
+          as: "font",
+          type: "font/woff2",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "preload",
+          href: "/fonts/geist-mono-latin.woff2",
+          as: "font",
+          type: "font/woff2",
+          crossOrigin: "anonymous",
+        },
+        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      ],
+      scripts: [
+        {
+          children: `
           (function() {
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', savedTheme);
           })();
         `,
-      },
-      ...(!import.meta.env.DEV
-        ? [
-            {
-              src: "https://static.cloudflareinsights.com/beacon.min.js",
-              defer: true,
-              "data-cf-beacon": '{"token": "2694e0f121d542d9baa344c450858c6f"}',
-            },
-          ]
-        : []),
-    ],
-  }),
+        },
+        ...(!import.meta.env.DEV && analyticsToken
+          ? [
+              {
+                src: "https://static.cloudflareinsights.com/beacon.min.js",
+                defer: true,
+                "data-cf-beacon": JSON.stringify({ token: analyticsToken }),
+              },
+            ]
+          : []),
+      ],
+    };
+  },
   shellComponent: RootShell,
   component: Outlet,
   errorComponent: RootErrorComponent,
@@ -195,6 +202,7 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isClientReady, setIsClientReady] = useState(false);
   const location = useLocation();
+  const diaryUrl = Route.useLoaderData()?.diaryUrl ?? null;
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
@@ -486,15 +494,20 @@ function RootLayout({ children }: { children: React.ReactNode }) {
 
       <footer className="border-t border-neutral-100 dark:border-neutral-900 bg-neutral-50/60 dark:bg-neutral-950/60">
         <div className="max-w-6xl mx-auto px-6 py-5 text-center text-[11px] text-neutral-500 dark:text-neutral-400">
-          © Ryan Lau Jun Hong · 2026 ·{" "}
-          <a
-            href="https://diary.ryanlau1220.dev"
-            target="_blank"
-            rel="noopener"
-            className="underline-offset-2 transition-colors hover:text-neutral-900 hover:underline dark:hover:text-white"
-          >
-            My Diary
-          </a>
+          © Ryan Lau Jun Hong · 2026
+          {diaryUrl ? (
+            <>
+              {" · "}
+              <a
+                href={diaryUrl}
+                target="_blank"
+                rel="noopener"
+                className="underline-offset-2 transition-colors hover:text-neutral-900 hover:underline dark:hover:text-white"
+              >
+                My Diary
+              </a>
+            </>
+          ) : null}
         </div>
       </footer>
 

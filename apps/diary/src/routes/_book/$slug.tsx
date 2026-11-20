@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_book/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageMeta({
+          siteUrl: loaderData.siteUrl,
           title: `${loaderData.title} · ${SITE_NAME}`,
           description: `${formatEntryDate(loaderData.entryDate)} — ${entrySummary(loaderData)}`,
           path: `/${loaderData.slug}`,

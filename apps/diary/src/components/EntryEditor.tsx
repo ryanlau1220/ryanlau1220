@@ -176,7 +176,7 @@ export default function EntryEditor({
             />
           </label>
           <label className={label}>
-            Link name (diary.ryanlau1220.dev/…)
+            Link name ({typeof window === "undefined" ? "" : window.location.host}/…)
             <input
               className="journal-field"
               maxLength={LIMITS.slug}

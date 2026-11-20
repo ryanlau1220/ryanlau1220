@@ -1,22 +1,30 @@
 export const SITE_NAME = "Ryan's Diary";
 export const SITE_DESCRIPTION =
   "A storybook diary of the events Ryan Lau attended: key takeaways, photographs, and how each moment felt.";
-// Absolute URLs in meta tags must point at the public site even when rendered locally.
-export const PUBLIC_SITE_URL = "https://diary.ryanlau1220.dev";
+/** Normalizes SITE_URL (from wrangler.jsonc vars or .dev.vars) to a bare origin. */
+export function siteOrigin(value: string | undefined, fallbackRequestUrl?: string) {
+  try {
+    return new URL((value ?? "").trim()).origin;
+  } catch {
+    return fallbackRequestUrl ? new URL(fallbackRequestUrl).origin : "";
+  }
+}
 
 export function pageMeta({
+  siteUrl,
   title,
   description,
   path,
   image,
 }: {
+  siteUrl: string;
   title: string;
   description: string;
   path: string;
   image: string;
 }) {
-  const url = `${PUBLIC_SITE_URL}${path}`;
-  const imageUrl = `${PUBLIC_SITE_URL}${image}`;
+  const url = `${siteUrl}${path}`;
+  const imageUrl = `${siteUrl}${image}`;
   return {
     meta: [
       { title },
