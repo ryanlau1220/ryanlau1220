@@ -1,4 +1,22 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+/** Resolves once scrollY has stayed the same for ten animation frames. */
+function waitForScrollToSettle(page: Page) {
+  return page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let last = window.scrollY;
+        let stillFrames = 0;
+        const tick = () => {
+          stillFrames = window.scrollY === last ? stillFrames + 1 : 0;
+          last = window.scrollY;
+          if (stillFrames >= 10) resolve();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+}
 
 test("event skills link to the project and its filtered project view", async ({ page }) => {
   await page.goto("/");
@@ -172,6 +190,9 @@ test("scrolling the page dismisses the globe card without clearing its filter", 
     .click();
   const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
   await expect(details).toBeVisible();
+  // The page uses scroll-behavior: smooth, so scrollIntoViewIfNeeded is still animating here.
+  // A wheel sent before that animation ends can be swallowed, so wait for the page to settle.
+  await waitForScrollToSettle(page);
   await page.mouse.move(10, 200);
   await page.mouse.wheel(0, 180);
   await expect(details).toHaveCount(0);
