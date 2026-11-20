@@ -5,7 +5,7 @@
  *   pnpm seed:local    # Miniflare state used by `pnpm dev`
  *   pnpm seed:remote   # the real Cloudflare D1 database and R2 bucket
  *
- * The original photo in seed-photos/ is never uploaded or committed. ImageMagick re-encodes it
+ * Source photos are never uploaded as-is. ImageMagick re-encodes each one
  * with every metadata block stripped (EXIF, GPS, camera model) and the long edge capped at 2000px.
  * Re-running is safe: rows are upserted by fixed IDs.
  */
@@ -20,31 +20,37 @@ const output = join(root, ".seed-output");
 mkdirSync(output, { recursive: true });
 
 const ENTRY = {
-  id: "5b1f5f0e-8f4a-4c3e-9d65-2f7a1c0d2026",
-  slug: "road-to-devfest-cloud-kl",
-  title: "Antigravity & Local LLMs",
-  eventName: "Road to DevFest Cloud KL 2026 #2 · GDG Cloud KL",
+  id: "7a3c9e10-4b2d-4f6e-8a51-0c9d2e7b2026",
+  slug: "placeholder-event",
+  title: "Placeholder Event",
+  eventName: "Placeholder Event",
   entryDate: "2026-11-18",
   takeaways: [
-    "(Placeholder) Write your first key takeaway from the Antigravity talk here.",
-    "(Placeholder) Write a takeaway from “Local Hosting Models 101” here.",
+    "(Placeholder) Write your first key takeaway here.",
+    "(Placeholder) Write another takeaway here.",
     "(Placeholder) Add anything else worth remembering.",
   ],
-  feeling: "(Placeholder) Write how the evening felt for you here.",
-  tags: ["gdg", "devfest", "local-llms", "ai"],
-  links: [
-    {
-      label: "Event page",
-      url: "https://gdg.community.dev/events/details/google-gdg-cloud-kl-presents-road-to-devfest-cloud-kl-2026-2-antigravity-amp-local-llms/",
-    },
-  ],
+  feeling: "(Placeholder) Write how the event felt for you here.",
+  tags: ["placeholder"],
+  links: [],
 };
 
+/** Earlier seeds that should no longer exist. Their rows and photos are removed on each run. */
+const RETIRED = [
+  {
+    entryId: "5b1f5f0e-8f4a-4c3e-9d65-2f7a1c0d2026",
+    objectKeys: [
+      "entries/5b1f5f0e-8f4a-4c3e-9d65-2f7a1c0d2026/9c2e6a41-3d7b-4f0a-8e21-6b5d4c3a2026.jpg",
+    ],
+  },
+];
+
+// `source` is relative to apps/diary. Originals are re-encoded before upload, never stored as-is.
 const PHOTOS = [
   {
-    id: "9c2e6a41-3d7b-4f0a-8e21-6b5d4c3a2026",
-    source: "roadtodevfest-1.jpg",
-    alt: "A speaker presents the slide “Local AI is 7 layers, and every tool hides some of them” to the audience in an auditorium.",
+    id: "c41f8b72-9e3a-4d15-b6a0-2e8f7d1c2026",
+    source: "../portfolio/public/images/portfolio-preview.png",
+    alt: "Preview image of Ryan Lau's portfolio website.",
   },
 ];
 
@@ -64,8 +70,22 @@ run("pnpm", ["exec", "wrangler", "d1", "migrations", "apply", "DIARY_DB", target
   stdio: "inherit",
 });
 
+for (const retired of RETIRED) {
+  for (const key of retired.objectKeys) {
+    try {
+      run("pnpm", ["exec", "wrangler", "r2", "object", "delete", `diary-photos/${key}`, target]);
+    } catch {
+      // Already gone.
+    }
+  }
+}
+
 const now = Date.now();
 const statements = [
+  ...RETIRED.map(
+    (retired) =>
+      `DELETE FROM photos WHERE entry_id = ${sql(retired.entryId)};\nDELETE FROM entries WHERE id = ${sql(retired.entryId)};`,
+  ),
   `INSERT INTO entries (id, slug, title, event_name, entry_date, takeaways, feeling, tags, links, created_at, updated_at)
    VALUES (${[ENTRY.id, ENTRY.slug, ENTRY.title, ENTRY.eventName, ENTRY.entryDate, JSON.stringify(ENTRY.takeaways), ENTRY.feeling, JSON.stringify(ENTRY.tags), JSON.stringify(ENTRY.links)].map(sql).join(", ")}, ${now}, ${now})
    ON CONFLICT(id) DO UPDATE SET slug = excluded.slug, title = excluded.title, event_name = excluded.event_name,
@@ -76,7 +96,7 @@ const statements = [
 for (const [index, photo] of PHOTOS.entries()) {
   const processed = join(output, `${photo.id}.jpg`);
   run("magick", [
-    join(root, "seed-photos", photo.source),
+    join(root, photo.source),
     "-auto-orient",
     "-resize",
     "2000x2000>",
