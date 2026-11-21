@@ -1,0 +1,28 @@
+# Gitleaks configuration for the ryanlau1220 monorepo.
+# Extends the built-in ruleset and allowlists values that are public by design.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public, non-secret identifiers committed on purpose"
+# These live in tracked config (wrangler.jsonc, registry.ts) and are safe to expose:
+# Cloudflare D1 database IDs, the public Turnstile site key, Web Analytics beacon tokens,
+# and the Web3Forms public access key. Real secrets stay in untracked .dev.vars / Worker secrets.
+regexTarget = "match"
+regexes = [
+  # Cloudflare D1 database IDs (UUID v4) and the Web3Forms public access key.
+  '''9f5d850e-4b4c-4ce7-ba99-29450d22f933''',
+  '''90d53c65-166c-4c08-84d9-252aa53f3bac''',
+  '''4cf3d562-875e-40d3-aac8-04ad869ec935''',
+  # Cloudflare Turnstile public site key.
+  '''0x4AAAAAAD5OBIUxwrQ_UYo-''',
+  # Cloudflare Web Analytics beacon tokens (portfolio and diary).
+  '''2694e0f121d542d9baa344c450858c6f''',
+  '''97289c376353402a80a5366c9ece5508''',
+  '''0ab5adeef84e4988be00f174b9797ec6''',
+]
+paths = [
+  # Documented example files contain only placeholders.
+  '''.*\.dev\.vars\.example$''',
+  '''pnpm-lock\.yaml$''',
+]
