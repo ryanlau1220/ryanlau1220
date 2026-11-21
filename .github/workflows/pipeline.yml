@@ -112,19 +112,25 @@ jobs:
         run: pnpm run check
 
       - name: Install Playwright browser
-        if: needs.changes.outputs.portfolio == 'true'
+        if: needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true'
         run: pnpm --filter portfolio-app exec playwright install --with-deps chromium
 
       - name: Run portfolio browser smoke tests
         if: needs.changes.outputs.portfolio == 'true'
         run: pnpm --filter portfolio-app exec playwright test
 
+      - name: Run diary browser smoke tests
+        if: needs.changes.outputs.diary == 'true'
+        run: pnpm --filter diary-app exec playwright test
+
       - name: Upload browser test results
-        if: failure() && needs.changes.outputs.portfolio == 'true'
+        if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: portfolio-playwright-results
-          path: apps/portfolio/test-results/
+          name: playwright-results
+          path: |
+            apps/portfolio/test-results/
+            apps/diary/test-results/
           if-no-files-found: ignore
           retention-days: 7
 
