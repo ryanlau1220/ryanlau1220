@@ -6,7 +6,6 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.spec.ts",
-  globalSetup: "./tests/global-setup.ts",
   fullyParallel: true,
   workers: 2,
   forbidOnly: !!process.env.CI,
@@ -21,8 +20,11 @@ export default defineConfig({
     { name: "mobile-chromium", use: { ...devices["Pixel 5"] } },
   ],
   webServer: {
+    // Seed first, then start the server in the same shell. Playwright runs webServer and any
+    // globalSetup concurrently, and two wrangler processes initializing fresh local state at
+    // once deadlock on the SQLite lock — so the seed must finish before `wrangler dev` starts.
     command:
-      "pnpm exec wrangler dev --config dist/server/wrangler.json --persist-to .wrangler/state --local --ip 127.0.0.1 --port 3101 --inspector-port 9232 --log-level warn",
+      "node tests/seed-local.mjs && pnpm exec wrangler dev --config dist/server/wrangler.json --persist-to .wrangler/state --local --ip 127.0.0.1 --port 3101 --inspector-port 9232 --log-level warn",
     url: "http://127.0.0.1:3101",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
