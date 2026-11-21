@@ -8,6 +8,11 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # Wait after a release before opening a PR, so a bad or compromised version has time to
+    # surface. Longer for majors, which are reviewed by hand anyway.
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
     # One PR for routine minor/patch bumps; majors stay separate for manual review.
     groups:
       apps-minor-patch:
@@ -25,6 +30,8 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:

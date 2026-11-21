@@ -1,0 +1,32 @@
+name: Dependabot auto-merge
+
+# Enables GitHub's native auto-merge for low-risk Dependabot PRs. Auto-merge still waits for the
+# branch ruleset's required checks (Validate apps, Review dependencies, gitleaks, CodeQL) to pass,
+# so a failing update never lands. Major updates to runtime dependencies are left for manual
+# review, since tests do not catch every behavioural or visual regression.
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Fetch update metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+
+      - name: Enable auto-merge for low-risk updates
+        # Any patch/minor bump, plus GitHub Actions bumps (pinned by us, easy to revert).
+        # Excludes major bumps of npm runtime/dev dependencies.
+        if: |
+          steps.metadata.outputs.update-type != 'version-update:semver-major'
+          || steps.metadata.outputs.package-ecosystem == 'github_actions'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
