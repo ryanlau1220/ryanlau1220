@@ -1,0 +1,36 @@
+version: 2
+
+updates:
+  # pnpm workspace. The "npm" ecosystem reads the pnpm-lock.yaml in /apps.
+  - package-ecosystem: npm
+    directory: /apps
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # One PR for routine minor/patch bumps; majors stay separate for manual review.
+    groups:
+      apps-minor-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "ci(deps)"
