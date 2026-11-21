@@ -1,40 +1,12 @@
 name: Apps CI and production deploy
 
+# The `changes` job is the single source of truth for which app changed (see its filters).
+# Keeping event `paths` filters here too would duplicate that list in three places and drift.
 on:
   pull_request:
     branches: [main]
-    paths:
-      - "apps/portfolio/**"
-      - "apps/diary/**"
-      - "apps/packages/**"
-      - "apps/package.json"
-      - "apps/pnpm-lock.yaml"
-      - "apps/pnpm-workspace.yaml"
-      - "apps/turbo.json"
-      - "apps/biome.json"
-      - ".github/workflows/pipeline.yml"
-      - "!**/README.md"
-      - "!**/readme.md"
-      - "!apps/portfolio/SETUP.md"
-      - "!apps/portfolio/src/data/credential-logo-sources.md"
-      - "!apps/diary/SETUP.md"
   push:
     branches: [main]
-    paths:
-      - "apps/portfolio/**"
-      - "apps/diary/**"
-      - "apps/packages/**"
-      - "apps/package.json"
-      - "apps/pnpm-lock.yaml"
-      - "apps/pnpm-workspace.yaml"
-      - "apps/turbo.json"
-      - "apps/biome.json"
-      - ".github/workflows/pipeline.yml"
-      - "!**/README.md"
-      - "!**/readme.md"
-      - "!apps/portfolio/SETUP.md"
-      - "!apps/portfolio/src/data/credential-logo-sources.md"
-      - "!apps/diary/SETUP.md"
   workflow_dispatch:
 
 permissions:
@@ -60,7 +32,16 @@ jobs:
         id: filter
         uses: dorny/paths-filter@v4
         with:
+          # "some-with-excludes" lets the "!" doc patterns subtract, so a README or SETUP.md
+          # change never flags an app (the default "some" quantifier ignores exclusions).
+          predicate-quantifier: some-with-excludes
           filters: |
+            docs: &docs
+              - "!**/README.md"
+              - "!**/readme.md"
+              - "!apps/portfolio/SETUP.md"
+              - "!apps/portfolio/src/data/credential-logo-sources.md"
+              - "!apps/diary/SETUP.md"
             shared: &shared
               - "apps/packages/**"
               - "apps/package.json"
@@ -71,9 +52,11 @@ jobs:
               - ".github/workflows/pipeline.yml"
             portfolio:
               - *shared
+              - *docs
               - "apps/portfolio/**"
             diary:
               - *shared
+              - *docs
               - "apps/diary/**"
 
   validate:
