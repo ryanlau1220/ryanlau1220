@@ -94,8 +94,30 @@ jobs:
       - name: Lint, type-check, test, and build
         run: pnpm run check
 
-      - name: Install Playwright browser
+      - name: Resolve Playwright version
+        id: playwright
         if: needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true'
+        run: echo "version=$(pnpm --filter portfolio-app exec node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browser
+        id: playwright-cache
+        if: needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # The cache holds the browser binaries, not the apt system libraries, so always install deps.
+      - name: Install Playwright browser (cached)
+        if: |
+          (needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true')
+          && steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm --filter portfolio-app exec playwright install-deps chromium
+
+      - name: Install Playwright browser (full)
+        if: |
+          (needs.changes.outputs.portfolio == 'true' || needs.changes.outputs.diary == 'true')
+          && steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter portfolio-app exec playwright install --with-deps chromium
 
       - name: Run portfolio browser smoke tests
