@@ -18,7 +18,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # 1. Generate Profile Summary Cards
       - name: Generate profile summary cards
@@ -50,7 +50,7 @@ jobs:
 
       # 4. Atomically publish everything together to the output branch
       - name: Push all assets to output branch
-        uses: crazy-max/ghaction-github-pages@v4
+        uses: crazy-max/ghaction-github-pages@v5
         with:
           target_branch: output
           build_dir: profile-summary-card-output
