@@ -190,11 +190,20 @@ test("scrolling the page dismisses the globe card without clearing its filter", 
     .click();
   const details = page.locator(".fixed.inset-0").filter({ hasText: "Technology / Skill" });
   await expect(details).toBeVisible();
-  // The page uses scroll-behavior: smooth, so scrollIntoViewIfNeeded is still animating here.
-  // A wheel sent before that animation ends can be swallowed, so wait for the page to settle.
+  // Dismissal needs a wheel event followed by the page actually scrolling >24px within 1s.
+  // scroll-behavior: smooth and wheel absorption make a single wheel flaky, so settle the page,
+  // then wheel until scrollY has genuinely moved before asserting the card closed.
   await waitForScrollToSettle(page);
   await page.mouse.move(10, 200);
-  await page.mouse.wheel(0, 180);
+  const startScroll = await page.evaluate(() => window.scrollY);
+  // Retry the wheel until the page has genuinely scrolled >24px, the threshold the dismissal
+  // logic requires. One wheel is usually enough; retrying absorbs any swallowed event.
+  await expect
+    .poll(async () => {
+      await page.mouse.wheel(0, 200);
+      return page.evaluate(() => window.scrollY);
+    })
+    .toBeGreaterThan(startScroll + 24);
   await expect(details).toHaveCount(0);
   await expect(page.locator("#projects").getByText("Clear: TypeScript")).toBeAttached();
 });
