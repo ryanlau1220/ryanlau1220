@@ -20,8 +20,14 @@ test("visitors see no owner controls", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Sign out/ })).toHaveCount(0);
 });
 
-test("an anonymous request has no session", async ({ page }) => {
+test("an anonymous request has no owner session", async ({ page }) => {
   const response = await page.request.get("/api/auth/get-session");
-  expect(response.status()).toBe(200);
-  expect((await response.text()).trim()).toBe("null");
+  // Two valid shapes, depending on whether GitHub OAuth is configured in this environment:
+  // auth off -> the whole /api/auth surface 404s; auth on -> 200 with a null session.
+  // Either way a visitor holds no session.
+  if (response.status() === 200) {
+    expect((await response.text()).trim()).toBe("null");
+  } else {
+    expect(response.status()).toBe(404);
+  }
 });
