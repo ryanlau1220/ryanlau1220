@@ -21,6 +21,11 @@
       "bucket_name": "diary-photos"
     }
   ],
+  // Workers Logs: keeps request logs, console output, and errors for 7 days, searchable in the
+  // dashboard (Workers > this Worker > Observability). On the Free plan Cloudflare simply stops
+  // storing once the daily allowance is used; on Paid, usage beyond the included amount is billed.
+  // Lower head_sampling_rate (1 = every request) if traffic ever grows.
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
   // Public, non-secret values. Local .dev.vars overrides them during `pnpm dev`.
   "vars": {
     "SITE_URL": "https://diary.ryanlau1220.dev",
