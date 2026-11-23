@@ -2,3 +2,11 @@ packages:
   - "portfolio"
   - "diary"
   - "packages/*"
+
+# Refuse package versions published less than 7 days ago (10080 minutes) when pnpm resolves
+# dependencies. This matches the 7-day cooldown in .github/dependabot.yml. Dependabot applies its
+# cooldown to pnpm in strict mode, so one younger entry anywhere in pnpm-lock.yaml makes every
+# npm update fail. Keeping our own installs inside the same window prevents that.
+# `pnpm install --frozen-lockfile` (CI) is unaffected. For an urgent fix that is younger than the
+# window, list the package under `minimumReleaseAgeExclude`.
+minimumReleaseAge: 10080
