@@ -5,6 +5,7 @@
 // state at once (that race deadlocks on the SQLite lock). Independent of scripts/seed.mjs,
 // which needs ImageMagick and real photos and so cannot run on a clean CI runner.
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -19,7 +20,30 @@ function wrangler(args) {
 const sql = (value) => `'${value.replace(/'/g, "''")}'`;
 const now = Date.now();
 
+// Fake signed-in users for the owner-access tests. The owner's GitHub ID comes from test.env, so
+// the server's owner check matches; the stranger is a signed-in GitHub user who is NOT the owner.
+const identities = JSON.parse(readFileSync(new URL("identities.json", import.meta.url), "utf8"));
+const ownerGithubId = /^OWNER_GITHUB_ID="(.*)"$/m.exec(
+  readFileSync(new URL("test.env", import.meta.url), "utf8"),
+)[1];
+const people = [
+  { key: "owner", githubId: ownerGithubId, ...identities.owner },
+  { key: "stranger", ...identities.stranger },
+];
+const sessionExpiry = now + 30 * 24 * 60 * 60 * 1000;
+const peopleSql = people.flatMap((person) => [
+  `INSERT OR REPLACE INTO user (id, name, email, email_verified, created_at, updated_at)
+   VALUES (${sql(`e2e-${person.key}-user`)}, ${sql(person.name)}, ${sql(`${person.name}@example.invalid`)}, 1, ${now}, ${now});`,
+  `INSERT OR REPLACE INTO account (id, account_id, provider_id, user_id, created_at, updated_at)
+   VALUES (${sql(`e2e-${person.key}-account`)}, ${sql(person.githubId)}, 'github', ${sql(`e2e-${person.key}-user`)}, ${now}, ${now});`,
+  `INSERT OR REPLACE INTO session (id, expires_at, token, user_id, created_at, updated_at)
+   VALUES (${sql(`e2e-${person.key}-session`)}, ${sessionExpiry}, ${sql(person.sessionToken)}, ${sql(`e2e-${person.key}-user`)}, ${now}, ${now});`,
+]);
+
 const seedSql = [
+  // Pages created by earlier owner tests (their slugs start with "e2e-"), so reruns start clean.
+  `DELETE FROM entries WHERE slug LIKE 'e2e-%';`,
+  ...peopleSql,
   `DELETE FROM photos WHERE entry_id = ${sql(ENTRY_ID)};`,
   `INSERT INTO entries (id, slug, title, event_name, entry_date, takeaways, feeling, tags, links, created_at, updated_at)
    VALUES (${sql(ENTRY_ID)}, 'placeholder-event', 'Placeholder Event', 'Placeholder Event', '2026-11-18',

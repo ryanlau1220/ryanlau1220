@@ -1,0 +1,8 @@
+{
+  "owner": { "name": "e2e-owner", "sessionToken": "e2e-owner-session-token" },
+  "stranger": {
+    "name": "e2e-stranger",
+    "githubId": "999999999",
+    "sessionToken": "e2e-stranger-session-token"
+  }
+}
